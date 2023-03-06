@@ -31,6 +31,8 @@ int main()
     int bufferSize = 1024;
     char buffer[bufferSize];
 
+    (void)buffer;
+    (void)bufferSize;
     //-- Socket()
     //-- Creation du socket 
     //  --> store the file descriptor returned by the socket : create a communication socket
@@ -45,11 +47,6 @@ int main()
         exit(EXIT_FAILURE);
     }
     std::cout << BOLD_YELLOW  << "Socket server created successfully" << RESET << std::endl;
-
-    //-- Fill pollfd array 
-    std::vector<pollfd> pollfdArray;
-    pollfd server_pollfd = { serverFd, POLLIN, 0};
-    pollfdArray.push_back(server_pollfd);
 
     //-- BIND
     //-- Enable to specify IP adress and Port Number to which the socket 
