@@ -20,7 +20,6 @@
 #define PORT 6697
 
 
-
 int main()
 {
     //-- Server Process 
@@ -31,8 +30,6 @@ int main()
     int bufferSize = 1024;
     char buffer[bufferSize];
 
-    (void)buffer;
-    (void)bufferSize;
     //-- Socket()
     //-- Creation du socket 
     //  --> store the file descriptor returned by the socket : create a communication socket
@@ -55,22 +52,23 @@ int main()
 
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(PORT);
+    std::cout << "Port: " << serverAddr.sin_port << std::endl;
     serverAddr.sin_addr.s_addr = htonl(INADDR_ANY); // put automatic IP Adress
     // std::cout << "IP adress du server a transmettre au client: " << htonl(INADDR_ANY) << std:: endl;
 
     //-- Bind()
     if ( bind(serverFd, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0)
     {
-        std::cout << BOLD_RED << "Error while bindind socket to Port 8080" << RESET << std::endl;
+        std::cout << BOLD_RED << "Error while bindind socket to Port " << PORT << RESET << std::endl;
         exit(EXIT_FAILURE);
     }
-    std::cout << BOLD_YELLOW  << "Socket bind successfully to port 8080" << RESET << std::endl;
+    std::cout << BOLD_YELLOW  << "Socket bind successfully to port " << PORT << RESET << std::endl;
     
     //-- Listen() --> wait for the client to approach the server to make a connection.
     // int listen(int sockfd, int backlog);
     // -- backlog == maximum 
     // SOMAXCONN defines the maximum number you're allowed to pass to listen().
-    if (listen(serverFd, SOMAXCONN) < 0)
+    if (listen(serverFd, 5) < 0)
     {
         std::cout << BOLD_RED << "Error while listening" << RESET << std::endl;
         exit(EXIT_FAILURE);    
@@ -85,12 +83,25 @@ int main()
         std::cout << BOLD_RED << "Error while accepting connection" << RESET << std::endl;
         exit(EXIT_FAILURE);     
     }
+
     std::cout << BOLD_GREEN  << "Server catch connection" << RESET << std::endl;
 
-    //-- read // wwrite : communication between processes
+    //-- Receive message from client
+    //-- Parsing des command here ? 
+    //-- Dans quoi stocker les commandes + clear le buffer at each time 
+    recv(clientFd, buffer, bufferSize, 0);
+    std::cout << "Message from client: " << buffer << std::endl;
+
+    //-- send message to the connection 
+    std::string response = "Message from server: bien reçu\n";
+    send(clientFd, response.c_str(), response.size(), 0);
+
     //-- CLOSE 
+    close (clientFd);
+    close (serverFd);
 
     return (0);
 }
 
-
+//-- listen server avec nc : nc -l -p 8080
+//-- 
