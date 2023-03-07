@@ -17,7 +17,7 @@
 #include "colors.hpp"
 
 //-- Defines
-#define PORT 6697
+#define PORT 5898
 
 
 int main()
@@ -30,6 +30,7 @@ int main()
     int bufferSize = 1024;
     char buffer[bufferSize];
 
+    memset(buffer, 0, bufferSize);
     //-- Socket()
     //-- Creation du socket 
     //  --> store the file descriptor returned by the socket : create a communication socket
@@ -88,9 +89,15 @@ int main()
 
     //-- Receive message from client
     //-- Parsing des command here ? 
-    //-- Dans quoi stocker les commandes + clear le buffer at each time 
-    recv(clientFd, buffer, bufferSize, 0);
-    std::cout << "Message from client: " << buffer << std::endl;
+    //-- Dans quoi stocker les commandes + clear le buffer at each time
+
+    size_t responseSize = recv(clientFd, buffer, bufferSize -1, 0);
+
+    std::cout << "Message from client: " << buffer << "size = " << responseSize << std::endl;
+
+
+    //-- Gerer la creation de channels
+    //--> begin with & or #  character => its name can't contain more than 200 characters
 
     //-- send message to the connection 
     std::string response = "Message from server: bien reçu\n";
