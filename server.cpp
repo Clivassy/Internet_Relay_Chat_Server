@@ -1,35 +1,30 @@
 
-//-- Official libraries
-#include <iostream>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <netdb.h>
-#include <poll.h>
-#include <vector>
-
 //-- Personnal Libraries 
 #include "colors.hpp"
-
-//-- Defines
-#define PORT 5898
+#include "server.hpp"
 
 
-int main()
+int main(int ac, char **av)
 {
-    //-- Server Process 
-    //-- Vector to handle multiple connection to the server  
+    if (ac != 3)
+    {
+        std::cout << BOLD_RED << "Wrong input arguments" << std::endl;
+        std::cout << "Ex: ./ircserv [port] [password]" << RESET << std::endl;
+        exit(EXIT_FAILURE);
+    }
 
+    //--- MINI PARSING ARG ---------------//
+    // checker si av[1] == port 
+    // checker si av[2] == password
+    //-------------------------------------//
+    
+    Server _server;
     int serverFd;
     int clientFd;
     int bufferSize = 1024;
     char buffer[bufferSize];
 
+    _server.port = atoi(av[1]);
     memset(buffer, 0, bufferSize);
     //-- Socket()
     //-- Creation du socket 
@@ -49,10 +44,12 @@ int main()
     //-- BIND
     //-- Enable to specify IP adress and Port Number to which the socket 
     //-- must be linked to communicate.
+
+    //--> avant le bind, fonction d'initialisation pr attributs server
     struct sockaddr_in  serverAddr;
 
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(PORT);
+    serverAddr.sin_port = htons(_server.port);
     std::cout << "Port: " << serverAddr.sin_port << std::endl;
     serverAddr.sin_addr.s_addr = htonl(INADDR_ANY); // put automatic IP Adress
     // std::cout << "IP adress du server a transmettre au client: " << htonl(INADDR_ANY) << std:: endl;
@@ -60,10 +57,10 @@ int main()
     //-- Bind()
     if ( bind(serverFd, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0)
     {
-        std::cout << BOLD_RED << "Error while bindind socket to Port " << PORT << RESET << std::endl;
+        std::cout << BOLD_RED << "Error while bindind socket to Port " << _server.port << RESET << std::endl;
         exit(EXIT_FAILURE);
     }
-    std::cout << BOLD_YELLOW  << "Socket bind successfully to port " << PORT << RESET << std::endl;
+    std::cout << BOLD_YELLOW  << "Socket bind successfully to port " << _server.port << RESET << std::endl;
     
     //-- Listen() --> wait for the client to approach the server to make a connection.
     // int listen(int sockfd, int backlog);
@@ -90,16 +87,27 @@ int main()
     //-- Receive message from client
     //-- Parsing des command here ? 
     //-- Dans quoi stocker les commandes + clear le buffer at each time
-
-    size_t responseSize = recv(clientFd, buffer, bufferSize -1, 0);
-
-    std::cout << "Message from client: " << buffer << "size = " << responseSize << std::endl;
-
+    size_t responseSize = 1;
+    std::string msg("");
+     while (responseSize > 0){
+        std::cout << "debut loop" << responseSize << std::endl;
+        responseSize = recv(clientFd, buffer, bufferSize -1, 0);
+        if ( responseSize > 0)
+        msg += buffer;
+        std::cout << "Buffer: " << buffer << std::endl;
+        // std::cout << "Message from client: " << msg << "size = " << responseSize << std::endl;
+        std::cout << "fin loop" << responseSize << std::endl;
+    }
+    std::cout << "Message from client: " << msg << "size = " << responseSize << std::endl;
+    
+    //size_t responseSize = recv(clientFd, buffer, bufferSize -1, 0);
+    //std::cout << "Message from client: " << buffer << "size = " << responseSize << std::endl;
 
     //-- Gerer la creation de channels
     //--> begin with & or #  character => its name can't contain more than 200 characters
 
     //-- send message to the connection 
+    std::cout << "here -> " << std::endl;
     std::string response = "Message from server: bien reçu\n";
     send(clientFd, response.c_str(), response.size(), 0);
 
