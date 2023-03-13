@@ -65,13 +65,15 @@ class Server
 		{
 			int i = 0; // limite pour eviter de kill process en debug, TBD mettre loop infinie
 			// TBD redefinir ctrl+C pour close les fd (evite de bloquer les ports en debug)
-			while(i < 3)
+			while(i < 8)
 			{
 				std::cout << BOLD_BLUE<< "loop step " + std::to_string(i) + "\n" << RESET << std::endl;
 
 				// ecoute nouvelle connection (accept) -> ajout client si nouvelle connexion entrante
 
 				// ecoute des clients (poll) -> lancement commande si message recu 
+					// parsing command
+					// execution command
 
 
 

@@ -3,7 +3,8 @@
 NAME = ircserv
 
 # Sources
-SRCS = ./server.cpp
+#SRCS = ./server.cpp
+SRCS = ./server_old.cpp
 
 
 # Header/s
