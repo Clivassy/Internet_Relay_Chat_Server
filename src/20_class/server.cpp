@@ -61,10 +61,6 @@ void Server::run()
 	int i = 0; // limite pour eviter de kill process en debug, TBD mettre loop infinie
 	// TBD redefinir ctrl+C pour close les fd (evite de bloquer les ports en debug)
 	
-	//std::vector<pollfd> fd_listened;
-	//fd_listened.push_back(pollfd());
-	//fd_listened[0].fd = this->serverFd;
-	//fd_listened[0].events = POLLIN;
 	int pollreturn = -1;
 	while (i < 3)
 	{
@@ -85,18 +81,18 @@ void Server::run()
 			std::cout << "poll events: " << fd_listened[0].events << RESET << std::endl;
 			std::cout << "poll revents: " << fd_listened[0].revents << RESET << std::endl;
 			// call fonction pour gérer event (julia)
+			// ecoute nouvelle connection (accept) -> ajout client si nouvelle connexion entrante
 
+			// ecoute des clients (poll) -> lancement commande si message recu
+			// parsing command
+			// execution command
 		}
 		if(pollreturn == 0) // TBD bloc pour debug, mais inutile a la fin
 		{
 			std::cout << "delay expired" << std::endl;
 		}
 
-		// ecoute nouvelle connection (accept) -> ajout client si nouvelle connexion entrante
 
-		// ecoute des clients (poll) -> lancement commande si message recu
-		// parsing command
-		// execution command
 
 		// temporisation pour debug (TBD a enlever a la fin)
 		sleep(1); // sleep 1s
