@@ -14,6 +14,8 @@ class Server
 		int					socketFd;
 		int					serverFd;
 		struct sockaddr_in	serverAddr;
+		std::vector<pollfd> fd_listened;
+
 		//TBD 
 		// ajouter tableau de client
 		// tableau de pollfd
