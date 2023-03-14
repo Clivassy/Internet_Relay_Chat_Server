@@ -17,6 +17,8 @@
 # include <map>
 
 # define BUFFER_SIZE 1024
+# define LISTENING_TIMEOUT 10000 // delai d'ecoute dans poll() en ms
+
 #include "20_class/server.hpp"
 
 
