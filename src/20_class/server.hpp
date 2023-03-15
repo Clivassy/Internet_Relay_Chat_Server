@@ -27,6 +27,9 @@ class Server
 		void set_password(std::string password);
 		void init();
 		void run();
+		void manage_poll_event();
+		void listen_client(pollfd& client_pollfd);
+
 		void terminate();
 };
 

@@ -80,24 +80,60 @@ void Server::run()
 			std::cout << "poll return: " << pollreturn << RESET << std::endl;
 			std::cout << "poll events: " << fd_listened[0].events << RESET << std::endl;
 			std::cout << "poll revents: " << fd_listened[0].revents << RESET << std::endl;
-			// call fonction pour gérer event (julia)
-			// ecoute nouvelle connection (accept) -> ajout client si nouvelle connexion entrante
+			// debug pour retirer event sur fd[0]
+				//this->fd_listened.push_back(pollfd());
+				//struct sockaddr_in clientAddr;
+				//socklen_t clientSize = sizeof(clientAddr);
+				//this->fd_listened[1].fd = accept(serverFd,(struct sockaddr *)&clientAddr, &clientSize);
+				//this->fd_listened[1].events = POLLIN; // event attendu = POLLIN
+				//size_t responseSize = 1;
 
-			// ecoute des clients (poll) -> lancement commande si message recu
-			// parsing command
-			// execution command
+				//this->manage_poll_event();
+
+
 		}
-		if(pollreturn == 0) // TBD bloc pour debug, mais inutile a la fin
+		if(pollreturn == 0) // TBD bloc pour debug, mais a supprimer car inutile a la fin
 		{
 			std::cout << "delay expired" << std::endl;
 		}
-
-
 
 		// temporisation pour debug (TBD a enlever a la fin)
 		sleep(1); // sleep 1s
 		i++;
 	}
+}
+
+void Server::manage_poll_event()
+{
+	for (std::vector<pollfd>::iterator it = this->fd_listened.begin(); it != this->fd_listened.end(); it++)
+	{
+		if (it->revents == POLLIN)
+		{
+			if (it == this->fd_listened.begin())
+			{
+				// Fonction Julia pour ajout nouveau client
+					//while(responseSize > 0)
+					//{
+					//	responseSize = recv(this->fd_listened[0].fd, this->buffer, this->bufferSize -1, 0);
+						
+					//	std::cout << "responseSize: " << responseSize << RESET << std::endl;
+					//	std::cout << "buffer: " << buffer << RESET << std::endl;
+					//}
+
+			}
+			else
+			{
+				this->listen_client(*it);
+			}
+		}
+
+		
+	}
+}
+
+void Server::listen_client(pollfd& client_pollfd)
+{
+	// ecoute client et lancement commande
 }
 
 void Server::terminate()
