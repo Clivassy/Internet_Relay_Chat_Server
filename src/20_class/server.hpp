@@ -31,8 +31,8 @@ class Server
 		int			port;
 		std::string	password;
 
-		const int			bufferSize;
-		char				buffer[BUFFER_SIZE];
+		//const int			bufferSize;
+		//char				buffer[BUFFER_SIZE];
 		int					socketFd;
 		int					serverFd;
 		struct sockaddr_in	serverAddr;
@@ -52,8 +52,8 @@ class Server
 		void run();
 		void manage_poll_event();
 		void addNewClient();
-		void authentication(Client &client);
-		void listen_client(pollfd& client_pollfd);
+		void listen_client(Client &client);
+		Client& getClient(int fd);
 
 		void terminate();
 };

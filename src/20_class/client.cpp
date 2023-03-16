@@ -1,8 +1,13 @@
 #include "client.hpp"
 
-Client::Client(){ }
+Client::Client():
+bufferSize(BUFFER_SIZE), is_authentified(false)
+{
+}
 
 Client::~Client(){ }
+
+
 /*
 void    Client::fillDataUser(Client &client, std::string token, char sep)
 {

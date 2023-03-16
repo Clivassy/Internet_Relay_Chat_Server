@@ -19,6 +19,7 @@
 # include "../10_tools/colors.hpp"
 
 
+# define BUFFER_SIZE 1024
 
 
 class Client {
@@ -55,5 +56,10 @@ class Client {
         socklen_t clientSize;
         User userInfos;
         std::vector<std::string> cmd;
+		const int			bufferSize;
+		char				buffer[BUFFER_SIZE];
+   		std::string UserInfos;
+		bool is_authentified;
+
 };
 #endif

@@ -2,12 +2,21 @@
 // TBD passer class dans fichiers .cpp et .hpp a part
 
 
-Server::Server():
-bufferSize(BUFFER_SIZE)
+Server::Server()
+//bufferSize(BUFFER_SIZE)
 {
 
 }
 
+Client& Server::getClient(int fd)
+{
+	for (std::vector<Client>::iterator it = this->clientList.begin(); it != this->clientList.end(); it++)
+		{
+			if (it->socketFd == fd)
+				return (*it);
+		}
+	std::cout << "fd non trouve dans getclient " << std::endl;
+}
 
 void Server::set_port(int port)
 {
@@ -21,7 +30,7 @@ void Server::set_password(std::string password)
 
 void Server::init()
 {
-	memset(this->buffer, 0, bufferSize); // TBD voir si il faut pas remplir de bufferS0ze * sizeof(int)
+	//memset(this->buffer, 0, bufferSize); // TBD voir si il faut pas remplir de bufferS0ze * sizeof(int)
 	this->serverFd = socket(AF_INET, SOCK_STREAM, 0);
 	if (this->serverFd < 0)
 	{
@@ -58,15 +67,22 @@ void Server::init()
 
 void Server::run()
 {
+	this->fdListened.reserve(100);
+
 	int i = 0; // limite pour eviter de kill process en debug, TBD mettre loop infinie
 	// TBD redefinir ctrl+C pour close les fd (evite de bloquer les ports en debug)
 	
 	int pollreturn = -1;
-	while (i < 3)
+	while (i < 7)
 	{
 		std::cout << BOLD_BLUE << "loop step " << i << RESET << std::endl;
 		std::cout << "Ecoute pollfd " << RESET << std::endl;
 		pollreturn = poll(&(this->fdListened[0]), this->fdListened.size(), LISTENING_TIMEOUT);
+		for (std::vector<pollfd>::iterator it = this->fdListened.begin(); it != this->fdListened.end(); it++)
+		{
+			std::cout << "it->revents: " << it->fd << " / " << it->revents << std::endl;
+
+		}
 		if(pollreturn < 0)
 		{
 			std::cout << BOLD_RED << "Error with poll()" << std::endl;
@@ -76,21 +92,7 @@ void Server::run()
 		}
 		if(pollreturn > 0)
 		{
-			std::cout << "poll event detected: " << pollreturn << RESET << std::endl;
-			std::cout << "poll return: " << pollreturn << RESET << std::endl;
-			std::cout << "poll events: " << fdListened[0].events << RESET << std::endl;
-			std::cout << "poll revents: " << fdListened[0].revents << RESET << std::endl;
-			// debug pour retirer event sur fd[0]
-				//this->fdListened.push_back(pollfd());
-				//struct sockaddr_in clientAddr;
-				//socklen_t clientSize = sizeof(clientAddr);
-				//this->fdListened[1].fd = accept(serverFd,(struct sockaddr *)&clientAddr, &clientSize);
-				//this->fdListened[1].events = POLLIN; // event attendu = POLLIN
-				//size_t responseSize = 1;
-
-				this->manage_poll_event();
-
-
+			this->manage_poll_event();
 		}
 		if(pollreturn == 0) // TBD bloc pour debug, mais a supprimer car inutile a la fin
 		{
@@ -108,7 +110,6 @@ void Server::manage_poll_event()
 	this->fdListened.reserve(this->fdListened.size() + 1);
 	for (std::vector<pollfd>::iterator it = this->fdListened.begin(); it != this->fdListened.end(); it++)
 	{
-		std::cout << "it->revents: " << it->fd << " / " << it->revents << std::endl;
 		if (it->revents == POLLIN)
 		{
 			if (it == this->fdListened.begin())
@@ -127,7 +128,7 @@ void Server::manage_poll_event()
 			}
 			else
 			{
-				this->listen_client(*it);
+				this->listen_client(this->getClient(it->fd));
 			}
 		}
 
@@ -152,21 +153,49 @@ void Server::addNewClient()
 	this->clientList.push_back(newClient);
 
 	this->fdListened.push_back(pollfd());
-	(this->fdListened.end())->fd = newClient.socketFd;
-	(this->fdListened.end())->events = POLLIN; // event attendu = POLLIN
+	//this->fdListened[1].fd = newClient.socketFd;
+	(--this->fdListened.end())->fd = newClient.socketFd;
+	(--this->fdListened.end())->events = POLLIN; // event attendu = POLLIN
 
-	this->authentication(*this->clientList.end());
+	//this->authentication(*(--this->clientList.end()));
 }
 
-void Server::authentication(Client &client)
+void Server::listen_client(Client &client)
 {
-	std::cout << "authent\n";
+	std::cout << "listen\n";
+	if (!client.is_authentified)
+	{
+		recv(client.socketFd, client.buffer, client.bufferSize - 1, 0);
+		client.UserInfos += client.buffer;
+
+		std::cout << client.UserInfos << std::endl;
+		
+		std::string answer = ":ybellot!ybellot@ybellot 001 ybellot :Welcome to the Internet Relay Network ybellot!ybellot@locahost\r\n";
+		//std::cout << answer;
+		send(client.socketFd, answer.c_str(), answer.size(), 0);
+		client.is_authentified = true;
+		client.UserInfos.clear();
+	}
+	else
+	{
+		recv(client.socketFd, client.buffer, client.bufferSize - 1, 0);
+		client.UserInfos += client.buffer;
+		std::cout << client.UserInfos << std::endl;
+		client.UserInfos.clear();
+
+
+
+
+	}
+
+
+
 }
-void Server::listen_client(pollfd& client_pollfd)
-{
-	std::cout << "lsiten\n";
-	// ecoute client et lancement commande
-}
+
+//void Server::listen_client(pollfd& client_pollfd)
+//{
+//	// ecoute client et lancement commande
+//}
 
 void Server::terminate()
 {
