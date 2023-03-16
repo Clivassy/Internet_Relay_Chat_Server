@@ -48,10 +48,10 @@ void Server::init()
 		std::cout << RESET << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	// ajout du fd server dans fd_listened
-	this->fd_listened.push_back(pollfd());
-	this->fd_listened[0].fd = this->serverFd;
-	this->fd_listened[0].events = POLLIN; // event attendu = POLLIN
+	// ajout du fd server dans fdListened
+	this->fdListened.push_back(pollfd());
+	this->fdListened[0].fd = this->serverFd;
+	this->fdListened[0].events = POLLIN; // event attendu = POLLIN
 
 	// TBD fonction pour print les attributs du server
 }
@@ -66,7 +66,7 @@ void Server::run()
 	{
 		std::cout << BOLD_BLUE << "loop step " << i << RESET << std::endl;
 		std::cout << "Ecoute pollfd " << RESET << std::endl;
-		pollreturn = poll(&(this->fd_listened[0]), this->fd_listened.size(), LISTENING_TIMEOUT);
+		pollreturn = poll(&(this->fdListened[0]), this->fdListened.size(), LISTENING_TIMEOUT);
 		if(pollreturn < 0)
 		{
 			std::cout << BOLD_RED << "Error with poll()" << std::endl;
@@ -78,17 +78,17 @@ void Server::run()
 		{
 			std::cout << "poll event detected: " << pollreturn << RESET << std::endl;
 			std::cout << "poll return: " << pollreturn << RESET << std::endl;
-			std::cout << "poll events: " << fd_listened[0].events << RESET << std::endl;
-			std::cout << "poll revents: " << fd_listened[0].revents << RESET << std::endl;
+			std::cout << "poll events: " << fdListened[0].events << RESET << std::endl;
+			std::cout << "poll revents: " << fdListened[0].revents << RESET << std::endl;
 			// debug pour retirer event sur fd[0]
-				//this->fd_listened.push_back(pollfd());
+				//this->fdListened.push_back(pollfd());
 				//struct sockaddr_in clientAddr;
 				//socklen_t clientSize = sizeof(clientAddr);
-				//this->fd_listened[1].fd = accept(serverFd,(struct sockaddr *)&clientAddr, &clientSize);
-				//this->fd_listened[1].events = POLLIN; // event attendu = POLLIN
+				//this->fdListened[1].fd = accept(serverFd,(struct sockaddr *)&clientAddr, &clientSize);
+				//this->fdListened[1].events = POLLIN; // event attendu = POLLIN
 				//size_t responseSize = 1;
 
-				//this->manage_poll_event();
+				this->manage_poll_event();
 
 
 		}
@@ -105,16 +105,20 @@ void Server::run()
 
 void Server::manage_poll_event()
 {
-	for (std::vector<pollfd>::iterator it = this->fd_listened.begin(); it != this->fd_listened.end(); it++)
+	this->fdListened.reserve(this->fdListened.size() + 1);
+	for (std::vector<pollfd>::iterator it = this->fdListened.begin(); it != this->fdListened.end(); it++)
 	{
+		std::cout << "it->revents: " << it->fd << " / " << it->revents << std::endl;
 		if (it->revents == POLLIN)
 		{
-			if (it == this->fd_listened.begin())
+			if (it == this->fdListened.begin())
 			{
+				this->addNewClient();
+
 				// Fonction Julia pour ajout nouveau client
 					//while(responseSize > 0)
 					//{
-					//	responseSize = recv(this->fd_listened[0].fd, this->buffer, this->bufferSize -1, 0);
+					//	responseSize = recv(this->fdListened[0].fd, this->buffer, this->bufferSize -1, 0);
 						
 					//	std::cout << "responseSize: " << responseSize << RESET << std::endl;
 					//	std::cout << "buffer: " << buffer << RESET << std::endl;
@@ -131,19 +135,47 @@ void Server::manage_poll_event()
 	}
 }
 
+void Server::addNewClient()
+{
+	Client newClient;
+
+
+	//-- Tentative d'acceptation du nouveau client
+	newClient.clientSize = sizeof(newClient.clientAddr);
+	std::cout << "check fd" << this->fdListened[0].fd << std::endl;
+	if ((newClient.socketFd = accept(this->fdListened[0].fd, (struct sockaddr *)&newClient.clientAddr, &newClient.clientSize)) < 0)
+	{
+		perror("accept");
+		std::cout << BOLD_RED << "Error while accepting connection" << RESET << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	this->clientList.push_back(newClient);
+
+	this->fdListened.push_back(pollfd());
+	(this->fdListened.end())->fd = newClient.socketFd;
+	(this->fdListened.end())->events = POLLIN; // event attendu = POLLIN
+
+	this->authentication(*this->clientList.end());
+}
+
+void Server::authentication(Client &client)
+{
+	std::cout << "authent\n";
+}
 void Server::listen_client(pollfd& client_pollfd)
 {
+	std::cout << "lsiten\n";
 	// ecoute client et lancement commande
 }
 
 void Server::terminate()
 {
 	//close(this->serverFd);
-	while(this->fd_listened.size() > 0)
+	while(this->fdListened.size() > 0)
 	{
-		std::cout << BOLD_YELLOW << "Close fd " << (*(--(this->fd_listened.end()))).fd << RESET << std::endl;
-		close((*(--(this->fd_listened.end()))).fd); // close last fd
-		this->fd_listened.pop_back(); // remove last fd
+		std::cout << BOLD_YELLOW << "Close fd " << (*(--(this->fdListened.end()))).fd << RESET << std::endl;
+		close((*(--(this->fdListened.end()))).fd); // close last fd
+		this->fdListened.pop_back(); // remove last fd
 	}
 }
 

@@ -16,10 +16,9 @@
 # include <vector>
 # include <map>
 
-# define BUFFER_SIZE 1024
-# define LISTENING_TIMEOUT 10000 // delai d'ecoute dans poll() en ms
 
 #include "20_class/server.hpp"
+//#include "20_class/client.hpp"
 
 
 //-- Personnal Libraries 
@@ -28,6 +27,8 @@
 // proto class
 class Server;
 
+
+// parsing_argv
 void parsing_arguments(int ac, char **av, Server& server);
 
 #endif 
