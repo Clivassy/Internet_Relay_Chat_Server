@@ -7,6 +7,24 @@ bufferSize(BUFFER_SIZE), is_authentified(false)
 
 Client::~Client(){ }
 
+std::vector<std::string>    splitCommand(std::string toSplit, char sep)
+{
+	std::vector<std::string> tokenList;
+	std::stringstream split(toSplit);
+	std::string token;
+
+	while (getline(split, token, sep))
+	{
+		tokenList.push_back(token);
+		//std::cout << BLUE << token << std::endl;
+	}
+	return (tokenList);
+}
+
+void    Client::fillDataUser(Client &client, std::string token, char sep)
+{
+	std::vector<std::string> informations;
+}
 /*
 	PREALABLE:
 	

@@ -16,6 +16,7 @@
 # include <poll.h>
 # include <vector>
 # include <map>
+#include  <sstream>
 # include "../10_tools/colors.hpp"
 
 
@@ -31,6 +32,7 @@ class Client {
         std::string serverName;
         std::string realName;
         std::string userMessage;
+
     };
     public:
         Client();
@@ -52,14 +54,17 @@ class Client {
 
     // protected:
         int socketFd;
-        struct sockaddr_in clientAddr;
-        socklen_t clientSize;
-        User userInfos;
-        std::vector<std::string> cmd;
-		const int			bufferSize;
-		char				buffer[BUFFER_SIZE];
-   		std::string UserInfos;
-		bool is_authentified;
+        struct sockaddr_in          clientAddr;
+        socklen_t                   clientSize;
+        User                        userInfos;
+        std::vector<std::string>    cmd;
+		const int			        bufferSize;
+		char				        buffer[BUFFER_SIZE];
+   		std::string                 UserInfos;
+		bool                        is_authentified;
 
 };
+
+    std::vector<std::string>    splitCommand(std::string toSplit, char sep);
+
 #endif
