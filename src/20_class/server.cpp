@@ -156,9 +156,10 @@ void Server::addNewClient()
 	//this->fdListened[1].fd = newClient.socketFd;
 	(--this->fdListened.end())->fd = newClient.socketFd;
 	(--this->fdListened.end())->events = POLLIN; // event attendu = POLLIN
-
 	//this->authentication(*(--this->clientList.end()));
 }
+
+
 
 void Server::listen_client(Client &client)
 {
