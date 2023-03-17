@@ -37,7 +37,10 @@ class Client {
     public:
         Client();
         ~Client(); 
-        void    fillDataUser(Client &client, std::string token, char sep);
+        void    fillDataUser( void );
+        void    sendResponse( void );
+        bool    getNickName( std::string toSplit );
+        bool    getUserInfos( std::string toSplit);
         //-- Getters
         //std::string    getUserName( void );
         //std::string    gethostName( void );
@@ -57,14 +60,15 @@ class Client {
         struct sockaddr_in          clientAddr;
         socklen_t                   clientSize;
         User                        userInfos;
-        std::vector<std::string>    cmd;
+        //std::vector<std::string>    cmd;
 		const int			        bufferSize;
 		char				        buffer[BUFFER_SIZE];
-   		std::string                 UserInfos;
+   		std::string                 authentification;
+        std::string                 cmd;
 		bool                        is_authentified;
 
 };
-
+    std::string                 removeLines(std::string);
     std::vector<std::string>    splitCommand(std::string toSplit, char sep);
 
 #endif

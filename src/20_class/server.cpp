@@ -167,25 +167,21 @@ void Server::listen_client(Client &client)
 	if (!client.is_authentified)
 	{
 		recv(client.socketFd, client.buffer, client.bufferSize - 1, 0);
-		client.UserInfos += client.buffer;
+		client.authentification += client.buffer;
 
-		std::cout << client.UserInfos << std::endl;
-		
-		std::string answer = ":ybellot!ybellot@ybellot 001 ybellot :Welcome to the Internet Relay Network ybellot!ybellot@locahost\r\n";
-		//std::cout << answer;
-		send(client.socketFd, answer.c_str(), answer.size(), 0);
-		client.is_authentified = true;
-		client.UserInfos.clear();
+		std::cout << client.authentification << std::endl;
+	
+		client.fillDataUser();
+		client.sendResponse();
+
+		client.authentification.clear();
 	}
 	else
 	{
 		recv(client.socketFd, client.buffer, client.bufferSize - 1, 0);
-		client.UserInfos += client.buffer;
-		std::cout << client.UserInfos << std::endl;
-		client.UserInfos.clear();
-
-
-
+		client.cmd += client.buffer;
+		std::cout << client.cmd << std::endl;
+		client.cmd.clear();
 
 	}
 
