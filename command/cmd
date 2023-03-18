@@ -2,10 +2,13 @@
  - NICK
  - USER
  - PING
- - PONG
  - OPER
  - QUIT
  - JOIN
  - PART
  - PRIVMSG
- - ERROR
+ - NOTICE
+ - MODE
+ - INVITE
+ - KICK
+ - WHOIS

@@ -10,12 +10,13 @@ bool	PASS(std::vector<std::string> &cmd, std::string &pw, int *cnct)
 		std::cout << ERR_NEEDMOREPARAMS("PASS");
 		return (false);
 	}
+	// Check avec espace
 	if (cmd[1] != pw)
 	{
 		std::cout << ERR_PASSWDMISMATCH;
 		return (false);
 	}
-//	*cnct = 1;
+	*cnct = 1;
 	std::cout << "Connection established \r" << std::endl;
 	return (true);
 }
@@ -33,7 +34,7 @@ bool	NICK(std::vector<std::string> &cmd/*, Client &clt, Server &srv*/)
 		if (cmd[1] == srv.clientList[i].ClientNick)
 		{
 			std::cout << ERR_NICKNAMEINUSE;
-			return (false);	
+			return (false);
 		}
 	}*/
 
@@ -54,7 +55,7 @@ bool	USER(std::vector<std::string> &cmd)
 		std::cout << ERR_NEEDMOREPARAMS("USER");
 		return (false);
 	}
-	//if (cmd[1].length() < 1 || cmd[1].length() > 20) //20 (USERLEN cmd) 
+	//if (cmd[1].length() < 1 || cmd[1].length() > 20) //20 (USERLEN cmd)
 	// A CONTINUER
 	return (true);
 }
@@ -121,14 +122,14 @@ bool	JOIN(std::vector<std::string> &cmd)
 		std::cout << ERR_NEEDMOREPARAMS("JOIN");
 		return (false);
 	}
-	// Les erreurs possible 
+	// Les erreurs possible
 	// ERR_TOOMANYCHANNELS
-	if (cmd[1][0] != "#")
+	if (cmd[1][0] != '#')
 	{
 		std::cout << ERR_BADCHANMASK(cmd[1]);
 		return (false);
 	}
-	
+
 	return (true);
 }
 
@@ -160,21 +161,23 @@ bool	PRIVMSG(std::vector<std::string> &cmd)
 
 std::vector<std::string> split(std::string &s)
 {
-	std::vector<std::string> cmd(20);
+	std::vector<std::string> cmd;
 	std::string	str;
 	size_t	pos = 0;
-	int i = 0;
+//	int i = 0;
 
 	if (s.empty())
 		return (cmd);
-	
-	while ((pos = s.find(" ")) != std::string::npos && i < 20)
+	while ((pos = s.find(" ")) != std::string::npos)
 	{
 		str = s.substr(0, pos);
-		cmd[i++] = str;
-		s.erase(0, pos + 1);	
+		cmd.push_back(str);
+	//	cmd[i++] = str;
+		s.erase(0, pos + 1);
 	}
-	cmd[i++] = s;
+	if (!s.empty())
+		cmd.push_back(s);
+	//cmd[i++] = s;
 	cmd.push_back(std::string(""));
 	return (cmd);
 }
@@ -183,14 +186,16 @@ bool	check_command(std::string &s, std::string &pw, int *cnct)
 {
 	std::vector<std::string> cmd = split(s);
 
-	std::string	choice[11] = {"NICK", "USER", "PING", "PONG", "OPER", "QUIT", "JOIN", "PART", "PRIVMSG", "ERROR"};
-	bool	(*f[10])(std::vector<std::string> &) = {&NICK, &USER, &PING, &PONG, &OPER, &QUIT, &JOIN, &PART, &PRIVMSG, &ERROR};
+	std::string	choice[9] = {"NICK", "USER", "PING", "PONG", "QUIT", "JOIN", "PART", "PRIVMSG", "ERROR"};
+	bool	(*f[9])(std::vector<std::string> &) = {&NICK, &USER, &PING, &PONG, &QUIT, &JOIN, &PART, &PRIVMSG, &ERROR};
 	int i = 0;
 
 	if (cmd.empty())
 		return (false);
 	if (cmd[0] == "PASS")
 		return (PASS(cmd, pw, cnct));
+	if (/* *cnct && */ cmd[0] == "OPER")
+		return (OPER(cmd, pw));
 	while (/* *cnct && */ i < 11)
 	{
 		if (cmd[0] == choice[i])
@@ -199,5 +204,4 @@ bool	check_command(std::string &s, std::string &pw, int *cnct)
 	}
 	std::cout << "Commande not found" << std::endl;
 	return (false);
-}	
-
+}
