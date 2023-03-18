@@ -1,0 +1,21 @@
+ERROR
+JOIN*
+NICK*
+OPER
+PART
+PASS
+PING
+PONG
+PRIVMSG*
+QUIT
+USER*
+
+
+LIST
+MODE
+NOTICE*
+WHOIS
+
+
+
+*= dans ccorrection

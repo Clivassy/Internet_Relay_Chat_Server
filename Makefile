@@ -4,16 +4,20 @@ NAME = ircserv
 
 # Sources
 SRCS += ./src/main.cpp
+SRCS += ./src/10_tools/utils.cpp
 SRCS += ./src/20_class/client.cpp
 SRCS += ./src/20_class/server.cpp
+SRCS += ./src/20_class/channel.cpp
 SRCS += ./src/30_Parsing_argv/parsing.cpp
 
 
 # Header/s
 HEADER += ./src/10_tools/colors.hpp
+HEADER += ./src/10_tools/utils.hpp
 HEADER += ./src/20_class/server.hpp
 HEADER += ./src/20_class/client.hpp
-HEADER += ./src/30_Parsing_argv/parsing.hpp
+HEADER += ./src/20_class/channel.hpp
+HEADER += ./src/10_tools/errors.hpp
 HEADER += ./src/main.hpp
 
 

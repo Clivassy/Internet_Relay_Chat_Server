@@ -1,7 +1,7 @@
 #include "client.hpp"
 
-Client::Client():
-bufferSize(BUFFER_SIZE), is_authentified(false)
+Client::Client(Server& serv):
+server(serv), bufferSize(BUFFER_SIZE), is_authentified(false), is_connected(false), isOperator(false)
 {
 
 }
@@ -29,18 +29,7 @@ void    Client::sendResponse( void )
 	// ADD protection en cas d'échec d'authentification
 }
 
-std::vector<std::string>    splitCommand(std::string toSplit, char sep)
-{
-	std::vector<std::string> tokenList;
-	std::stringstream split(toSplit);
-	std::string token;
 
-	while (getline(split, token, sep))
-	{
-		tokenList.push_back(token);
-	}
-	return (tokenList);
-}
 
 std::string		removeLines( std::string toSplit )
 {
@@ -58,7 +47,7 @@ bool    Client::getNickName( std::string toSplit )
 
 	toSplit = removeLines(toSplit);
 	std::cout << BOLD_YELLOW <<  toSplit << RESET << std::endl;
-	result = splitCommand(toSplit, ' ');
+	result = split(toSplit, ' ');
 	/*std::cout << GREEN << "|" << result[0] << "|" << std::endl;
 	std::cout << "|" << result[1] << "|" << std::endl;
 	std::cout << "size = " << result.size() << RESET << std::endl;*/
@@ -79,13 +68,13 @@ bool    Client::getUserInfos( std::string toSplit )
 
 	toSplit = removeLines(toSplit);
 	std::cout << BOLD_YELLOW <<  toSplit << RESET << std::endl;
-	result = splitCommand(toSplit, ':');
+	result = split(toSplit, ':');
 	std::cout << GREEN << "|" << result[0] << "|" << std::endl;
 	std::cout << "|" << result[1] << "|" << std::endl;
 	std::cout << "size = " << result.size() << RESET << std::endl;
 	if (result.size() == 2)
 	{
-		username = splitCommand(result[0], ' ');
+		username = split(result[0], ' ');
 		if (username[0].compare("USER") == 0)
 		{
 			if (username.size() == 4)
@@ -112,13 +101,13 @@ void    Client::fillDataUser( void )
 	std::vector<std::string> informations;
 	std::vector<std::string> result;
 
-	informations = splitCommand(this->authentification, '\r');
+	informations = split(this->authentification, '\r');
 	std::cout << RED << this->authentification << "size = " << informations.size() << RESET << std::endl;
 
 	if (informations.size() == 4)
 	{
 		std::cout<< "BEGING AUTHENTICATION\n" << std::endl;
-		result = splitCommand(informations[0], ' ');
+		result = split(informations[0], ' ');
 		if (result[0].compare("CAP") == 0 && result[1].compare("LS") == 0 && result.size() == 2)
 		{
 			std::cout << BOLD_RED << "OK\n";

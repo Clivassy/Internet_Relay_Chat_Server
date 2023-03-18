@@ -159,32 +159,13 @@ bool	PRIVMSG(std::vector<std::string> &cmd)
 	return (true);
 }
 
-std::vector<std::string> split(std::string &s)
-{
-	std::vector<std::string> cmd;
-	std::string	str;
-	size_t	pos = 0;
-//	int i = 0;
 
-	if (s.empty())
-		return (cmd);
-	while ((pos = s.find(" ")) != std::string::npos)
-	{
-		str = s.substr(0, pos);
-		cmd.push_back(str);
-	//	cmd[i++] = str;
-		s.erase(0, pos + 1);
-	}
-	if (!s.empty())
-		cmd.push_back(s);
-	//cmd[i++] = s;
-	cmd.push_back(std::string(""));
-	return (cmd);
-}
-
-bool	check_command(std::string &s, std::string &pw, int *cnct)
+// FAIRE UN sent a la place de std::cout 
+//	send(this->socketFd, this->userInfos.userMessage.c_str(), this->userInfos.userMessage.size(), 0);
+//bool	launchCommand::check_command()
+bool	launchCommand(std::string &s, std::string &pw, int *cnct)
 {
-	std::vector<std::string> cmd = split(s);
+	std::vector<std::string> cmd = split(s, ' ');
 
 	std::string	choice[9] = {"NICK", "USER", "PING", "PONG", "QUIT", "JOIN", "PART", "PRIVMSG", "ERROR"};
 	bool	(*f[9])(std::vector<std::string> &) = {&NICK, &USER, &PING, &PONG, &QUIT, &JOIN, &PART, &PRIVMSG, &ERROR};

@@ -16,9 +16,12 @@
 # include <poll.h>
 # include <vector>
 # include <map>
-#include  <sstream>
+# include  <sstream>
 # include "../10_tools/colors.hpp"
+# include "../10_tools/utils.hpp"
 
+
+class Server;
 
 # define BUFFER_SIZE 1024
 
@@ -35,12 +38,14 @@ class Client {
 
     };
     public:
-        Client();
+        Client(Server& serv);
         ~Client(); 
         void    fillDataUser( void );
         void    sendResponse( void );
         bool    getNickName( std::string toSplit );
         bool    getUserInfos( std::string toSplit);
+
+		bool	launchCommand();
         //-- Getters
         //std::string    getUserName( void );
         //std::string    gethostName( void );
@@ -56,19 +61,23 @@ class Client {
         //void    setUserMessage( std::string userName );
 
     // protected:
+		Server&						server;
         int socketFd;
         struct sockaddr_in          clientAddr;
         socklen_t                   clientSize;
         User                        userInfos;
-        //std::vector<std::string>    cmd;
 		const int			        bufferSize;
 		char				        buffer[BUFFER_SIZE];
    		std::string                 authentification;
         std::string                 cmd;
 		bool                        is_authentified;
 
+		bool                        is_connected;
+		bool						isOperator;
+
 };
     std::string                 removeLines(std::string);
-    std::vector<std::string>    splitCommand(std::string toSplit, char sep);
+    //std::vector<std::string>    splitCommand(std::string toSplit, char sep);
+
 
 #endif

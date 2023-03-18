@@ -138,7 +138,7 @@ void Server::manage_poll_event()
 
 void Server::addNewClient()
 {
-	Client newClient;
+	Client newClient(*this);
 
 
 	//-- Tentative d'acceptation du nouveau client
@@ -166,7 +166,7 @@ void Server::listen_client(Client &client)
 	std::cout << "listen\n";
 	if (!client.is_authentified)
 	{
-		recv(client.socketFd, client.buffer, client.bufferSize - 1, 0);
+		recv(client.socketFd, client.buffer, client.bufferSize - 1, 0); // TBD voir si flag O_NONBLOCK
 		client.authentification += client.buffer;
 
 		std::cout << client.authentification << std::endl;
@@ -178,6 +178,8 @@ void Server::listen_client(Client &client)
 	}
 	else
 	{
+		// TBD faire loop poour recuperer command complete avant envoie partie Arzu
+		// qd cmd complet copier dans client/cmd et envoyer fct
 		recv(client.socketFd, client.buffer, client.bufferSize - 1, 0);
 		client.cmd += client.buffer;
 		std::cout << client.cmd << std::endl;

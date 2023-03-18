@@ -1,5 +1,5 @@
-#ifndef MAIN_HPP
-# define MAIN_HPP
+#ifndef CHANNEL_HPP
+# define CHANNEL_HPP
 
 # include <iostream>
 # include <string>
@@ -15,23 +15,18 @@
 # include <poll.h>
 # include <vector>
 # include <map>
+# include <set>
+# include "server.hpp"
 
-
-
-#include "20_class/server.hpp"
-//#include "20_class/client.hpp"
-
-
-//-- Personnal Libraries 
-# include "10_tools/colors.hpp"
-
-// proto class
 class Server;
 
+class Channel
+{
+	protected:
+		Server&						server;
+		std::set<int>				clientConnected;
+		std::vector<std::string>	messagesHistory;
 
-// 30_parsing_argv
-void parsing_arguments(int ac, char **av, Server& server);
+};
 
-
-
-#endif 
+#endif
