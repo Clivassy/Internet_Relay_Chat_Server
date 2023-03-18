@@ -1,0 +1,11 @@
+ - PASS
+ - NICK
+ - USER
+ - PING
+ - PONG
+ - OPER
+ - QUIT
+ - JOIN
+ - PART
+ - PRIVMSG
+ - ERROR
