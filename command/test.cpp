@@ -1,51 +1,83 @@
 # include "test.hpp"
+# include "../src/20_class/client.hpp"
+#include <sys/types.h>
+#include <sys/socket.h>
 
 //source https://modern.ircdocs.horse/#client-messages
 
 // The PASS command is used to set a ‘connection password’. If set, the password must be set before any attempt to register the connection is made. This requires that clients send a PASS command before sending the NICK / USER combination.
-bool	PASS(std::vector<std::string> &cmd, std::string &pw, int *cnct)
+//	send(this->socketFd, this->userInfos.userMessage.c_str(), this->userInfos.userMessage.size(), 0);
+
+void	Client::sendMessage(std::string str)
 {
+	send(this->socketFd, str.c_str(), str.size(), 0);
+}
+
+bool	Client::cmdPASS(std::vector<std::string> &cmd)
+{
+	int pos = 0;
+	int tmp_pos = 0;
 	if (cmd[1].empty())
 	{
-		std::cout << ERR_NEEDMOREPARAMS("PASS");
+		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
 		return (false);
 	}
 	// Check avec espace
-	if (cmd[1] != pw)
+	if ((pos = this->server.get_password().find(" ")) == std::string::npos)
 	{
-		std::cout << ERR_PASSWDMISMATCH;
-		return (false);
+		if (cmd[1] != this->server.get_password())
+		{
+			sendMessage(ERR_PASSWDMISMATCH);
+			return (false);
+		}
 	}
-	*cnct = 1;
-	std::cout << "Connection established \r" << std::endl;
+	else
+	{
+		for (int i = 1; i < cmd.size(); i++)
+		{
+			if (cmd[i] != this->server.get_password().substr(tmp_pos, pos))
+			{
+				sendMessage(ERR_PASSWDMISMATCH);
+				return (false);
+			}
+			tmp_pos = pos + 1;
+		}
+	}
+	this->isConnected = true;
+	sendMessage("Connection established \r\n");
 	return (true);
 }
 
 // The NICK command is used to give the client a nickname or change the previous one.
-bool	NICK(std::vector<std::string> &cmd/*, Client &clt, Server &srv*/)
+bool	Client::cmdNICK(std::vector<std::string> &cmd, Client &clt)
 {
 	if (cmd[1].empty())
 	{
-		std::cout << ERR_NONICKNAMEGIVEN;
+		sendMessage(ERR_NONICKNAMEGIVEN);
 		return (false);
 	}
-/*	for (int i = 0; i < srv.clientList; i++)
+	if (cmd.size > 2)
+	{
+		sendMessage(ERR_ERRONEUSNICKNAME) 
+		return (false);
+	}
+	for (int i = 0; i < srv.clientList.size(); i++)
 	{
 		if (cmd[1] == srv.clientList[i].ClientNick)
 		{
-			std::cout << ERR_NICKNAMEINUSE;
+			sendMessage(ERR_NICKNAMEINUSE);
 			return (false);
 		}
-	}*/
+	}
+	sendMessage(NICK(this->User.nickname, cmd[1]));
+	this->User.nickname = cmd[1];
 
-	//If the server does not accept the new nickname supplied by the client as valid (for instance, due to containing invalid characters), it should issue an ERR_ERRONEUSNICKNAME numeric and ignore the NICK command.
 
 	//The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, and to inform other clients about the change of nickname. In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.
 
-	std::cout << "Nickname is changed\r" << std::endl;
 	return (true);
 }
-
+/*
 // The USER command is used at the beginning of a connection to specify the username and realname of a new user.
 bool	USER(std::vector<std::string> &cmd)
 {
@@ -158,31 +190,31 @@ bool	PRIVMSG(std::vector<std::string> &cmd)
 	}
 	return (true);
 }
-
+*/
 
 // FAIRE UN sent a la place de std::cout 
 //	send(this->socketFd, this->userInfos.userMessage.c_str(), this->userInfos.userMessage.size(), 0);
 //bool	launchCommand::check_command()
-bool	launchCommand(std::string &s, std::string &pw, int *cnct)
+bool	Client::launchCommand(void)
 {
-	std::vector<std::string> cmd = split(s, ' ');
+	std::vector<std::string> vecmd = split(this->cmd, ' ');
 
-	std::string	choice[9] = {"NICK", "USER", "PING", "PONG", "QUIT", "JOIN", "PART", "PRIVMSG", "ERROR"};
-	bool	(*f[9])(std::vector<std::string> &) = {&NICK, &USER, &PING, &PONG, &QUIT, &JOIN, &PART, &PRIVMSG, &ERROR};
+//	std::string	choice[9] = {"NICK", "USER", "PING", "PONG", "QUIT", "JOIN", "PART", "PRIVMSG", "ERROR"};
+//	bool	(*f[9])(std::vector<std::string> &) = {&NICK, &USER, &PING, &PONG, &QUIT, &JOIN, &PART, &PRIVMSG, &ERROR};
 	int i = 0;
 
-	if (cmd.empty())
+	if (vecmd.empty())
 		return (false);
-	if (cmd[0] == "PASS")
-		return (PASS(cmd, pw, cnct));
-	if (/* *cnct && */ cmd[0] == "OPER")
+	if (vecmd[0] == "PASS")
+		return (cmdPASS(vecmd));
+/*	if (this->isConnected && cmd[0] == "OPER")
 		return (OPER(cmd, pw));
-	while (/* *cnct && */ i < 11)
+	while (this->isConnected && i < 11)
 	{
 		if (cmd[0] == choice[i])
 			return (*f[i])(cmd);
 		i++;
-	}
+	}*/
 	std::cout << "Commande not found" << std::endl;
 	return (false);
 }

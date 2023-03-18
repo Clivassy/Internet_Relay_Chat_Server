@@ -48,6 +48,7 @@ class Server
 		Server();
 		void set_port(int port);
 		void set_password(std::string password);
+		std::string get_password(void);
 		void init();
 		void run();
 		void manage_poll_event();

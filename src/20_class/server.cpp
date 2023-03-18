@@ -28,6 +28,11 @@ void Server::set_password(std::string password)
 	this->password = password;
 }
 
+std::string Server::get_password(void)
+{
+	return (this->password);
+}
+
 void Server::init()
 {
 	//memset(this->buffer, 0, bufferSize); // TBD voir si il faut pas remplir de bufferS0ze * sizeof(int)

@@ -5,7 +5,7 @@
 # include <iostream>
 # include <fstream>
 # include <string>
-# include "errors.hpp"
+# include "../src/10_tools/errors.hpp"
 
 
 bool	check_command(std::string &s, std::string &pw, int *cnct);

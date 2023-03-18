@@ -19,7 +19,7 @@
 # include  <sstream>
 # include "../10_tools/colors.hpp"
 # include "../10_tools/utils.hpp"
-
+# include "server.hpp"
 
 class Server;
 
@@ -44,8 +44,12 @@ class Client {
         void    sendResponse( void );
         bool    getNickName( std::string toSplit );
         bool    getUserInfos( std::string toSplit);
+		
+		// Command
+		bool	launchCommand(void);
+		void	sendMessage(std::string str);
+		bool	cmdPASS(std::vector<std::string> &cmd);
 
-		bool	launchCommand();
         //-- Getters
         //std::string    getUserName( void );
         //std::string    gethostName( void );
@@ -71,8 +75,7 @@ class Client {
    		std::string                 authentification;
         std::string                 cmd;
 		bool                        is_authentified;
-
-		bool                        is_connected;
+		bool                        isConnected;
 		bool						isOperator;
 
 };
