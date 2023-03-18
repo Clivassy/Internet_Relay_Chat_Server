@@ -27,7 +27,8 @@ class Client;
 
 class Server
 {
-	protected:
+	public:
+	//protected:
 		int			port;
 		std::string	password;
 

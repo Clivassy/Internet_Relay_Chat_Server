@@ -19,6 +19,7 @@
 # include  <sstream>
 # include "../10_tools/colors.hpp"
 # include "../10_tools/utils.hpp"
+# include "../20_class/server.hpp"
 
 
 class Server;
@@ -44,6 +45,7 @@ class Client {
         void    sendResponse( void );
         bool    getNickName( std::string toSplit );
         bool    getUserInfos( std::string toSplit);
+		bool    getPassword( std::string toSplit );
 
 		bool	launchCommand();
         //-- Getters
