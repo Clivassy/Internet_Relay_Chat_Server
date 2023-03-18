@@ -16,6 +16,7 @@
 # include <poll.h>
 # include <vector>
 # include <map>
+#include  <sstream>
 # include "../10_tools/colors.hpp"
 
 
@@ -31,11 +32,15 @@ class Client {
         std::string serverName;
         std::string realName;
         std::string userMessage;
+
     };
     public:
         Client();
         ~Client(); 
-        void    fillDataUser(Client &client, std::string token, char sep);
+        void    fillDataUser( void );
+        void    sendResponse( void );
+        bool    getNickName( std::string toSplit );
+        bool    getUserInfos( std::string toSplit);
         //-- Getters
         //std::string    getUserName( void );
         //std::string    gethostName( void );
@@ -52,14 +57,18 @@ class Client {
 
     // protected:
         int socketFd;
-        struct sockaddr_in clientAddr;
-        socklen_t clientSize;
-        User userInfos;
-        std::vector<std::string> cmd;
-		const int			bufferSize;
-		char				buffer[BUFFER_SIZE];
-   		std::string UserInfos;
-		bool is_authentified;
+        struct sockaddr_in          clientAddr;
+        socklen_t                   clientSize;
+        User                        userInfos;
+        //std::vector<std::string>    cmd;
+		const int			        bufferSize;
+		char				        buffer[BUFFER_SIZE];
+   		std::string                 authentification;
+        std::string                 cmd;
+		bool                        is_authentified;
 
 };
+    std::string                 removeLines(std::string);
+    std::vector<std::string>    splitCommand(std::string toSplit, char sep);
+
 #endif

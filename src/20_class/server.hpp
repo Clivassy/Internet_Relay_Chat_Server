@@ -37,7 +37,7 @@ class Server
 		int					serverFd;
 		struct sockaddr_in	serverAddr;
 		std::vector<pollfd> fdListened;
-		std::vector<Client> clientList;
+		std::vector<Client> clientList;		
 
 		//TBD 
 		// ajouter tableau de client
