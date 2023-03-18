@@ -3,14 +3,16 @@
 NAME = ircserv
 
 # Sources
-SRCS = ./src/20_class/server.cpp
-SRCS += ./src/30_Parsing_argv/parsing.cpp
 SRCS += ./src/main.cpp
+SRCS += ./src/20_class/client.cpp
+SRCS += ./src/20_class/server.cpp
+SRCS += ./src/30_Parsing_argv/parsing.cpp
 
 
 # Header/s
-HEADER = ./src/10_tools/colors.hpp
+HEADER += ./src/10_tools/colors.hpp
 HEADER += ./src/20_class/server.hpp
+HEADER += ./src/20_class/client.hpp
 HEADER += ./src/30_Parsing_argv/parsing.hpp
 HEADER += ./src/main.hpp
 
@@ -20,7 +22,8 @@ OBJS = ${SRCS:.cpp=.o}
 # Compilateurs
 CC = c++
 
-CFLAGS = -g -Wall -Wextra -Werror -std=c++98
+#CFLAGS = -g -Wall -Wextra -Werror -std=c++98
+CFLAGS = -g -Wall -Wextra -std=c++98
 
 ##########   RULES   ##########
 all: $(NAME)
