@@ -32,7 +32,6 @@ class Channel
 	protected:
 		Server&						server;
 		std::set<int>				clientConnected;
-		std::vector<std::string>	messagesHistory;
 };
 
 #endif

@@ -41,13 +41,16 @@ class Client {
     public:
         Client(Server& serv);
         ~Client(); 
-        void    fillDataUser( void );
-        void    sendResponse( void );
-        bool    getNickName( std::string toSplit );
-        bool    getUserInfos( std::string toSplit);
-		bool    getPassword( std::string toSplit );
-
-		bool	launchCommand();
+        void    			fillDataUser( void );
+        void    			sendResponse( void );
+        bool    			getNickName( std::string toSplit );
+        bool    			getUserInfos( std::string toSplit);
+		std::string    		getPassword( std::string toSplit );
+		std::string			getPrefix( void );
+		bool				launchCommand();
+		void				errorAuthentification ( void );
+		void				errorPassword( void );
+	
         //-- Getters
         //std::string    getUserName( void );
         //std::string    gethostName( void );
@@ -76,6 +79,7 @@ class Client {
 
 		bool                        is_connected;
 		bool						isOperator;
+		bool						isValidPassword;
 
 };
     std::string                 removeLines(std::string);

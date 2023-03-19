@@ -26,9 +26,3 @@ void    Channel::sendMessageToClients( std::string msg )
 	}   
 
 }
-
-// pushback : le message dans messagesHistory.
-void	Channel::addMsgToHistory(std::string msg)
-{
-	this->messagesHistory.push_back(msg);
-}
