@@ -13,10 +13,12 @@ void	Client::sendMessage(std::string str)
 	send(this->socketFd, str.c_str(), str.size(), 0);
 }
 
-bool	Client::cmdPASS(std::vector<std::string> &cmd)
+bool	Client::cmdPASS(void)
 {
+	std::vector<std::string> cmd = split(this->cmd, ' ');
 	int pos = 0;
 	int tmp_pos = 0;
+
 	if (cmd[1].empty())
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
@@ -49,8 +51,10 @@ bool	Client::cmdPASS(std::vector<std::string> &cmd)
 }
 
 // The NICK command is used to give the client a nickname or change the previous one.
-bool	Client::cmdNICK(std::vector<std::string> &cmd, Client &clt)
+bool	Client::cmdNICK(void)
 {
+	std::vector<std::string> cmd = split(this->cmd, ' ');
+
 	if (cmd[1].empty())
 	{
 		sendMessage(ERR_NONICKNAMEGIVEN);
@@ -70,84 +74,90 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd, Client &clt)
 		}
 	}
 	sendMessage(NICK(this->User.nickname, cmd[1]));
-	this->User.nickname = cmd[1];
-
-
+	this->userInfos.nickname = cmd[1];
 	//The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, and to inform other clients about the change of nickname. In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.
-
 	return (true);
 }
-/*
+
 // The USER command is used at the beginning of a connection to specify the username and realname of a new user.
-bool	USER(std::vector<std::string> &cmd)
+bool	Client::cmdUSER(void)
 {
-	std::cout << "USER" << std::endl;
-	if (cmd[1].empty())
+	
+	std::vector<std::string> ccmd = split(this->cmd, ':');
+	std::vector<std::string> cmd = split(ccmd[0], ' ');
+	if (ccmd[1])
+		cmd.push_back(ccmd[1]);
+
+	if (cmd[1].empty() || cmd[2].empty() || cmd[3].empty() || cmd[4].empty())
 	{
-		std::cout << ERR_NEEDMOREPARAMS("USER");
+		sendMessage(ERR_NEEDMOREPARAMS("USER"));
 		return (false);
 	}
-	//if (cmd[1].length() < 1 || cmd[1].length() > 20) //20 (USERLEN cmd)
-	// A CONTINUER
+	if (cmd[2] != "0" || cmd[3] != "*")
+	{
+		sendMessage("USER :Parameters incorrect");
+		return (false);
+	}
+
+	//If a client tries to send the USER command after they have already completed registration with the server, the ERR_ALREADYREGISTERED reply should be sent and the attempt should fail.
+
+	//If the client sends a USER command after the server has successfully received a username using the Ident Protocol, the <username> parameter from this command should be ignored in favour of the one received from the identity server.
+
+	this->userInfos.username = cmd[4];
+	this->userInfos.realname = cmd[4];
+	//Clients SHOULD use the nickname as a fallback value for <username> and <realname> when they don’t have a meaningful value to use.
 	return (true);
 }
 
 //The PING command is sent by either clients or servers to check the other side of the connection is still connected and/or to check for connection latency, at the application layer.
-bool	PING(std::vector<std::string> &cmd)
+bool	Client::cmdPING(void)
 {
-	std::cout << "PING" << std::endl;
+	std::vector<std::string> cmd = split(this->cmd, ' ');
+
 	if (cmd[1].empty())
 	{
-		std::cout << ERR_NEEDMOREPARAMS("PING");
+		sendMessage(ERR_NEEDMOREPARAMS("PING"));
 		return (false);
 	}
-	std::cout << "PONG" << cmd[1] << "\r" << std::endl;
-	return (true);
-}
-
-//The PONG command is used as a reply to PING commands, by both clients and servers. The <token> should be the same as the one in the PING message that triggered this PONG.
-bool	PONG(std::vector<std::string> &cmd)
-{
-	std::cout << "PONG" << std::endl;
+	sendMessage("PONG" + cmd[1] + "\r");
 	return (true);
 }
 
 // The OPER command is used by a normal user to obtain IRC operator privileges. Both parameters are required for the command to be successful.
-bool	OPER(std::vector<std::string> &cmd, std::string &pw)
+bool	Client::cmdOPER(void)
 {
-	std::cout << "OPER" << std::endl;
-	if (cmd[2].empty())
+	std::vector<std::string> cmd = split(this->cmd, ' ');
+	if (cmd[1].empty() || cmd[2].empty())
 	{
-		std::cout << ERR_NEEDMOREPARAMS("OPER");
+		sendMessage(ERR_NEEDMOREPARAMS("OPER"));
 		return (false);
 	}
-	if (cmd[2] != pw)
+	if (cmd[2] != this->server.get_password())
 	{
-		std::cout << ERR_PASSWDMISMATCH;
+		sendMessage(ERR_PASSWDMISMATCH);
 		return (false);
 	}
-	// If the supplied name and password are both correct, and the user is connecting from a valid host, the RPL_YOUREOPER message is sent to the user. The user will also receive a MODE message indicating their new user modes, and other messages may be sent.
-	std::cout << " :You are now an IRC operator" << std::endl;
+	sendMessage(RPL_YOUREOPER(cmd[1]);
+	//The user will also receive a MODE message indicating their new user modes, and other messages may be sent.
 	return (true);
 }
 
 // The QUIT command is used to terminate a client’s connection to the server. The server acknowledges this by replying with an ERROR message and closing the connection to the client.
-bool	QUIT(std::vector<std::string> &cmd)
+bool	Client::cmdQUIT(void)
 {
+	std::vector<std::string> cmd = split(this->cmd, ' ');
+	// This is typically only dispatched to clients that share a channel with the exiting user.
+	// Envoye Quit :<reason> au autres clients
 	std::cout << ":QUIT : Bye for now" << std::endl;
 	return (true);
 }
 
-// This message is sent from a server to a client to report a fatal error, before terminating the client’s connection.
-bool	ERROR(std::vector<std::string> &cmd)
-{
-	std::cout << "ERROR" << std::endl;
-	return (true);
-}
-
+/*
 // The JOIN command indicates that the client wants to join the given channel(s), each channel using the given key for it. The server receiving the command checks whether or not the client can join the given channel, and processes the request. Servers MUST process the parameters of this command as lists on incoming commands from clients, with the first <key> being used for the first <channel>, the second <key> being used for the second <channel>, etc.
 bool	JOIN(std::vector<std::string> &cmd)
 {
+	std::vector<std::string> cmd = split(this->cmd, ' ');
+	int pos = 0;
 	std::cout << "JOIN" << std::endl;
 	if (cmd[1].empty())
 	{
@@ -168,6 +178,8 @@ bool	JOIN(std::vector<std::string> &cmd)
 // The PART command removes the client from the given channel(s). On sending a successful PART command, the user will receive a PART message from the server for each channel they have been removed from. <reason> is the reason that the client has left the channel(s).
 bool	PART(std::vector<std::string> &cmd)
 {
+	std::vector<std::string> cmd = split(this->cmd, ' ');
+	int pos = 0;
 	std::cout << "PART" << std::endl;
 	if (cmd[1].empty())
 	{
@@ -182,6 +194,8 @@ bool	PART(std::vector<std::string> &cmd)
 // The PRIVMSG command is used to send private messages between users, as well as to send messages to channels. <target> is the nickname of a client or the name of a channel.
 bool	PRIVMSG(std::vector<std::string> &cmd)
 {
+	std::vector<std::string> cmd = split(this->cmd, ' ');
+	int pos = 0;
 	std::cout << "PRIVMSG" << std::endl;
 	if (cmd[2].empty())
 	{
@@ -195,14 +209,15 @@ bool	PRIVMSG(std::vector<std::string> &cmd)
 // FAIRE UN sent a la place de std::cout 
 //	send(this->socketFd, this->userInfos.userMessage.c_str(), this->userInfos.userMessage.size(), 0);
 //bool	launchCommand::check_command()
+//- PASS, NICK, USER, PING, OPER, QUIT, JOIN, PART, PRIVMSG, NOTICE, MODE, INVITE. KICK, WHOIS
 bool	Client::launchCommand(void)
 {
-	std::vector<std::string> vecmd = split(this->cmd, ' ');
 
 //	std::string	choice[9] = {"NICK", "USER", "PING", "PONG", "QUIT", "JOIN", "PART", "PRIVMSG", "ERROR"};
 //	bool	(*f[9])(std::vector<std::string> &) = {&NICK, &USER, &PING, &PONG, &QUIT, &JOIN, &PART, &PRIVMSG, &ERROR};
 	int i = 0;
 
+	std::vector<std::string> vecmd = split(this->cmd, ' ');
 	if (vecmd.empty())
 		return (false);
 	if (vecmd[0] == "PASS")

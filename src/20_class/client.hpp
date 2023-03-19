@@ -50,6 +50,16 @@ class Client {
 		void	sendMessage(std::string str);
 		bool	cmdPASS(std::vector<std::string> &cmd);
 
+        void    			fillDataUser( void );
+        void    			sendResponse( void );
+        bool    			getNickName( std::string toSplit );
+        bool    			getUserInfos( std::string toSplit);
+		std::string    		getPassword( std::string toSplit );
+		std::string			getPrefix( void );
+		bool				launchCommand();
+		void				errorAuthentification ( void );
+		void				errorPassword( void );
+	
         //-- Getters
         //std::string    getUserName( void );
         //std::string    gethostName( void );
@@ -77,6 +87,7 @@ class Client {
 		bool                        is_authentified;
 		bool                        isConnected;
 		bool						isOperator;
+		bool						isValidPassword;
 
 };
     std::string                 removeLines(std::string);

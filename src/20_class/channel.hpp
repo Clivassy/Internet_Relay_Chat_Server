@@ -22,11 +22,16 @@ class Server;
 
 class Channel
 {
+	public:
+		Channel( Server& serv );
+		~Channel( void );
+		void	sendMessageToClients( std::string msg);
+		void	addMsgToHistory(std::string msg);
+		void    addClientToChannel( void );
+	
 	protected:
 		Server&						server;
 		std::set<int>				clientConnected;
-		std::vector<std::string>	messagesHistory;
-
 };
 
 #endif
