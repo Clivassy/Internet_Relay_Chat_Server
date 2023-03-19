@@ -15,7 +15,8 @@ Client& Server::getClient(int fd)
 			if (it->socketFd == fd)
 				return (*it);
 		}
-	std::cout << "fd non trouve dans getclient " << std::endl;
+	std::cout << BOLD_RED << "fd non trouve dans getclient -> /!\\ pour suite execution (return getClient non valid)" << RESET << std::endl;
+	return (this->clientList[0]); // return 1er client si fd non trouvé
 }
 
 void Server::set_port(int port)
@@ -73,14 +74,14 @@ void Server::run()
 	// TBD redefinir ctrl+C pour close les fd (evite de bloquer les ports en debug)
 	
 	int pollreturn = -1;
-	while (i < 7)
+	while (i < 30)
 	{
 		std::cout << BOLD_BLUE << "loop step " << i << RESET << std::endl;
 		std::cout << "Ecoute pollfd " << RESET << std::endl;
 		pollreturn = poll(&(this->fdListened[0]), this->fdListened.size(), LISTENING_TIMEOUT);
 		for (std::vector<pollfd>::iterator it = this->fdListened.begin(); it != this->fdListened.end(); it++)
 		{
-			std::cout << "it->revents: " << it->fd << " / " << it->revents << std::endl;
+			std::cout << "event catch on fd " << it->fd << " : " << it->revents << std::endl;
 
 		}
 		if(pollreturn < 0)
@@ -115,24 +116,12 @@ void Server::manage_poll_event()
 			if (it == this->fdListened.begin())
 			{
 				this->addNewClient();
-
-				// Fonction Julia pour ajout nouveau client
-					//while(responseSize > 0)
-					//{
-					//	responseSize = recv(this->fdListened[0].fd, this->buffer, this->bufferSize -1, 0);
-						
-					//	std::cout << "responseSize: " << responseSize << RESET << std::endl;
-					//	std::cout << "buffer: " << buffer << RESET << std::endl;
-					//}
-
 			}
 			else
 			{
 				this->listen_client(this->getClient(it->fd));
 			}
 		}
-
-		
 	}
 }
 
@@ -159,11 +148,8 @@ void Server::addNewClient()
 	//this->authentication(*(--this->clientList.end()));
 }
 
-
-
 void Server::listen_client(Client &client)
 {
-	std::cout << "listen\n";
 	if (!client.is_authentified)
 	{
 		recv(client.socketFd, client.buffer, client.bufferSize - 1, 0); // TBD voir si flag O_NONBLOCK
@@ -178,27 +164,23 @@ void Server::listen_client(Client &client)
 	}
 	else
 	{
-		// TBD faire loop poour recuperer command complete avant envoie partie Arzu
-		// qd cmd complet copier dans client/cmd et envoyer fct
+		clear_str(client.buffer, client.bufferSize);
 		recv(client.socketFd, client.buffer, client.bufferSize - 1, 0);
+		//std::cout << BOLD_PURPLE << "read buffer: " << client.buffer << RESET << std::endl;
 		client.cmd += client.buffer;
-		std::cout << client.cmd << std::endl;
-		client.cmd.clear();
-
+		if (client.cmd.find("\r\n"))
+		{
+			split(client.cmd, "\r\n");
+			std::cout << BOLD_YELLOW << "launch command: " << YELLOW << pop_command(client.cmd) << RESET << std::endl;
+		}
 	}
 
 
 
 }
 
-//void Server::listen_client(pollfd& client_pollfd)
-//{
-//	// ecoute client et lancement commande
-//}
-
 void Server::terminate()
 {
-	//close(this->serverFd);
 	while(this->fdListened.size() > 0)
 	{
 		std::cout << BOLD_YELLOW << "Close fd " << (*(--(this->fdListened.end()))).fd << RESET << std::endl;
