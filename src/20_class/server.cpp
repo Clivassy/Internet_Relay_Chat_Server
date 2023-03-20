@@ -155,7 +155,7 @@ void Server::addNewClient()
 
 void Server::listen_client(Client &client)
 {
-	if (!client.is_authentified)
+	if (!client.isAuthentified)
 	{
 		recv(client.socketFd, client.buffer, client.bufferSize - 1, 0); // TBD voir si flag O_NONBLOCK
 		client.authentification += client.buffer;

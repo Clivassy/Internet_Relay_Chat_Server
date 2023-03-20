@@ -1,12 +1,6 @@
 #ifndef TEST_HPP
 #define TEST_HPP
 
-# include <vector>
-# include <iostream>
-# include <fstream>
-# include <string>
-# include "../src/10_tools/errors.hpp"
-
 
 bool	check_command(std::string &s, std::string &pw, int *cnct);
 bool	PASS(std::vector<std::string> &cmd, std::string &pw, int *cnct);

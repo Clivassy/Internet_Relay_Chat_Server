@@ -9,7 +9,7 @@
 
 
 //source https://modern.ircdocs.horse/#client-messages
-
+/*
 void	Client::sendMessage(std::string str)
 {
 	send(this->socketFd, str.c_str(), str.size(), 0);
@@ -274,4 +274,4 @@ bool	Client::launchCommand(std::string command)
 	}
 	sendMessage("Command not found");
 	return (false);
-}
+}*/
