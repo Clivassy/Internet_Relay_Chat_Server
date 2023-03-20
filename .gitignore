@@ -1,4 +1,4 @@
 ircserv
 *.o
 *output
-.vscode/*
+*.out

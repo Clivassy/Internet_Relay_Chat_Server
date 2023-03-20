@@ -20,8 +20,10 @@
 # include "../../10_tools/colors.hpp"
 # include "../../10_tools/utils.hpp"
 # include "../server.hpp"
+# include "../channel.hpp"
 
 class Server;
+class Channel;
 
 # define BUFFER_SIZE 1024
 
@@ -84,7 +86,7 @@ class Client {
 
     // protected:
 		Server&						server;
-        int socketFd;
+        int							socketFd;
         struct sockaddr_in          clientAddr;
         socklen_t                   clientSize;
         User                        userInfos;

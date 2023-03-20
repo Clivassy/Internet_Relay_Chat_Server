@@ -194,5 +194,24 @@ void Server::terminate()
 	}
 }
 
+bool	Server::isChannelExisting(std::string name)
+{
+	if (this->channelList.count(name) >= 1)
+		return (true);
+	return false;
+}
+
+void	Server::addChannel(std::string name)
+{
+	if (this->isChannelExisting(name))
+		return;
+	Channel chan = Channel(*this); // TBD initialiser les attributs du channel si on en ajoute
+	this->channelList.insert(std::make_pair(name, chan));
+}
+
+Channel& Server::getChannel(std::string name)
+{
+	return((this->channelList.find(name))->second);
+}
 
 
