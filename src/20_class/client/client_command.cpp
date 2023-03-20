@@ -65,14 +65,14 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 	}
 	for (int i = 0; i < (int)this->server.clientList.size(); i++)
 	{
-		if (cmd[1] == this->server.clientList[i].ClientNick)
+		if (cmd[1] == this->server.clientList[i].userInfos.nickName)
 		{
 			sendMessage(ERR_NICKNAMEINUSE(cmd[1]));
 			return (false);
 		}
 	}
-	sendMessage(NICK(this->userInfos.Nickname, cmd[1]));
-	this->userInfos.nickname = cmd[1];
+	sendMessage(NICK(this->userInfos.nickName, cmd[1]));
+	this->userInfos.nickName = cmd[1];
 	//The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, and to inform other clients about the change of nickname. In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.
 	return (true);
 }
@@ -95,8 +95,8 @@ bool	Client::cmdUSER(std::vector<std::string> &cmd)
 
 	//If the client sends a USER command after the server has successfully received a username using the Ident Protocol, the <username> parameter from this command should be ignored in favour of the one received from the identity server.
 
-	this->userInfos.username = cmd[4];
-	this->userInfos.realname = cmd[4];
+	this->userInfos.userName = cmd[4];
+	this->userInfos.realName = cmd[4];
 	//Clients SHOULD use the nickname as a fallback value for <username> and <realname> when they don’t have a meaningful value to use.
 	return (true);
 }
@@ -124,7 +124,7 @@ bool	Client::cmdOPER(std::vector<std::string> &cmd)
 		sendMessage(ERR_PASSWDMISMATCH);
 		return (false);
 	}
-	sendMessage(RPL_YOUREOPER(cmd[1]);
+	sendMessage(RPL_YOUREOPER(cmd[1]));
 	//The user will also receive a MODE message indicating their new user modes, and other messages may be sent.
 	return (true);
 }
@@ -133,7 +133,7 @@ bool	Client::cmdQUIT(std::vector<std::string> &cmd)
 {
 	// This is typically only dispatched to clients that share a channel with the exiting user.
 	// Envoye Quit :<reason> au autres clients
-	std::cout << ":QUIT : Bye for now" << std::endl;
+	sendMessage(":QUIT : Bye for now" + cmd[1]);
 	return (true);
 }
 
@@ -265,7 +265,7 @@ bool	Client::launchCommand(std::string command)
 	std::vector<std::string> ccmd = split(command, ':');
 	std::vector<std::string> vecmd = split(ccmd[0], ' ');
 	std::string	choice[14] = {"PASS", "NICK", "USER", "PING", "OPER", "QUIT", "JOIN", "PART", "PRIVMSG", "NOTICE", "MODE", "INVITE", "KICK", "WHOIS"};
-	bool	(*f[14])(std::vector<std::string> &) = {&cmdPASS, &Client::cmdNICK, &Client::cmdUSER, &Client::cmdPING, &Client::cmdOPER, &Client::cmdQUIT, &Client::cmdJOIN, &Client::cmdPART, &Client::cmdPRIVMSG, &Client::cmdNOTICE, &Client::cmdMODE, &Client::cmdINVITE, &Client::cmdKICK, &Client::cmdWHOIS};
+	bool	(Client::*f[14])(std::vector<std::string> &) = {&Client::cmdPASS, &Client::cmdNICK, &Client::cmdUSER, &Client::cmdPING, &Client::cmdOPER, &Client::cmdQUIT, &Client::cmdJOIN, &Client::cmdPART, &Client::cmdPRIVMSG, &Client::cmdNOTICE, &Client::cmdMODE, &Client::cmdINVITE, &Client::cmdKICK, &Client::cmdWHOIS};
 	int i = 0;
 	
 	if (!ccmd[1].empty())
@@ -275,7 +275,7 @@ bool	Client::launchCommand(std::string command)
 	while (i < 13)
 	{
 		if (vecmd[0] == choice[i])
-			return (*f[i])(vecmd);
+			return (this->*f[i])(vecmd);
 		i++;
 	}
 	sendMessage("Command not found");
