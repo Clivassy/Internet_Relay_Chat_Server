@@ -176,8 +176,9 @@ void Server::listen_client(Client &client)
 		if (client.cmd.find("\r\n"))
 		{
 			split(client.cmd, "\r\n");
-			std::cout << BOLD_YELLOW << "launch command: " << YELLOW << pop_command(client.cmd) << RESET << std::endl;
-			client.launchCommand(pop_command(client.cmd));
+			std::string cc = pop_command(client.cmd);
+			std::cout << BOLD_YELLOW << "launch command: " << YELLOW << cc << RESET << std::endl;
+			client.launchCommand(pop_command(cc));
 		}
 
 	}
