@@ -177,11 +177,10 @@ void Server::listen_client(Client &client)
 		{
 			split(client.cmd, "\r\n");
 			std::cout << BOLD_YELLOW << "launch command: " << YELLOW << pop_command(client.cmd) << RESET << std::endl;
+			client.launchCommand(pop_command(client.cmd));
 		}
+
 	}
-
-
-
 }
 
 void Server::terminate()
