@@ -42,7 +42,7 @@ class Client {
         ~Client(); 
 		
 		// Command
-		bool	launchCommand(void);
+		bool	launchCommand(std::string command);
 		void	sendMessage(std::string str);
 		bool	cmdPASS(std::vector<std::string> &cmd);
 		bool	cmdUSER(std::vector<std::string> &cmd);

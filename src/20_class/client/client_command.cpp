@@ -9,7 +9,7 @@
 
 
 //source https://modern.ircdocs.horse/#client-messages
-/*
+
 void	Client::sendMessage(std::string str)
 {
 	send(this->socketFd, str.c_str(), str.size(), 0);
@@ -26,7 +26,7 @@ bool	Client::cmdPASS(std::vector<std::string> &cmd)
 		return (false);
 	}
 	// Check avec espace
-	if ((pos = this->server.get_password().find(" ")) == std::string::npos)
+	if ((pos = this->server.get_password().find(" ")) == (int)std::string::npos)
 	{
 		if (cmd[1] != this->server.get_password())
 		{
@@ -36,7 +36,7 @@ bool	Client::cmdPASS(std::vector<std::string> &cmd)
 	}
 	else
 	{
-		for (int i = 1; i < cmd.size(); i++)
+		for (int i = 1; i < (int)cmd.size(); i++)
 		{
 			if (cmd[i] != this->server.get_password().substr(tmp_pos, pos))
 			{
@@ -58,20 +58,20 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 		sendMessage(ERR_NONICKNAMEGIVEN);
 		return (false);
 	}
-	if (cmd.size > 2)
+	if (cmd.size() > 2)
 	{
-		sendMessage(ERR_ERRONEUSNICKNAME) 
+		sendMessage(ERR_ERRONEUSNICKNAME(cmd[1])); 
 		return (false);
 	}
-	for (int i = 0; i < srv.clientList.size(); i++)
+	for (int i = 0; i < (int)this->server.clientList.size(); i++)
 	{
-		if (cmd[1] == srv.clientList[i].ClientNick)
+		if (cmd[1] == this->server.clientList[i].ClientNick)
 		{
-			sendMessage(ERR_NICKNAMEINUSE);
+			sendMessage(ERR_NICKNAMEINUSE(cmd[1]));
 			return (false);
 		}
 	}
-	sendMessage(NICK(this->User.nickname, cmd[1]));
+	sendMessage(NICK(this->userInfos.Nickname, cmd[1]));
 	this->userInfos.nickname = cmd[1];
 	//The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, and to inform other clients about the change of nickname. In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.
 	return (true);
@@ -206,6 +206,7 @@ bool	Client::cmdNOTICE(std::vector<std::string> &cmd)
 	if (cmd[2].empty())
 		return (false);
 	// Envoyer le message
+	return (true);
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -216,6 +217,7 @@ bool	Client::cmdMODE(std::vector<std::string> &cmd)
 		sendMessage(ERR_NEEDMOREPARAMS("MODE"));
 		return (false);
 	}
+	return (true);
 }
 
 // Parameters: <nickname> <channel>
@@ -231,6 +233,7 @@ bool	Client::cmdINVITE(std::vector<std::string> &cmd)
 	// Si le client est deja dans le channel => ERR_USERONCHANNEL
 	
 	//When the invite is successful, the server MUST send a RPL_INVITING numeric to the command issuer, and an INVITE message, with the issuer as <source>, to the target user. Other channel members SHOULD NOT be notified.
+	return (true);
 }
 
 //  Parameters: <channel> <user> [<comment>]
@@ -242,6 +245,7 @@ bool	Client::cmdKICK(std::vector<std::string> &cmd)
 		return (false);
 	}
 	// supprime le user du channel
+	return (true);
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -252,17 +256,19 @@ bool	Client::cmdWHOIS(std::vector<std::string> &cmd)
 		sendMessage(ERR_NEEDMOREPARAMS("WHOIS"));
 		return (false);
 	}
+	return (true);
 }
+
 //- PASS, NICK, USER, PING, OPER, QUIT, JOIN, PART, PRIVMSG, NOTICE, MODE, INVITE. KICK, WHOIS
 bool	Client::launchCommand(std::string command)
 {
 	std::vector<std::string> ccmd = split(command, ':');
 	std::vector<std::string> vecmd = split(ccmd[0], ' ');
 	std::string	choice[14] = {"PASS", "NICK", "USER", "PING", "OPER", "QUIT", "JOIN", "PART", "PRIVMSG", "NOTICE", "MODE", "INVITE", "KICK", "WHOIS"};
-	bool	(*f[14])(std::vector<std::string> &) = {&Client::cmdPASS, &Client::cmdNICK, &Client::cmdUSER, &Client::cmdPING, &Client::cmdOPER, &Client::cmdQUIT, &Client::cmdJOIN, &Client::cmdPART, &Client::cmdPRIVMSG, &Client::cmdNOTICE, &Client::cmdMODE, &Client::cmdINVITE, &Client::cmdKICK, &Client::cmdWHOIS};
+	bool	(*f[14])(std::vector<std::string> &) = {&cmdPASS, &Client::cmdNICK, &Client::cmdUSER, &Client::cmdPING, &Client::cmdOPER, &Client::cmdQUIT, &Client::cmdJOIN, &Client::cmdPART, &Client::cmdPRIVMSG, &Client::cmdNOTICE, &Client::cmdMODE, &Client::cmdINVITE, &Client::cmdKICK, &Client::cmdWHOIS};
 	int i = 0;
 	
-	if (ccmd[1])
+	if (!ccmd[1].empty())
 		vecmd.push_back(ccmd[1]);
 	if (vecmd.empty())
 		return (false);
@@ -274,4 +280,4 @@ bool	Client::launchCommand(std::string command)
 	}
 	sendMessage("Command not found");
 	return (false);
-}*/
+}
