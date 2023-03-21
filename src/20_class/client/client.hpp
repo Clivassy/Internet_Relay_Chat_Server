@@ -18,6 +18,7 @@
 # include <map>
 # include  <sstream>
 # include "../../10_tools/colors.hpp"
+# include "../../10_tools/errors.hpp"
 # include "../../10_tools/utils.hpp"
 # include "../server.hpp"
 # include "../channel.hpp"

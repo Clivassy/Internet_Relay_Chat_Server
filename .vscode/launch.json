@@ -8,7 +8,7 @@
 		"preLaunchTask": "make_cmd",
 		"request": "launch",
 		"program": "${workspaceFolder}/ircserv",
-		"args": ["6090", "123"],
+		"args": ["6091", "1"],
 		"stopAtEntry": false,
 		"cwd": "${workspaceFolder}",
 		"environment": [],

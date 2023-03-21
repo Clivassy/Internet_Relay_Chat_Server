@@ -81,3 +81,49 @@ std::string pop_command(std::string& cmd)
 //	cmd.push_back(std::string(""));
 //	return (cmd);
 //}
+
+void test()
+{
+	
+}
+template<typename T>
+void print_vector(std::vector<T> vec)
+{
+	std::cout << "[";
+	for (typename std::vector<T>::iterator it=vec.begin(); it != vec.end(); it++)
+	{
+		std::cout << *it;
+		if(it + 1 != vec.end())
+			std::cout << ", ";
+
+
+	}
+	std::cout << "]" << std::endl;
+}
+
+
+template<typename key, typename T>
+void print_map(std::map<key, T> map)
+{
+	std::cout << "[";
+	for (typename std::map<key, T>::iterator it=map.begin(); it != map.end();)
+	{
+		std::cout << (it->first);
+		if(++it != map.end())
+			std::cout << ", ";
+	}
+	std::cout << "]" << std::endl;
+}
+
+template<typename key>
+void print_set(std::set<key> set)
+{
+	std::cout << "[";
+	for (typename std::set<key>::const_iterator it=set.begin(); it != set.end();)
+	{
+		std::cout << (*it);
+		if(++it != set.end())
+			std::cout << ", ";
+	}
+	std::cout << "]" << std::endl;
+}
