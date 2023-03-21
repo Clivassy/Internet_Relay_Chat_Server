@@ -10,6 +10,7 @@
 
 //source https://modern.ircdocs.horse/#client-messages
 
+/////////////////////////////////////////////////////////
 void	Client::sendMessage(std::string str)
 {
 	send(this->socketFd, str.c_str(), str.size(), 0);
@@ -22,6 +23,7 @@ void	Client::sendOtherClient(std::string str)
 			send(it->socketFd, str.c_str(), str.size(), 0);
 	}
 }
+////////////////////////////////////////////////////////
 
 bool	Client::cmdPASS(std::vector<std::string> &cmd)
 {
@@ -80,14 +82,13 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 		}
 	}
 	sendMessage(NICK(this->userInfos.nickName, cmd[1]));
+	sendOtherClient(NICK_INFORM(this->userInfos.nickName, this->userInfos.userName, cmd[1]))
 	this->userInfos.nickName = cmd[1];
-	//The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, and to inform other clients about the change of nickname. In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.
 	return (true);
 }
 
 bool	Client::cmdUSER(std::vector<std::string> &cmd)
 {
-	// Deja enregistrer
 	if (cmd[1].empty() || cmd[2].empty() || cmd[3].empty() || cmd[4].empty())
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("USER"));
@@ -98,14 +99,13 @@ bool	Client::cmdUSER(std::vector<std::string> &cmd)
 		sendMessage("USER :Parameters incorrect");
 		return (false);
 	}
-
-	//If a client tries to send the USER command after they have already completed registration with the server, the ERR_ALREADYREGISTERED reply should be sent and the attempt should fail.
-
-	//If the client sends a USER command after the server has successfully received a username using the Ident Protocol, the <username> parameter from this command should be ignored in favour of the one received from the identity server.
-
+	if (this->isAuthentified)
+	{
+		sendMessage(ERR_ALREADYREGISTERED);
+		return (false);
+	}
 	this->userInfos.userName = cmd[4];
 	this->userInfos.realName = cmd[4];
-	//Clients SHOULD use the nickname as a fallback value for <username> and <realname> when they don’t have a meaningful value to use.
 	return (true);
 }
 
@@ -140,10 +140,16 @@ bool	Client::cmdOPER(std::vector<std::string> &cmd)
 
 bool	Client::cmdQUIT(std::vector<std::string> &cmd)
 {
-	// This is typically only dispatched to clients that share a channel with the exiting user.
-	// Envoye Quit :<reason> au autres clients
-	(void) cmd;
-	sendMessage("QUIT : Bye for now");
+	if (cmd.size() == 1)
+	{
+		sendMessage(QUIT(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName));
+		sendOtherClient(QUIT(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName));
+	}
+	else
+	{
+		sendMessage(QUIT_REASON(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, cmd[1]));	
+		sendOtherClient(QUIT_REASON(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, cmd[1]));	
+	}
 	return (true);
 }
 

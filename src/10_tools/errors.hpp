@@ -11,6 +11,7 @@
 # define QUIT(nick, user, host) (nick + "!" + user + "@" + host  + " QUIT\r\n")
 
 # define NICK(old_nick, nick) (":" + old_nick + " NICK " + nick + "\r\n")
+# define NICK_INFORM(old_nick, user, host, nick) (":" + old_nick + "!" + user + "@" + host + " NICK " + nick + "\r\n")
 
 # define JOIN(nick, user, host, chan) (":" + nick + "!" + user + "@" + host  + " JOIN " + chan + "\r\n")
 //message pour tous les gens sur le channel ":<nick persone qui a join>!<user>@<host> JOIN <channel>"
@@ -45,7 +46,7 @@
 //ecrit le topic du channel si celui ci est set
 # define RPL_TOPICWHOTIME(nick, chan, whoset, user, setat) ("333 " + nick + " " + chan + " " + whoset + "!" + user + "@localhost " + setat + "\r\n")
 
-# define ERR_ALREADYREGISTERED "462 :Unauthorized command (already registered)\r\n"
+# define ERR_ALREADYREGISTERED "462 :You may not reregister\r\n"
 
 # define ERR_NEEDMOREPARAMS(command) (std::string("461 ") + command + " :Not enough parameters\r\n")
 
