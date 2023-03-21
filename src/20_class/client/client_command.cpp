@@ -12,6 +12,7 @@
 
 void	Client::sendMessage(std::string str)
 {
+//	std::cout << "sendMessage " << str.c_str() << " " << str.size() << std::endl;
 	send(this->socketFd, str.c_str(), str.size(), 0);
 }
 
@@ -108,7 +109,8 @@ bool	Client::cmdPING(std::vector<std::string> &cmd)
 		sendMessage(ERR_NEEDMOREPARAMS("PING"));
 		return (false);
 	}
-	sendMessage("PONG" + cmd[1] + "\r");
+	std::cout << "PONG " + cmd[1] + "\r" << std::endl;
+	sendMessage("PONG " + cmd[1] + "\r");
 	return (true);
 }
 
@@ -133,7 +135,8 @@ bool	Client::cmdQUIT(std::vector<std::string> &cmd)
 {
 	// This is typically only dispatched to clients that share a channel with the exiting user.
 	// Envoye Quit :<reason> au autres clients
-	sendMessage(":QUIT : Bye for now" + cmd[1]);
+	(void) cmd;
+	sendMessage("QUIT : Bye for now");
 	return (true);
 }
 
@@ -262,20 +265,26 @@ bool	Client::cmdWHOIS(std::vector<std::string> &cmd)
 //- PASS, NICK, USER, PING, OPER, QUIT, JOIN, PART, PRIVMSG, NOTICE, MODE, INVITE. KICK, WHOIS
 bool	Client::launchCommand(std::string command)
 {
+	std::cout << "HERE launchCommand => " << command << std::endl;
+	
 	std::vector<std::string> ccmd = split(command, ':');
 	std::vector<std::string> vecmd = split(ccmd[0], ' ');
 	std::string	choice[14] = {"PASS", "NICK", "USER", "PING", "OPER", "QUIT", "JOIN", "PART", "PRIVMSG", "NOTICE", "MODE", "INVITE", "KICK", "WHOIS"};
 	bool	(Client::*f[14])(std::vector<std::string> &) = {&Client::cmdPASS, &Client::cmdNICK, &Client::cmdUSER, &Client::cmdPING, &Client::cmdOPER, &Client::cmdQUIT, &Client::cmdJOIN, &Client::cmdPART, &Client::cmdPRIVMSG, &Client::cmdNOTICE, &Client::cmdMODE, &Client::cmdINVITE, &Client::cmdKICK, &Client::cmdWHOIS};
 	int i = 0;
-	
-	if (!ccmd[1].empty())
-		vecmd.push_back(ccmd[1]);
+
+//	if (!ccmd[1].empty())
+//		vecmd.push_back(ccmd[1]);
 	if (vecmd.empty())
 		return (false);
+	std::cout << "vecmd " << vecmd[0] << std::endl;
 	while (i < 13)
 	{
 		if (vecmd[0] == choice[i])
+		{
+			std::cout << "bouhhhh" << std::endl;
 			return (this->*f[i])(vecmd);
+		}
 		i++;
 	}
 	sendMessage("Command not found");
