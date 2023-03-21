@@ -36,9 +36,15 @@ class Client {
         std::string realName;
         std::string userMessage;
 
+
     };
     public:
         Client(Server& serv);
+		Client& operator=(const Client&other)
+		{
+			(void)other;
+			return (*this);
+		}
         ~Client(); 
 		
 		// Command
@@ -96,6 +102,11 @@ class Client {
 		bool                        isConnected;
 		bool						isOperator;
 		bool						isValidPassword;
+		std::vector<std::string>	authentificationCmd;
+		bool CAP_LS;
+		bool Password;
+		bool NICK;
+		bool USER;
 
 };
     std::string                 removeLines(std::string);

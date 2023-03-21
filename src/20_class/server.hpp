@@ -2,6 +2,7 @@
 # define SERVER_HPP
 
 //# include "../main.hpp"
+# include <algorithm>
 # include <iostream>
 # include <string>
 # include <string.h>
