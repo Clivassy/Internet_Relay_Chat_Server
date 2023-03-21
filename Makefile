@@ -6,7 +6,7 @@ NAME = ircserv
 SRCS += ./src/main.cpp
 SRCS += ./src/10_tools/utils.cpp
 SRCS += ./src/20_class/client/client.cpp
-#SRCS += ./src/20_class/client/client_command.cpp
+SRCS += ./src/20_class/client/client_command.cpp
 SRCS += ./src/20_class/server.cpp
 SRCS += ./src/20_class/channel.cpp
 SRCS += ./src/30_Parsing_argv/parsing.cpp
@@ -28,7 +28,7 @@ OBJS = ${SRCS:.cpp=.o}
 CC = c++
 
 #CFLAGS = -g -Wall -Wextra -Werror -std=c++98
-CFLAGS = -g -Wall -Wextra -std=c++98
+CFLAGS = -g3 -Wall -Wextra -std=c++98
 
 ##########   RULES   ##########
 all: $(NAME)

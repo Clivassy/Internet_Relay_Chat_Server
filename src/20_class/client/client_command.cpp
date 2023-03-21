@@ -9,9 +9,10 @@
 
 
 //source https://modern.ircdocs.horse/#client-messages
-/*
+
 void	Client::sendMessage(std::string str)
 {
+//	std::cout << "sendMessage " << str.c_str() << " " << str.size() << std::endl;
 	send(this->socketFd, str.c_str(), str.size(), 0);
 }
 
@@ -26,7 +27,7 @@ bool	Client::cmdPASS(std::vector<std::string> &cmd)
 		return (false);
 	}
 	// Check avec espace
-	if ((pos = this->server.get_password().find(" ")) == std::string::npos)
+	if ((pos = this->server.get_password().find(" ")) == (int)std::string::npos)
 	{
 		if (cmd[1] != this->server.get_password())
 		{
@@ -36,7 +37,7 @@ bool	Client::cmdPASS(std::vector<std::string> &cmd)
 	}
 	else
 	{
-		for (int i = 1; i < cmd.size(); i++)
+		for (int i = 1; i < (int)cmd.size(); i++)
 		{
 			if (cmd[i] != this->server.get_password().substr(tmp_pos, pos))
 			{
@@ -58,21 +59,21 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 		sendMessage(ERR_NONICKNAMEGIVEN);
 		return (false);
 	}
-	if (cmd.size > 2)
+	if (cmd.size() > 2)
 	{
-		sendMessage(ERR_ERRONEUSNICKNAME) 
+		sendMessage(ERR_ERRONEUSNICKNAME(cmd[1])); 
 		return (false);
 	}
-	for (int i = 0; i < srv.clientList.size(); i++)
+	for (int i = 0; i < (int)this->server.clientList.size(); i++)
 	{
-		if (cmd[1] == srv.clientList[i].ClientNick)
+		if (cmd[1] == this->server.clientList[i].userInfos.nickName)
 		{
-			sendMessage(ERR_NICKNAMEINUSE);
+			sendMessage(ERR_NICKNAMEINUSE(cmd[1]));
 			return (false);
 		}
 	}
-	sendMessage(NICK(this->User.nickname, cmd[1]));
-	this->userInfos.nickname = cmd[1];
+	sendMessage(NICK(this->userInfos.nickName, cmd[1]));
+	this->userInfos.nickName = cmd[1];
 	//The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, and to inform other clients about the change of nickname. In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.
 	return (true);
 }
@@ -95,8 +96,8 @@ bool	Client::cmdUSER(std::vector<std::string> &cmd)
 
 	//If the client sends a USER command after the server has successfully received a username using the Ident Protocol, the <username> parameter from this command should be ignored in favour of the one received from the identity server.
 
-	this->userInfos.username = cmd[4];
-	this->userInfos.realname = cmd[4];
+	this->userInfos.userName = cmd[4];
+	this->userInfos.realName = cmd[4];
 	//Clients SHOULD use the nickname as a fallback value for <username> and <realname> when they don’t have a meaningful value to use.
 	return (true);
 }
@@ -108,7 +109,8 @@ bool	Client::cmdPING(std::vector<std::string> &cmd)
 		sendMessage(ERR_NEEDMOREPARAMS("PING"));
 		return (false);
 	}
-	sendMessage("PONG" + cmd[1] + "\r");
+	std::cout << "PONG " + cmd[1] + "\r" << std::endl;
+	sendMessage("PONG " + cmd[1] + "\r");
 	return (true);
 }
 
@@ -124,7 +126,7 @@ bool	Client::cmdOPER(std::vector<std::string> &cmd)
 		sendMessage(ERR_PASSWDMISMATCH);
 		return (false);
 	}
-	sendMessage(RPL_YOUREOPER(cmd[1]);
+	sendMessage(RPL_YOUREOPER(cmd[1]));
 	//The user will also receive a MODE message indicating their new user modes, and other messages may be sent.
 	return (true);
 }
@@ -133,7 +135,8 @@ bool	Client::cmdQUIT(std::vector<std::string> &cmd)
 {
 	// This is typically only dispatched to clients that share a channel with the exiting user.
 	// Envoye Quit :<reason> au autres clients
-	std::cout << ":QUIT : Bye for now" << std::endl;
+	(void) cmd;
+	sendMessage("QUIT : Bye for now");
 	return (true);
 }
 
@@ -206,6 +209,7 @@ bool	Client::cmdNOTICE(std::vector<std::string> &cmd)
 	if (cmd[2].empty())
 		return (false);
 	// Envoyer le message
+	return (true);
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -216,6 +220,7 @@ bool	Client::cmdMODE(std::vector<std::string> &cmd)
 		sendMessage(ERR_NEEDMOREPARAMS("MODE"));
 		return (false);
 	}
+	return (true);
 }
 
 // Parameters: <nickname> <channel>
@@ -231,6 +236,7 @@ bool	Client::cmdINVITE(std::vector<std::string> &cmd)
 	// Si le client est deja dans le channel => ERR_USERONCHANNEL
 	
 	//When the invite is successful, the server MUST send a RPL_INVITING numeric to the command issuer, and an INVITE message, with the issuer as <source>, to the target user. Other channel members SHOULD NOT be notified.
+	return (true);
 }
 
 //  Parameters: <channel> <user> [<comment>]
@@ -242,6 +248,7 @@ bool	Client::cmdKICK(std::vector<std::string> &cmd)
 		return (false);
 	}
 	// supprime le user du channel
+	return (true);
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -252,26 +259,34 @@ bool	Client::cmdWHOIS(std::vector<std::string> &cmd)
 		sendMessage(ERR_NEEDMOREPARAMS("WHOIS"));
 		return (false);
 	}
+	return (true);
 }
+
 //- PASS, NICK, USER, PING, OPER, QUIT, JOIN, PART, PRIVMSG, NOTICE, MODE, INVITE. KICK, WHOIS
 bool	Client::launchCommand(std::string command)
 {
+	std::cout << "HERE launchCommand => " << command << std::endl;
+	
 	std::vector<std::string> ccmd = split(command, ':');
 	std::vector<std::string> vecmd = split(ccmd[0], ' ');
 	std::string	choice[14] = {"PASS", "NICK", "USER", "PING", "OPER", "QUIT", "JOIN", "PART", "PRIVMSG", "NOTICE", "MODE", "INVITE", "KICK", "WHOIS"};
-	bool	(*f[14])(std::vector<std::string> &) = {&Client::cmdPASS, &Client::cmdNICK, &Client::cmdUSER, &Client::cmdPING, &Client::cmdOPER, &Client::cmdQUIT, &Client::cmdJOIN, &Client::cmdPART, &Client::cmdPRIVMSG, &Client::cmdNOTICE, &Client::cmdMODE, &Client::cmdINVITE, &Client::cmdKICK, &Client::cmdWHOIS};
+	bool	(Client::*f[14])(std::vector<std::string> &) = {&Client::cmdPASS, &Client::cmdNICK, &Client::cmdUSER, &Client::cmdPING, &Client::cmdOPER, &Client::cmdQUIT, &Client::cmdJOIN, &Client::cmdPART, &Client::cmdPRIVMSG, &Client::cmdNOTICE, &Client::cmdMODE, &Client::cmdINVITE, &Client::cmdKICK, &Client::cmdWHOIS};
 	int i = 0;
-	
-	if (ccmd[1])
-		vecmd.push_back(ccmd[1]);
+
+//	if (!ccmd[1].empty())
+//		vecmd.push_back(ccmd[1]);
 	if (vecmd.empty())
 		return (false);
+	std::cout << "vecmd " << vecmd[0] << std::endl;
 	while (i < 13)
 	{
 		if (vecmd[0] == choice[i])
-			return (*f[i])(vecmd);
+		{
+			std::cout << "bouhhhh" << std::endl;
+			return (this->*f[i])(vecmd);
+		}
 		i++;
 	}
 	sendMessage("Command not found");
 	return (false);
-}*/
+}
