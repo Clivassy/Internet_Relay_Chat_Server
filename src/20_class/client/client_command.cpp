@@ -12,8 +12,15 @@
 
 void	Client::sendMessage(std::string str)
 {
-//	std::cout << "sendMessage " << str.c_str() << " " << str.size() << std::endl;
 	send(this->socketFd, str.c_str(), str.size(), 0);
+}
+
+void	Client::sendOtherClient(std::string str)
+{
+	for (std::vector<Client>::iterator it = this->server.clientList.begin(); it != this->server.clientList.end(); it++)
+	{
+			send(it->socketFd, str.c_str(), str.size(), 0);
+	}
 }
 
 bool	Client::cmdPASS(std::vector<std::string> &cmd)

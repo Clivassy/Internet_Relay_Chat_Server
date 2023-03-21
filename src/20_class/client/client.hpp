@@ -44,6 +44,7 @@ class Client {
 		// Command
 		bool	launchCommand(std::string command);
 		void	sendMessage(std::string str);
+		void	sendOtherClient(std::string str);
 		bool	cmdPASS(std::vector<std::string> &cmd);
 		bool	cmdUSER(std::vector<std::string> &cmd);
 		bool	cmdNICK(std::vector<std::string> &cmd);
