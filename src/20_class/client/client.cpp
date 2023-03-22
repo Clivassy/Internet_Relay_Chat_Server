@@ -2,7 +2,7 @@
 
 Client::Client(Server& serv):
 server(serv), bufferSize(BUFFER_SIZE), isAuthentified(false), isConnected(false), isOperator(false),
-isValidPassword(false), status(COMING)
+isValidPassword(false), status(WAITING)
 { }
 
 Client::~Client(){ }
@@ -193,7 +193,7 @@ void    Client::fillDataUser( void )
 		//	// get userName
 		//	std::cout  << GREEN << this->authentificationCmd[3] << RESET << std::endl;
 		//}
-	}
+	//}
 
 
 
@@ -240,4 +240,4 @@ void    Client::fillDataUser( void )
 			}
 		}
 	}*/
-}
+//}

@@ -25,21 +25,18 @@ void	Client::sendOtherClient(std::string str)
 
 bool	Client::cmdPASS(std::vector<std::string> &cmd)
 {
-	std::cout << GREEN <<  "HERE" << RESET << std::endl;
-	std::cout << GREEN << "|"<< cmd[1] << "|" << RESET << std::endl;
 	if (cmd[1].empty())
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
 		return (false);
 	}
-	std::cout << this->status << std::endl;
 	if (this->status == COMING)
 	{
-		std::cout << "|" << this->server.get_password() << "|" << std::endl;
 		if (this->server.get_password().compare(cmd[1]) == 0)
 		{
 			std::cout << "PASSWORD IS OK" << std::endl;
 			this->status = REGISTERED;
+			return (true);
 		}
 		else
 			this->status = BAD_PASSWORD;
@@ -51,34 +48,50 @@ bool	Client::cmdPASS(std::vector<std::string> &cmd)
 	}
 	if (this->status == BAD_PASSWORD)
 	{
-
+		sendMessage(ERR_PASSWDMISMATCH);
+		this->status = COMING;
+		return (false);
 	}
-
 	return (true);
 }
 
 bool	Client::cmdNICK(std::vector<std::string> &cmd)
 {
+	// Cas d'erreur généralistes
 	if (cmd[1].empty())
 	{
 		sendMessage(ERR_NONICKNAMEGIVEN);
 		return (false);
 	}
-	if (cmd.size() > 2)
+		if (cmd.size() > 2)
 	{
 		sendMessage(ERR_ERRONEUSNICKNAME(cmd[1])); 
 		return (false);
 	}
-	for (int i = 0; i < (int)this->server.clientList.size(); i++)
+
+	// ici gérer le stockage du nickname a l'authentification 
+	if (this->status == REGISTERED)
 	{
-		if (cmd[1] == this->server.clientList[i].userInfos.nickName)
+		this->userInfos.nickName = cmd[1];
+	}
+
+	// ici gérer le changement de nickname 
+	if (this->status == CONNECTED)
+	{
+		// si nickname deja present
+		for (int i = 0; i < (int)this->server.clientList.size(); i++)
 		{
-			sendMessage(ERR_NICKNAMEINUSE(cmd[1]));
-			return (false);
+			if (cmd[1] == this->server.clientList[i].userInfos.nickName)
+			{
+				sendMessage(ERR_NICKNAMEINUSE(cmd[1]));
+				return (false);
+			}
 		}
 	}
-	sendMessage(NICK(this->userInfos.nickName, cmd[1]));
 	this->userInfos.nickName = cmd[1];
+
+	sendMessage(NICK(this->userInfos.nickName, cmd[1]));
+	sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost");
 	//The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, and to inform other clients about the change of nickname. In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.
 	return (true);
 }
@@ -103,6 +116,7 @@ bool	Client::cmdUSER(std::vector<std::string> &cmd)
 
 	this->userInfos.userName = cmd[4];
 	this->userInfos.realName = cmd[4];
+	sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost");
 	//Clients SHOULD use the nickname as a fallback value for <username> and <realname> when they don’t have a meaningful value to use.
 	return (true);
 }
@@ -239,6 +253,27 @@ bool	Client::cmdWHOIS(std::vector<std::string> &cmd)
 	return (true);
 }
 
+bool	Client::cmdCAP(std::vector<std::string> &cmd)
+{
+	if (cmd.size() == 2)
+	{
+		std::cout << RED << cmd[1] << std::endl;
+		if (cmd[1].compare("LS") == 0)
+		{
+			std::cout << RED << "here" << std::endl;
+			this->status = COMING;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool	Client::cmdJOIN(std::vector<std::string> &cmd)
+{
+	(void)cmd;
+	return true;
+}
+
 //- PASS, NICK, USER, PING, OPER, QUIT, JOIN, PART, PRIVMSG, NOTICE, MODE, INVITE. KICK, WHOIS
 bool	Client::launchCommand(std::string command)
 {
@@ -246,7 +281,7 @@ bool	Client::launchCommand(std::string command)
 	
 	std::vector<std::string> ccmd = split(command, ':');
 	std::vector<std::string> vecmd = split(ccmd[0], ' ');
-	std::string	choice[14] = {"PASS", "NICK", "USER", "PING", "OPER", "QUIT", "JOIN", "PART", "PRIVMSG", "NOTICE", "MODE", "INVITE", "KICK", "WHOIS"};
+	std::string	choice[15] = {"CAP", "PASS", "NICK", "USER", "PING", "OPER", "QUIT", "JOIN", "PART", "PRIVMSG", "NOTICE", "MODE", "INVITE", "KICK", "WHOIS"};
 	bool	(Client::*f[14])(std::vector<std::string> &) = {&Client::cmdPASS, &Client::cmdNICK, &Client::cmdUSER, &Client::cmdPING, &Client::cmdOPER, &Client::cmdQUIT, &Client::cmdJOIN, &Client::cmdPART, &Client::cmdPRIVMSG, &Client::cmdNOTICE, &Client::cmdMODE, &Client::cmdINVITE, &Client::cmdKICK, &Client::cmdWHOIS};
 	int i = 0;
 
@@ -254,10 +289,15 @@ bool	Client::launchCommand(std::string command)
 //		vecmd.push_back(ccmd[1]);
 	if (vecmd.empty())
 		return (false);
-	std::cout << "vecmd " << vecmd[0] << std::endl;
-	while (i < 13)
+	std::cout <<  "COMMANDE = " << vecmd[0] << std::endl;
+	//sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost\r\n");
+	/*while (i < 13)
 	{
-		if (vecmd[0].compare("PASS") == 0)
+		if (vecmd[0].compare("CAP") == 0)
+		{
+			return (this->cmdCAP(vecmd));
+		}
+		else if (vecmd[0].compare("PASS") == 0)
 		{
 			return (this->cmdPASS(vecmd));
 		}
@@ -267,7 +307,7 @@ bool	Client::launchCommand(std::string command)
 			return (this->*f[i])(vecmd);
 		}
 		i++;
-	}
+	}*/
 	//sendMessage("Command not found");
 	return (false);
 }

@@ -111,7 +111,7 @@ void Server::run()
 		{
 			std::cout << BOLD_BLUE << "Event detected by poll \n" << RESET;
 			this->manage_poll_event();
-			this->printState();
+			//this->printState();
 		}
 		if(pollreturn == 0) // TBD bloc pour debug, mais a supprimer car inutile a la fin
 		{
@@ -182,15 +182,6 @@ void Server::addNewClient()
 	(--this->fdListened.end())->fd = newClient.socketFd;
 	(--this->fdListened.end())->events = POLLIN; // event attendu = POLLIN
 	//this->authentication(*(--this->clientList.end()));
-}
-
-void replace_rn_by_n(std::string& str)
-{
-	while(str.find("\r\n") != std::string::npos)
-	{
-		str.replace(str.find("\r\n"),  2, "\n");
-	}
-	
 }
 
 void Server::listen_client(Client &client)

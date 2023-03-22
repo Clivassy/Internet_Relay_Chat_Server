@@ -48,7 +48,7 @@ bool isChannelFlag(char flag)
 // Des qu'il a rejoint on doit envoyer une message "<source> joined the channel" doit etre envoye
 // ainsi que le topic du channel (avec RPL_TOPIC) et la liste des utilisateurs connectes (avc RPL_NAMREPLY
 // suivi d'un RPL_ENDOFNAMES)
-bool	Client::cmdJOIN(std::vector<std::string> &cmd)
+/*bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 {
 	if (cmd.size() <=1)
 	{
@@ -73,4 +73,4 @@ bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 	
 	
 	return (true);
-}
+}*/

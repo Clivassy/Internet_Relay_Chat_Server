@@ -27,6 +27,7 @@ class Server;
 class Channel;
 
 # define BUFFER_SIZE 1024
+# define WAITING 0
 # define COMING 1
 # define REGISTERED 2
 # define BAD_PASSWORD 3
@@ -57,6 +58,7 @@ class Client {
 		bool	launchCommand(std::string command);
 		void	sendMessage(std::string str);
 		void	sendOtherClient(std::string str);
+		bool	cmdCAP(std::vector<std::string> &cmd);
 		bool	cmdPASS(std::vector<std::string> &cmd);
 		bool	cmdUSER(std::vector<std::string> &cmd);
 		bool	cmdNICK(std::vector<std::string> &cmd);
