@@ -186,8 +186,23 @@ void Server::addNewClient()
 }
 
 void Server::listen_client(Client &client)
-{
+{	
+	
 	if (!client.isAuthentified)
+	{
+		client.userInfos.userMessage = ":zuzu!zuzu@arzu 001 zuzu :Welcome to the Internet Relay Network zuzu!zuzu@host\r\n"; 
+		if (send(client.socketFd, client.userInfos.userMessage.c_str(), client.userInfos.userMessage.size(), 0) < 0)
+		{
+			std::cout << BOLD_RED << "Error with send()" << std::endl;
+			perror("send");
+			client.server.terminate();
+			exit(EXIT_FAILURE);
+		}
+		client.isAuthentified = 1;
+	}
+
+
+/*	if (!client.isAuthentified)
 	{
 		memset(client.buffer, 0, client.bufferSize);
 		std::vector<std::string> tmp;
@@ -223,7 +238,7 @@ void Server::listen_client(Client &client)
 		if (client.isAuthentified == true)
 			client.sendResponse();
 		client.authentification.clear();
-	}
+	}*/
 	else
 	{
 		clear_str(client.buffer, client.bufferSize);

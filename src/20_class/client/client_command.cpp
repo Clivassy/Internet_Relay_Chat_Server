@@ -27,34 +27,15 @@ void	Client::sendOtherClient(std::string str)
 
 bool	Client::cmdPASS(std::vector<std::string> &cmd)
 {
-	int pos = 0;
-	int tmp_pos = 0;
-
-	if (cmd[1].empty())
+	if (cmd[1] == "\0")
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
 		return (false);
 	}
-	// Check avec espace
-	if ((pos = this->server.get_password().find(" ")) == (int)std::string::npos)
+	if (cmd[1] != this->server.get_password())
 	{
-		if (cmd[1] != this->server.get_password())
-		{
-			sendMessage(ERR_PASSWDMISMATCH);
-			return (false);
-		}
-	}
-	else
-	{
-		for (int i = 1; i < (int)cmd.size(); i++)
-		{
-			if (cmd[i] != this->server.get_password().substr(tmp_pos, pos))
-			{
-				sendMessage(ERR_PASSWDMISMATCH);
-				return (false);
-			}
-			tmp_pos = pos + 1;
-		}
+		sendMessage(ERR_PASSWDMISMATCH);
+		return (false);
 	}
 	this->isConnected = true;
 	sendMessage("Connection established \r\n");
@@ -63,12 +44,15 @@ bool	Client::cmdPASS(std::vector<std::string> &cmd)
 
 bool	Client::cmdNICK(std::vector<std::string> &cmd)
 {
+	std::cout << "in cmdPASS " << cmd[0] << std::endl;
+	std::cout << "in cmdPASS " << cmd[1] << std::endl;
+	std::cout << "size of cmd " << cmd.size() << std::endl;
 	if (cmd[1].empty())
 	{
 		sendMessage(ERR_NONICKNAMEGIVEN);
 		return (false);
 	}
-	if (cmd.size() > 2)
+	if (cmd.size() < 3)
 	{
 		sendMessage(ERR_ERRONEUSNICKNAME(cmd[1])); 
 		return (false);
@@ -265,6 +249,7 @@ bool	Client::launchCommand(std::string command)
 	std::cout << "vecmd " << vecmd[0] << std::endl;
 	while (i < 13)
 	{
+		std::cout << "choice[i]" << choice[i] << std::endl;
 		if (vecmd[0] == choice[i])
 		{
 			std::cout << "bouhhhh" << std::endl;
@@ -272,6 +257,6 @@ bool	Client::launchCommand(std::string command)
 		}
 		i++;
 	}
-	sendMessage("Command not found");
+	sendMessage("Command not found\r\n");
 	return (false);
 }
