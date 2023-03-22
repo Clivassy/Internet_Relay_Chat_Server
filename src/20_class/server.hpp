@@ -54,10 +54,12 @@ class Server
 		void		terminate();
 
 		// client
-		void		manage_poll_event();
-		void		addNewClient();
-		void		listen_client(Client &client);
-		Client&		getClient(int fd);
+		void							manage_poll_event();
+		void							addNewClient();
+		void							listen_client(Client &client);
+		std::vector<Client>::iterator	getClient(int fd);
+		std::vector<Client>::iterator	getClient(std::string user);
+
 
 		// channel
 		bool		isChannelExisting(std::string name);

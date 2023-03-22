@@ -36,4 +36,7 @@
 # define RESET "\033[0m"
 # define RST "\033[0m"
 
+// other
+# define BLUE_PIPE BOLD_BLUE << "  | " << RESET
+
 #endif
