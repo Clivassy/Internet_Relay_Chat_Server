@@ -11,9 +11,9 @@ Channel::~Channel( void )
 }
 
 // Ajouter le fd du clien qui se connecte au serveur dans la liste des clients connectés
-void    Channel::addClientToChannel( void )
+void Channel::addClient(Client& client)
 {
-	
+	clientConnected.insert(client.socketFd);
 }
 
 // recevoir une string et send a tous les clients connectés

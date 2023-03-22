@@ -20,8 +20,10 @@
 # include "../../10_tools/colors.hpp"
 # include "../../10_tools/utils.hpp"
 # include "../server.hpp"
+# include "../channel.hpp"
 
 class Server;
+class Channel;
 
 # define BUFFER_SIZE 1024
 
@@ -36,9 +38,15 @@ class Client {
         std::string realName;
         std::string userMessage;
 
+
     };
     public:
         Client(Server& serv);
+		Client& operator=(const Client&other)
+		{
+			(void)other;
+			return (*this);
+		}
         ~Client(); 
 		
 		// Command
@@ -64,7 +72,7 @@ class Client {
         void    			sendResponse( void );
         bool    			getNickName( std::string toSplit );
         bool    			getUserInfos( std::string toSplit);
-		std::string    		getPassword( std::string toSplit );
+		bool	    		getPassword( std::string toSplit );
 		std::string			getPrefix( void );
 		void				errorAuthentification ( void );
 		void				errorPassword( void );
@@ -85,7 +93,7 @@ class Client {
 
     // protected:
 		Server&						server;
-        int socketFd;
+        int							socketFd;
         struct sockaddr_in          clientAddr;
         socklen_t                   clientSize;
         User                        userInfos;
@@ -97,6 +105,13 @@ class Client {
 		bool                        isConnected;
 		bool						isOperator;
 		bool						isValidPassword;
+		std::vector<std::string>	authentificationCmd;
+
+	// Authentication
+		bool CAP_LS;
+		bool Password;
+		bool NICK;
+		bool USER;
 
 };
     std::string                 removeLines(std::string);

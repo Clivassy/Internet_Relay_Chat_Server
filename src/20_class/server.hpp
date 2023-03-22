@@ -2,6 +2,7 @@
 # define SERVER_HPP
 
 //# include "../main.hpp"
+# include <algorithm>
 # include <iostream>
 # include <string>
 # include <string.h>
@@ -19,12 +20,14 @@
 # include "../10_tools/colors.hpp"
 # include "../10_tools/utils.hpp"
 # include "client/client.hpp"
+# include "channel.hpp"
 
 
 # define BUFFER_SIZE 1024
 # define LISTENING_TIMEOUT 10000 // delai d'ecoute dans poll() en ms
 
 class Client;
+class Channel;
 
 class Server
 {
@@ -33,32 +36,35 @@ class Server
 		int			port;
 		std::string	password;
 
-		//const int			bufferSize;
-		//char				buffer[BUFFER_SIZE];
-		int					socketFd;
-		int					serverFd;
-		struct sockaddr_in	serverAddr;
-		std::vector<pollfd> fdListened;
-		std::vector<Client> clientList;		
-
-		//TBD 
-		// ajouter tableau de client
-		// tableau de pollfd
-
+		int								socketFd;
+		int								serverFd;
+		struct sockaddr_in				serverAddr;
+		std::vector<pollfd> 			fdListened;
+		std::vector<Client> 			clientList;		
+		std::map<std::string, Channel>	channelList;
 
 	public:
+		// Server
 		Server();
-		void set_port(int port);
-		void set_password(std::string password);
-		std::string get_password(void);
-		void init();
-		void run();
-		void manage_poll_event();
-		void addNewClient();
-		void listen_client(Client &client);
-		Client& getClient(int fd);
+		void		set_port(int port);
+		void		set_password(std::string password);
+		std::string	get_password(void);
+		void		init();
+		void		run();
+		void		terminate();
 
-		void terminate();
+		// client
+		void		manage_poll_event();
+		void		addNewClient();
+		void		listen_client(Client &client);
+		Client&		getClient(int fd);
+
+		// channel
+		bool		isChannelExisting(std::string name);
+		void		addChannel(std::string name);
+		Channel&	getChannel(std::string name);
+
+
 };
 
 #endif 

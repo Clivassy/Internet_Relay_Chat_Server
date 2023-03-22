@@ -17,8 +17,10 @@
 # include <map>
 # include <set>
 # include "server.hpp"
+# include "./client/client.hpp"
 
 class Server;
+class Client;
 
 class Channel
 {
@@ -27,8 +29,8 @@ class Channel
 		~Channel( void );
 		void	sendMessageToClients( std::string msg);
 		void	addMsgToHistory(std::string msg);
-		void    addClientToChannel( void );
-	
+		void	addClient(Client& client);
+
 	protected:
 		Server&						server;
 		std::set<int>				clientConnected;
