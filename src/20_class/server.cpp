@@ -110,6 +110,20 @@ void Server::run()
 		i++;
 	}
 }
+bool operator==( Client& other, const Client& rhs) 
+{
+    return (other.socketFd == rhs.socketFd);
+}
+
+bool operator==( const Client& other, Client& rhs) 
+{
+    return (other.socketFd == rhs.socketFd);
+}
+
+bool operator==( const Client& other, const Client& rhs) 
+{
+    return (other.socketFd == rhs.socketFd);
+}
 
 void Server::manage_poll_event()
 {
@@ -118,13 +132,31 @@ void Server::manage_poll_event()
 	{
 		if (it->revents == POLLIN)
 		{
+			std::cout << "REVENT = " << it->revents << std::endl;
 			if (it == this->fdListened.begin())
 			{
 				this->addNewClient();
-			}
+				std::cout << BOLD_YELLOW << "CLIENT : " << this->clientList[it->fd].socketFd << RESET << std::endl;
+			}	
 			else
 			{
 				this->listen_client(this->getClient(it->fd));
+			}
+		}
+	}
+	
+	std::vector<pollfd>::iterator ite = this->fdListened.begin();
+	for (size_t i = 0; i < fdListened.size(); i++, ite++)
+	{
+		if(ite->revents == -1)
+		{
+			close(ite->fd);
+			this->fdListened.erase(ite);
+
+			std::vector<Client>::iterator it  = std::find(this->clientList.begin(), this->clientList.end(), this->getClient(ite->fd) );
+			if (it != clientList.end())
+    		{	
+				this->clientList.erase(it);
 			}
 		}
 	}
@@ -157,14 +189,39 @@ void Server::listen_client(Client &client)
 {
 	if (!client.isAuthentified)
 	{
-		recv(client.socketFd, client.buffer, client.bufferSize - 1, 0); // TBD voir si flag O_NONBLOCK
+		memset(client.buffer, 0, client.bufferSize);
+		std::vector<std::string> tmp;
+		//client.authentification.clear();
+		if (recv(client.socketFd, client.buffer, client.bufferSize - 1, 0) < 0) // TBD voir si flag O_NONBLOCK
+		{
+			perror("recv");
+			std::cout << BOLD_RED << "Error while receiving connection" << RESET << std::endl;
+			exit(EXIT_FAILURE);
+		}
+
 		client.authentification += client.buffer;
+		if (client.authentification.find("\r"))
+		{
+			tmp = split(client.authentification, '\r');
+			for (std::vector<std::string>::iterator it = tmp.begin(); it != tmp.end() ; it++)
+			{
+				std::string tmp = *it;
+				tmp = removeLines(tmp);
 
-		std::cout << client.authentification << std::endl;
-	
+				if (!tmp.empty())
+				{
+					client.authentificationCmd.push_back(tmp);
+				}	
+			}
+		}
+		else
+		{
+			tmp = split(client.authentification, "\n");
+			client.authentificationCmd.push_back(tmp[0]);
+		}
 		client.fillDataUser();
-		client.sendResponse();
-
+		if (client.isAuthentified == true)
+			client.sendResponse();
 		client.authentification.clear();
 	}
 	else
@@ -182,6 +239,7 @@ void Server::listen_client(Client &client)
 		}
 
 	}
+
 }
 
 void Server::terminate()
