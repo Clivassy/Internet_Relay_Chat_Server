@@ -8,15 +8,27 @@ Server::Server()
 
 }
 
-Client& Server::getClient(int fd)
+std::vector<Client>::iterator Server::getClient(int fd)
 {
-	for (std::vector<Client>::iterator it = this->clientList.begin(); it != this->clientList.end(); it++)
+	std::vector<Client>::iterator it;
+	for (it = this->clientList.begin(); it != this->clientList.end(); it++)
 		{
 			if (it->socketFd == fd)
-				return (*it);
+				return (it);
 		}
 	std::cout << BOLD_RED << "fd non trouve dans getclient -> /!\\ pour suite execution (return getClient non valid)" << RESET << std::endl;
-	return (this->clientList[0]); // return 1er client si fd non trouvé
+	return (it); // return 1er client si fd non trouvé
+}
+std::vector<Client>::iterator Server::getClient(std::string user)
+{
+	std::vector<Client>::iterator it;
+	for (it = this->clientList.begin(); it != this->clientList.end(); it++)
+		{
+			if (it->userInfos.userName == user)
+				return (it);
+		}
+	std::cout << BOLD_RED << "user non trouve dans getclient -> /!\\ pour suite execution (return getClient non valid)" << RESET << std::endl;
+	return (it); // return 1er client si fd non trouvé
 }
 
 void Server::set_port(int port)
@@ -81,8 +93,7 @@ void Server::run()
 	int pollreturn = -1;
 	while (i < 30)
 	{
-		std::cout << BOLD_BLUE << "loop step " << i << RESET << std::endl;
-		std::cout << "Ecoute pollfd " << RESET << std::endl;
+		std::cout << BOLD_BLUE << "loop step " << i << BLUE << " (1 loop = " << LISTENING_TIMEOUT/1000 << "s)  Waiting for event ..." << RESET << std::endl;
 		pollreturn = poll(&(this->fdListened[0]), this->fdListened.size(), LISTENING_TIMEOUT);
 		for (std::vector<pollfd>::iterator it = this->fdListened.begin(); it != this->fdListened.end(); it++)
 		{
@@ -98,13 +109,17 @@ void Server::run()
 		}
 		if(pollreturn > 0)
 		{
+			std::cout << BOLD_BLUE << "Event detected by poll \n" << RESET;
 			this->manage_poll_event();
+			this->printState();
 		}
 		if(pollreturn == 0) // TBD bloc pour debug, mais a supprimer car inutile a la fin
 		{
-			std::cout << "delay expired" << std::endl;
+			std::cout << BOLD_BLUE << "Poll delay expired \n\n" << RESET;
+
 		}
 
+		
 		// temporisation pour debug (TBD a enlever a la fin)
 		sleep(1); // sleep 1s
 		i++;
@@ -124,7 +139,23 @@ void Server::manage_poll_event()
 			}
 			else
 			{
-				this->listen_client(this->getClient(it->fd));
+				this->listen_client(*(this->getClient(it->fd)));
+			}
+		}
+	}
+	
+	std::vector<pollfd>::iterator ite = this->fdListened.begin();
+	for (size_t i = 0; i < fdListened.size(); i++, ite++)
+	{
+		if(ite->revents == -1)
+		{
+			close(ite->fd);
+			this->fdListened.erase(ite);
+
+			std::vector<Client>::iterator it  = std::find(this->clientList.begin(), this->clientList.end(), *(this->getClient(ite->fd)) );
+			if (it != clientList.end())
+    		{	
+				this->clientList.erase(it);
 			}
 		}
 	}
@@ -215,3 +246,63 @@ Channel& Server::getChannel(std::string name)
 }
 
 
+
+void Server::printState()
+{
+	std::cout << BOLD_BLUE << "Server state after command" << RESET << std::endl;
+	// server parameters
+	std::cout << BLUE_PIPE << BOLD_PURPLE << "Server parameters" << RESET << std::endl;
+	std::cout << BLUE_PIPE << PURPLE << "  socketFd " << socketFd << " | serverFd " << serverFd << std::endl;
+	std::cout << BLUE_PIPE << PURPLE << "  fdListened (fd,events,revents): "<< PURPLE << "[";
+	for (std::vector<pollfd>::iterator it=this->fdListened.begin(); it != this->fdListened.end(); it++)
+	{
+		std::cout << "(" << it->fd << "," << it->events << "," << it->revents << ")";
+		if(it + 1 != this->fdListened.end())
+			std::cout << ", ";
+		else
+			std::cout << "]";
+	}
+	std::cout << RESET << std::endl;
+
+	// Clients parameters
+	std::cout << BLUE_PIPE << BOLD_GREEN << "Clients" << RESET << std::endl;
+	std::cout << BLUE_PIPE << GREEN << "  clientList (by fd):" << "[";
+	if (this->clientList.begin() == this->clientList.end())
+	{
+		std::cout << "empty";
+	}
+	else
+	{
+		for (std::vector<Client>::iterator it=this->clientList.begin(); it != this->clientList.end(); it++)
+		{
+			std::cout << it->socketFd;
+			if(it + 1 != this->clientList.end())
+				std::cout << ", ";
+		}
+	}
+	std::cout << "]";
+	std::cout << RESET << std::endl;
+
+	// Channels parameters
+	std::cout << BLUE_PIPE << BOLD_YELLOW << "Channels" << RESET << std::endl;
+	std::cout << BLUE_PIPE << YELLOW << "  channelList (by name):" << "[";
+	if (this->channelList.begin() == this->channelList.end())
+	{
+		std::cout << "empty";
+	}
+	else
+	{
+		for (std::map<std::string, Channel>::iterator it=this->channelList.begin(); it != this->channelList.end(); it++)
+		{
+			std::cout << it->first;
+			if(++it != this->channelList.end())
+				std::cout << ", ";
+			--it;
+		}
+	}
+	std::cout << "]";
+
+	std::cout << RESET << std::endl << std::endl;
+
+
+}
