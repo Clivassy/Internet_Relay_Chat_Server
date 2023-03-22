@@ -82,7 +82,7 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 		}
 	}
 	sendMessage(NICK(this->userInfos.nickName, cmd[1]));
-	sendOtherClient(NICK_INFORM(this->userInfos.nickName, this->userInfos.userName, cmd[1]))
+	sendOtherClient(NICK_INFORM(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, cmd[1]));
 	this->userInfos.nickName = cmd[1];
 	return (true);
 }
