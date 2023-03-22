@@ -47,10 +47,8 @@ void clear_str(char* str, size_t size)
 
 void replace_rn_by_n(std::string& str)
 {
-	std::cout << "string: " << str << std::endl;
 	while(str.find("\r\n") != std::string::npos)
 	{
-	std::cout << "string: " << str << std::endl;
 		str.replace(str.find("\r\n"),  2, "\n");
 	}
 	
