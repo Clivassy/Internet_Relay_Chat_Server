@@ -153,35 +153,28 @@ void Server::addNewClient()
 	//this->authentication(*(--this->clientList.end()));
 }
 
+void replace_rn_by_n(std::string& str)
+{
+	while(str.find("\r\n") != std::string::npos)
+	{
+		str.replace(str.find("\r\n"),  2, "\n");
+	}
+	
+}
+
 void Server::listen_client(Client &client)
 {
-	if (!client.isAuthentified)
-	{
-		recv(client.socketFd, client.buffer, client.bufferSize - 1, 0); // TBD voir si flag O_NONBLOCK
-		client.authentification += client.buffer;
-
-		std::cout << client.authentification << std::endl;
-	
-		client.fillDataUser();
-		client.sendResponse();
-
-		client.authentification.clear();
-	}
-	else
-	{
 		clear_str(client.buffer, client.bufferSize);
 		recv(client.socketFd, client.buffer, client.bufferSize - 1, 0);
-		//std::cout << BOLD_PURPLE << "read buffer: " << client.buffer << RESET << std::endl;
+		std::cout << BOLD_YELLOW << "buffer read: -->" << YELLOW << client.buffer << BOLD_YELLOW << "<--" << RESET << std::endl;
 		client.cmd += client.buffer;
-		if (client.cmd.find("\r\n"))
+		replace_rn_by_n(client.cmd);
+		if (client.cmd.find("\n") != std::string::npos)
 		{
-			split(client.cmd, "\r\n");
 			std::string cc = pop_command(client.cmd);
-			std::cout << BOLD_YELLOW << "launch command: " << YELLOW << cc << RESET << std::endl;
-			client.launchCommand(pop_command(cc));
+			std::cout << BOLD_YELLOW << "launched command: -->" << YELLOW << "|" << cc << "|" << BOLD_YELLOW << "<--" << RESET << std::endl;
+			client.launchCommand(cc);
 		}
-
-	}
 }
 
 void Server::terminate()

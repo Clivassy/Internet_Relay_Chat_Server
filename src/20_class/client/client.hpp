@@ -26,7 +26,10 @@ class Server;
 class Channel;
 
 # define BUFFER_SIZE 1024
-
+# define COMING 1
+# define REGISTERED 2
+# define BAD_PASSWORD 3
+# define CONNECTED 4
 
 class Client {
 
@@ -70,7 +73,7 @@ class Client {
 		std::string			getPrefix( void );
 		void				errorAuthentification ( void );
 		void				errorPassword( void );
-	
+
         //-- Getters
         //std::string    getUserName( void );
         //std::string    gethostName( void );
@@ -99,6 +102,7 @@ class Client {
 		bool                        isConnected;
 		bool						isOperator;
 		bool						isValidPassword;
+		int							status;
 
 };
     std::string                 removeLines(std::string);

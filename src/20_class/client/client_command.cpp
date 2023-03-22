@@ -25,37 +25,35 @@ void	Client::sendOtherClient(std::string str)
 
 bool	Client::cmdPASS(std::vector<std::string> &cmd)
 {
-	int pos = 0;
-	int tmp_pos = 0;
-
+	std::cout << GREEN <<  "HERE" << RESET << std::endl;
+	std::cout << GREEN << "|"<< cmd[1] << "|" << RESET << std::endl;
 	if (cmd[1].empty())
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
 		return (false);
 	}
-	// Check avec espace
-	if ((pos = this->server.get_password().find(" ")) == (int)std::string::npos)
+	std::cout << this->status << std::endl;
+	if (this->status == COMING)
 	{
-		if (cmd[1] != this->server.get_password())
+		std::cout << "|" << this->server.get_password() << "|" << std::endl;
+		if (this->server.get_password().compare(cmd[1]) == 0)
 		{
-			sendMessage(ERR_PASSWDMISMATCH);
-			return (false);
+			std::cout << "PASSWORD IS OK" << std::endl;
+			this->status = REGISTERED;
 		}
+		else
+			this->status = BAD_PASSWORD;
 	}
-	else
+	if (this->status == REGISTERED)
 	{
-		for (int i = 1; i < (int)cmd.size(); i++)
-		{
-			if (cmd[i] != this->server.get_password().substr(tmp_pos, pos))
-			{
-				sendMessage(ERR_PASSWDMISMATCH);
-				return (false);
-			}
-			tmp_pos = pos + 1;
-		}
+		sendMessage(ERR_ALREADYREGISTERED);
+		return (true);
 	}
-	this->isConnected = true;
-	sendMessage("Connection established \r\n");
+	if (this->status == BAD_PASSWORD)
+	{
+
+	}
+
 	return (true);
 }
 
@@ -287,13 +285,17 @@ bool	Client::launchCommand(std::string command)
 	std::cout << "vecmd " << vecmd[0] << std::endl;
 	while (i < 13)
 	{
-		if (vecmd[0] == choice[i])
+		if (vecmd[0].compare("PASS") == 0)
+		{
+			return (this->cmdPASS(vecmd));
+		}
+		else if (vecmd[0] == choice[i])
 		{
 			std::cout << "bouhhhh" << std::endl;
 			return (this->*f[i])(vecmd);
 		}
 		i++;
 	}
-	sendMessage("Command not found");
+	//sendMessage("Command not found");
 	return (false);
 }
