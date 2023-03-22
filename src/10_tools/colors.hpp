@@ -38,5 +38,7 @@
 
 // other
 # define BLUE_PIPE BOLD_BLUE << "  | " << RESET
+# define PRINT_BOOL(value) (value?"\U00002705":"\U0000274C")
+
 
 #endif
