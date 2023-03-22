@@ -67,7 +67,7 @@ std::string		removeLines( std::string toSplit )
 	return(toSplit);
 }
 
-std::string    Client::getPassword( std::string toSplit )
+bool    Client::getPassword( std::string toSplit )
 {
 	std::vector<std::string> result;
 
@@ -76,17 +76,18 @@ std::string    Client::getPassword( std::string toSplit )
 	{
 		if ( result.size() == 2)
 		{
-			return(result[1]);
+			if (result[0].compare("PASS") == 0 and result[1].compare(this->server.password) != 0)
+				this->isValidPassword = false;
+			return (true);
 		}
 	}
-	return (NULL);
+	return (false);
 }
 
 bool    Client::getNickName( std::string toSplit )
 {
 	std::vector<std::string> result;
 
-	// toSplit = removeLines(toSplit);
 	result = split(toSplit, ' ');
 	if (result.size() == 2)
 	{
@@ -141,17 +142,19 @@ void    Client::fillDataUser( void )
 		std::cout << "size: " << this->authentificationCmd.size() << std::endl;
 		if (this->authentificationCmd[0].compare("CAP LS") == 0)
 		{
-			// check mot de pass
 			if (this->Password == false)
 			{
-				std::cout << RED << "HERE" << std::endl;
 				if (authentificationCmd.size() > 1 )
 				{
-					std::string ret = getPassword(authentificationCmd[1]);
-					std::cout << ret << std::endl;
-					this->Password = true;
-					if (ret.compare(this->server.password) != 0)
-						this->isValidPassword = false;
+					if (getPassword(authentificationCmd[1]) == true)
+						this->Password = true;
+					else
+						this->errorAuthentification();
+					//std::string ret = getPassword(authentificationCmd[1]);
+					//std::cout << ret << std::endl;
+					//this->Password = true;
+					//if (ret.compare(this->server.password) != 0)
+					//	this->isValidPassword = false;
 				}
 			}
 			if ( this->NICK == false)
