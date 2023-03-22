@@ -38,9 +38,15 @@ class Client {
         std::string realName;
         std::string userMessage;
 
+
     };
     public:
         Client(Server& serv);
+		Client& operator=(const Client&other)
+		{
+			(void)other;
+			return (*this);
+		}
         ~Client(); 
 		
 		// Command
@@ -66,7 +72,7 @@ class Client {
         void    			sendResponse( void );
         bool    			getNickName( std::string toSplit );
         bool    			getUserInfos( std::string toSplit);
-		std::string    		getPassword( std::string toSplit );
+		bool	    		getPassword( std::string toSplit );
 		std::string			getPrefix( void );
 		void				errorAuthentification ( void );
 		void				errorPassword( void );
@@ -99,6 +105,13 @@ class Client {
 		bool                        isConnected;
 		bool						isOperator;
 		bool						isValidPassword;
+		std::vector<std::string>	authentificationCmd;
+
+	// Authentication
+		bool CAP_LS;
+		bool Password;
+		bool NICK;
+		bool USER;
 
 };
     std::string                 removeLines(std::string);
