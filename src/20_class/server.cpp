@@ -112,10 +112,10 @@ void Server::run()
 		std::cout << BOLD_BLUE << "loop step " << i << BLUE << " (1 loop = " << LISTENING_TIMEOUT/1000 << "s)  Waiting for event ... \U0001F634" << RESET << std::endl;
 		pollreturn = poll(&(this->fdListened[0]), this->fdListened.size(), LISTENING_TIMEOUT);
 		for (std::vector<pollfd>::iterator it = this->fdListened.begin(); it != this->fdListened.end(); it++)
-		//{
-		//	std::cout << "event catch on fd " << it->fd << " : " << it->revents << std::endl;
+		{
+			std::cout << "event catch on fd " << it->fd << " : " << it->revents << std::endl;
 
-		//}
+		}
 		if(pollreturn < 0)
 		{
 			std::cout << BOLD_RED << "Error with poll()" << std::endl;
@@ -143,20 +143,6 @@ void Server::run()
 		i++;
 	}
 }
-bool operator==( Client& other, const Client& rhs) 
-{
-    return (other.socketFd == rhs.socketFd);
-}
-
-bool operator==( const Client& other, Client& rhs) 
-{
-    return (other.socketFd == rhs.socketFd);
-}
-
-bool operator==( const Client& other, const Client& rhs) 
-{
-    return (other.socketFd == rhs.socketFd);
-}
 
 void Server::manage_poll_event()
 {
@@ -168,8 +154,7 @@ void Server::manage_poll_event()
 			if (it == this->fdListened.begin())
 			{
 				this->addNewClient();
-				std::cout << BOLD_YELLOW << "CLIENT : " << this->clientList[it->fd].socketFd << RESET << std::endl;
-			}	
+			}
 			else
 			{
 				this->listen_client(*(this->getClient(it->fd)));
@@ -177,7 +162,7 @@ void Server::manage_poll_event()
 		}
 	}
 	
-	std::vector<pollfd>::iterator ite = this->fdListened.begin();
+	/*std::vector<pollfd>::iterator ite = this->fdListened.begin();
 	for (size_t i = 0; i < fdListened.size(); i++, ite++)
 	{
 		if(ite->revents == -1)
@@ -191,7 +176,7 @@ void Server::manage_poll_event()
 				this->clientList.erase(it);
 			}
 		}
-	}
+	}*/
 }
 
 void Server::addNewClient()
@@ -221,57 +206,31 @@ void Server::listen_client(Client &client)
 {
 	if (!client.isAuthentified)
 	{
-		memset(client.buffer, 0, client.bufferSize);
-		std::vector<std::string> tmp;
-		//client.authentification.clear();
-		if (recv(client.socketFd, client.buffer, client.bufferSize - 1, 0) < 0) // TBD voir si flag O_NONBLOCK
-		{
-			perror("recv");
-			std::cout << BOLD_RED << "Error while receiving connection" << RESET << std::endl;
-			exit(EXIT_FAILURE);
-		}
-
+		recv(client.socketFd, client.buffer, client.bufferSize - 1, 0); // TBD voir si flag O_NONBLOCK
 		client.authentification += client.buffer;
-		if (client.authentification.find("\r"))
-		{
-			tmp = split(client.authentification, '\r');
-			for (std::vector<std::string>::iterator it = tmp.begin(); it != tmp.end() ; it++)
-			{
-				std::string tmp = *it;
-				tmp = removeLines(tmp);
 
-				if (!tmp.empty())
-				{
-					client.authentificationCmd.push_back(tmp);
-				}	
-			}
-		}
-		else
-		{
-			tmp = split(client.authentification, "\n");
-			client.authentificationCmd.push_back(tmp[0]);
-		}
+		std::cout << client.authentification << std::endl;
+	
 		client.fillDataUser();
-		if (client.isAuthentified == true)
-			client.sendResponse();
+		client.sendResponse();
+
 		client.authentification.clear();
 	}
 	else
 	{
 		clear_str(client.buffer, client.bufferSize);
 		recv(client.socketFd, client.buffer, client.bufferSize - 1, 0);
-		std::cout << BOLD_YELLOW << "buffer read: -->" << YELLOW << client.buffer << BOLD_YELLOW << "<--" << RESET << std::endl;
+		//std::cout << BOLD_PURPLE << "read buffer: " << client.buffer << RESET << std::endl;
 		client.cmd += client.buffer;
-		replace_rn_by_n(client.cmd);
-		if (client.cmd.find("\n") != std::string::npos)
+		if (client.cmd.find("\r\n"))
 		{
+			split(client.cmd, "\r\n");
 			std::string cc = pop_command(client.cmd);
-			std::cout << BOLD_YELLOW << "launched command: -->" << YELLOW << cc << BOLD_YELLOW << "<--" << RESET << std::endl;
-			client.launchCommand(cc);
+			std::cout << BOLD_YELLOW << "launch command: " << YELLOW << cc << RESET << std::endl;
+			client.launchCommand(pop_command(cc));
 		}
 
 	}
-
 }
 
 void Server::terminate()
