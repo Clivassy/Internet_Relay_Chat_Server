@@ -33,7 +33,7 @@ class Channel
 
 	protected:
 		Server&						server;
-		std::set<int>				clientConnected;
+		std::set<std::string>				clientConnected; // userName is used to identify a client
 };
 
 #endif

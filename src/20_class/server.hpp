@@ -2,6 +2,7 @@
 # define SERVER_HPP
 
 //# include "../main.hpp"
+# include <algorithm>
 # include <iostream>
 # include <string>
 # include <string.h>
@@ -23,7 +24,7 @@
 
 
 # define BUFFER_SIZE 1024
-# define LISTENING_TIMEOUT 10000 // delai d'ecoute dans poll() en ms
+# define LISTENING_TIMEOUT 30000 // delai d'ecoute dans poll() en ms
 
 class Client;
 class Channel;
@@ -53,16 +54,21 @@ class Server
 		void		terminate();
 
 		// client
-		void		manage_poll_event();
-		void		addNewClient();
-		void		listen_client(Client &client);
-		Client&		getClient(int fd);
+		void							manage_poll_event();
+		void							addNewClient();
+		void							listen_client(Client &client);
+		std::vector<Client>::iterator	getClient(int fd);
+		std::vector<Client>::iterator	getClient(std::string user);
+
 
 		// channel
 		bool		isChannelExisting(std::string name);
 		void		addChannel(std::string name);
 		Channel&	getChannel(std::string name);
 
+
+		// debug
+		void		printState();
 
 };
 

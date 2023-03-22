@@ -45,16 +45,25 @@ void clear_str(char* str, size_t size)
 	}
 }
 
-// take a string, remove and return the part before the first occurence off /r/n
+void replace_rn_by_n(std::string& str)
+{
+	while(str.find("\r\n") != std::string::npos)
+	{
+		str.replace(str.find("\r\n"),  2, "\n");
+	}
+	
+}
+
+// take a string, remove and return the part before the first occurence off /n
 std::string pop_command(std::string& cmd)
 {
 	std::vector<std::string> output;
-	if (cmd.size() == 0)
+	if (cmd.size() == std::string::npos)
 		return (cmd);
-	if (cmd.find("\r\n") == 0)
+	if (cmd.find("\n") == std::string::npos)
 		return (cmd);
-	output = split(cmd, "\r\n");
-	cmd.erase(0, output[0].size() + 2); // size + 2 pour enlever "\r\n"
+	output = split(cmd, "\n");
+	cmd.erase(0, output[0].size() + 1); // size + 1 pour enlever "\n"
 	return (output[0]);
 }
 
@@ -81,3 +90,49 @@ std::string pop_command(std::string& cmd)
 //	cmd.push_back(std::string(""));
 //	return (cmd);
 //}
+
+void test()
+{
+	
+}
+template<typename T>
+void print_vector(std::vector<T> vec)
+{
+	std::cout << "[";
+	for (typename std::vector<T>::iterator it=vec.begin(); it != vec.end(); it++)
+	{
+		std::cout << *it;
+		if(it + 1 != vec.end())
+			std::cout << ", ";
+
+
+	}
+	std::cout << "]" << std::endl;
+}
+
+
+template<typename key, typename T>
+void print_map(std::map<key, T> map)
+{
+	std::cout << "[";
+	for (typename std::map<key, T>::iterator it=map.begin(); it != map.end();)
+	{
+		std::cout << (it->first);
+		if(++it != map.end())
+			std::cout << ", ";
+	}
+	std::cout << "]" << std::endl;
+}
+
+template<typename key>
+void print_set(std::set<key> set)
+{
+	std::cout << "[";
+	for (typename std::set<key>::const_iterator it=set.begin(); it != set.end();)
+	{
+		std::cout << (*it);
+		if(++it != set.end())
+			std::cout << ", ";
+	}
+	std::cout << "]" << std::endl;
+}

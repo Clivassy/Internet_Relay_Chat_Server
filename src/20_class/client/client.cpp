@@ -23,8 +23,13 @@ void	Client::errorPassword( void )
 {
 	std::string msg(this->getPrefix() + " 464 " + this->userInfos.nickName + " :Password incorrect\r\n");
 	send(this->socketFd, msg.c_str(), msg.size(), 0);
-	this->server.terminate();
-	exit(EXIT_FAILURE);
+
+	// recupérer le fd dans pollfd
+	for (std::vector<pollfd>::iterator it = this->server.fdListened.begin(); it != this->server.fdListened.end(); it++)
+	{
+		if (this->socketFd == it->fd)
+			it->revents = -1; 
+	}
 }
 
 void    Client::sendResponse( void )
@@ -42,7 +47,6 @@ void    Client::sendResponse( void )
 	+ "@" + this->userInfos.serverName
 	+ "\r\n" ;
 
-	std::cout << RED << this->userInfos.userMessage << std::endl;
 	if (send(this->socketFd, this->userInfos.userMessage.c_str(), this->userInfos.userMessage.size(), 0) < 0)
 	{
 		std::cout << BOLD_RED << "Error with send()" << std::endl;
@@ -62,15 +66,17 @@ std::string		removeLines( std::string toSplit )
 	return(toSplit);
 }
 
-std::string    Client::getPassword( std::string toSplit )
+std::string   Client::getPassword( std::string toSplit )
 {
 	std::vector<std::string> result;
 
-	toSplit = removeLines(toSplit);
 	result = split(toSplit, ' ');
-	if (result[0].compare("PASS") == 0 && result.size() == 2)
+	if (result.size() > 1)
 	{
-		return(result[1]);
+		if ( result.size() == 2)
+		{
+			return (result[1]);
+		}
 	}
 	return (NULL);
 }
@@ -79,9 +85,8 @@ bool    Client::getNickName( std::string toSplit )
 {
 	std::vector<std::string> result;
 
-	toSplit = removeLines(toSplit);
 	result = split(toSplit, ' ');
-	if (result[0].compare("NICK") == 0 && result.size() == 2)
+	if (result.size() == 2)
 	{
 		this->userInfos.nickName = result[1];
 		return(true);
@@ -94,8 +99,9 @@ bool    Client::getUserInfos( std::string toSplit )
 	std::vector<std::string> result;
 	std::vector<std::string> username;
 
-	toSplit = removeLines(toSplit);
 	result = split(toSplit, ':');
+	std::cout << result[0] << std::endl;
+	std::cout << result[1] << std::endl;
 
 	if (result.size() == 2)
 	{
@@ -109,21 +115,89 @@ bool    Client::getUserInfos( std::string toSplit )
 				this->userInfos.serverName = username[3];
 			}
 			this->userInfos.realName = result[1];
-			
-			// DEBEUG
-			std::cout << "userName : " << this->userInfos.userName << std::endl;
-			std::cout << "HostName : " << this->userInfos.hostName<< std::endl;
-			std::cout << "ServerName : " << this->userInfos.serverName<< std::endl;
-			std::cout << "RealName : " << this->userInfos.realName << std::endl;
 			return(true);
 		}
 	}
 	return (false);
 }
-
+/*
 void    Client::fillDataUser( void )
 {
-	std::vector<std::string> informations;
+	if (this->authentificationCmd.size() > 0)
+	{
+		if (this->authentificationCmd[0].compare("CAP LS") == 0)
+		{
+			if (this->Password == false)
+			{
+				if (authentificationCmd.size() > 1 )
+				{
+					std::string ret = getPassword(authentificationCmd[1]);
+					this->Password = true;
+					if (ret.compare(this->server.password) != 0)
+						this->isValidPassword = false;
+				}
+			}
+			if ( this->NICK2 == false)
+			{
+				if (authentificationCmd.size() > 2 )
+				{
+					if (this->getNickName(this->authentificationCmd[2]) == true)
+					{
+						std::cout << this->userInfos.nickName << std::endl;
+						this->NICK2 = true;
+					}
+					else
+					{
+						if (this->isValidPassword == false)
+							this->errorPassword();
+					}
+				}
+			}
+			if ( this->USER == false)
+			{
+				if (this->authentificationCmd.size() > 3) 
+				{
+					this->getUserInfos(authentificationCmd[3]);
+					this->USER = true;
+				}
+			}
+			if (this->USER)
+			{
+				if (this->isValidPassword == false)
+					this->errorPassword();
+				else
+				{
+					this->isAuthentified = true;
+				}
+			}
+
+		}*/
+		//if (authentificationCmd.size() == 2)
+		//{
+		//	std::cout << RED << "PASS : OK" << RESET << std::endl;
+		//	std::cout  << GREEN << this->authentificationCmd[1] << RESET << std::endl;
+//
+		//	// check du PASS a faire ici
+		//	// changer le flag ici 
+		//}
+		//if (authentificationCmd.size() == 3)
+		//{
+		//	std::cout << RED << "NICK2 : OK" << RESET << std::endl;
+		//	// get nickname 
+		//	if (this->getNickName(this->authentificationCmd[2]) == true)
+		//		std::cout  << GREEN << this->userInfos.nickName << RESET << std::endl;
+		//}
+		//if(this->authentificationCmd.size() == 4)
+		//{
+		//	std::cout << RED << "USER: OK" << RESET << std::endl;
+		//	// get userName
+		//	std::cout  << GREEN << this->authentificationCmd[3] << RESET << std::endl;
+		//}
+	}
+
+
+
+	/*std::vector<std::string> informations;
 	std::vector<std::string> result;
 
 	informations = split(this->authentification, '\r');
@@ -165,5 +239,5 @@ void    Client::fillDataUser( void )
 					this->errorPassword();
 			}
 		}
-	}
+	}*/
 }
