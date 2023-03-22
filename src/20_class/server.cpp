@@ -82,8 +82,8 @@ void Server::run()
 	while (i < 30)
 	{
 		std::cout << BOLD_BLUE << "loop step " << i << BLUE << " (1 loop = " << LISTENING_TIMEOUT/1000 << "s)" << RESET << std::endl;
-		this->printState();
 		pollreturn = poll(&(this->fdListened[0]), this->fdListened.size(), LISTENING_TIMEOUT);
+		this->printState();
 		for (std::vector<pollfd>::iterator it = this->fdListened.begin(); it != this->fdListened.end(); it++)
 		//{
 		//	std::cout << "event catch on fd " << it->fd << " : " << it->revents << std::endl;
@@ -228,14 +228,14 @@ void Server::listen_client(Client &client)
 	{
 		clear_str(client.buffer, client.bufferSize);
 		recv(client.socketFd, client.buffer, client.bufferSize - 1, 0);
-		//std::cout << BOLD_PURPLE << "read buffer: " << client.buffer << RESET << std::endl;
+		std::cout << BOLD_YELLOW << "buffer read: -->" << YELLOW << client.buffer << BOLD_YELLOW << "<--" << RESET << std::endl;
 		client.cmd += client.buffer;
 		if (client.cmd.find("\r\n"))
 		{
 			split(client.cmd, "\r\n");
 			std::string cc = pop_command(client.cmd);
-			std::cout << BOLD_YELLOW << "launch command: " << YELLOW << cc << RESET << std::endl;
-			client.launchCommand(pop_command(cc));
+			std::cout << BOLD_YELLOW << "launched command: -->" << YELLOW << cc << BOLD_YELLOW << "<--" << RESET << std::endl;
+			client.launchCommand(cc);
 		}
 
 	}
