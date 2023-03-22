@@ -7,6 +7,7 @@ SRCS += ./src/main.cpp
 SRCS += ./src/10_tools/utils.cpp
 SRCS += ./src/20_class/client/client.cpp
 SRCS += ./src/20_class/client/client_command.cpp
+SRCS += ./src/20_class/client/cmdJOIN.cpp
 SRCS += ./src/20_class/server.cpp
 SRCS += ./src/20_class/channel.cpp
 SRCS += ./src/30_Parsing_argv/parsing.cpp

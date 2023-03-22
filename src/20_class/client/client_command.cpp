@@ -153,34 +153,6 @@ bool	Client::cmdQUIT(std::vector<std::string> &cmd)
 	return (true);
 }
 
-// INFO POUR LES CHANNELS 
-// Servers MUST process the parameters of this command as lists on incoming commands from clients, with the first <key> being used for the first <channel>, the second <key> being used for the second <channel>, etc.
-// While a client is joined to a channel, they receive all relevant information about that channel including the JOIN, PART, KICK, and MODE messages affecting the channel. They receive all PRIVMSG and NOTICE messages sent to the channel, and they also receive QUIT messages from other clients joined to the same channel (to let them know those users have left the channel and the network). This allows them to keep track of other channel members and channel modes.
-
-bool	Client::cmdJOIN(std::vector<std::string> &cmd)
-{
-	if (cmd[1].empty())
-	{
-		sendMessage(ERR_NEEDMOREPARAMS("JOIN"));
-		return (false);
-	}
-	// Les erreurs possible
-	// ERR_TOOMANYCHANNELS
-	// ERR_BANNEDFROMCHAN : Returned to indicate that a JOIN command failed because the client has been banned from the channel and has not had a ban exception set for them. The text used in the last param of this message may vary.
-	// ERR_INVITEONLYCHAN : Returned to indicate that a JOIN command failed because the channel is set to [invite-only] mode and the client has not been invited to the channel or had an invite exception set for them. The text used in the last param of this message may vary.
-	if (cmd[1][0] != '#')
-	{
-		sendMessage(ERR_BADCHANMASK(cmd[1]));
-		return (false);
-	}
-	//Note that this command also accepts the special argument of ("0", 0x30) instead of any of the usual parameters, which requests that the sending client leave all channels they are currently connected to. The server will process this command as though the client had sent a PART command for each channel they are a member of.
-
-	// This message may be sent from a server to a client to notify the client that someone has joined a channel. In this case, the message <source> will be the client who is joining, and <channel> will be the channel which that client has joined
-	// Servers SHOULD NOT send multiple channels in this message to clients, and SHOULD distribute these multiple-channel JOIN messages as a series of messages with a single channel name on each.
-
-	// Des qu'il a rejoint on doit envoyer une message "<source> joined the channel" doit etre envoye ainsi que le topic du channel (avec RPL_TOPIC) et la liste des utilisateurs connectes (avc RPL_NAMREPLY suivi d'un RPL_ENDOFNAMES)
-	return (true);
-}
 
 // Supprime un client ou des channels
 bool	Client::cmdPART(std::vector<std::string> &cmd)

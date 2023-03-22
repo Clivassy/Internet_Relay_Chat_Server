@@ -24,7 +24,7 @@
 
 
 # define BUFFER_SIZE 1024
-# define LISTENING_TIMEOUT 10000 // delai d'ecoute dans poll() en ms
+# define LISTENING_TIMEOUT 30000 // delai d'ecoute dans poll() en ms
 
 class Client;
 class Channel;
@@ -64,6 +64,9 @@ class Server
 		void		addChannel(std::string name);
 		Channel&	getChannel(std::string name);
 
+
+		// debug
+		void		printState();
 
 };
 

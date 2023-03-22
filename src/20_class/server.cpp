@@ -81,14 +81,14 @@ void Server::run()
 	int pollreturn = -1;
 	while (i < 30)
 	{
-		std::cout << BOLD_BLUE << "loop step " << i << RESET << std::endl;
-		std::cout << "Ecoute pollfd " << RESET << std::endl;
+		std::cout << BOLD_BLUE << "loop step " << i << BLUE << " (1 loop = " << LISTENING_TIMEOUT/1000 << "s)" << RESET << std::endl;
+		this->printState();
 		pollreturn = poll(&(this->fdListened[0]), this->fdListened.size(), LISTENING_TIMEOUT);
 		for (std::vector<pollfd>::iterator it = this->fdListened.begin(); it != this->fdListened.end(); it++)
-		{
-			std::cout << "event catch on fd " << it->fd << " : " << it->revents << std::endl;
+		//{
+		//	std::cout << "event catch on fd " << it->fd << " : " << it->revents << std::endl;
 
-		}
+		//}
 		if(pollreturn < 0)
 		{
 			std::cout << BOLD_RED << "Error with poll()" << std::endl;
@@ -102,7 +102,7 @@ void Server::run()
 		}
 		if(pollreturn == 0) // TBD bloc pour debug, mais a supprimer car inutile a la fin
 		{
-			std::cout << "delay expired" << std::endl;
+			//std::cout << "delay expired" << std::endl;
 		}
 
 		// temporisation pour debug (TBD a enlever a la fin)
@@ -150,7 +150,6 @@ void Server::manage_poll_event()
 	{
 		if(ite->revents == -1)
 		{
-			std::cout << "event : " << ite->revents << std::endl; 
 			close(ite->fd);
 			this->fdListened.erase(ite);
 
@@ -203,7 +202,6 @@ void Server::listen_client(Client &client)
 		client.authentification += client.buffer;
 		if (client.authentification.find("\r"))
 		{
-			std::cout << "need split\n";
 			tmp = split(client.authentification, '\r');
 			for (std::vector<std::string>::iterator it = tmp.begin(); it != tmp.end() ; it++)
 			{
@@ -212,7 +210,6 @@ void Server::listen_client(Client &client)
 
 				if (!tmp.empty())
 				{
-					std::cout << YELLOW << "|" << tmp << "|" << RESET << std::endl;
 					client.authentificationCmd.push_back(tmp);
 				}	
 			}
@@ -276,3 +273,61 @@ Channel& Server::getChannel(std::string name)
 }
 
 
+
+void Server::printState()
+{
+	// server parameters
+	std::cout << BOLD_PURPLE << "  Server parameters" << RESET << std::endl;
+	std::cout << PURPLE;
+	std::cout << "  socketFd " << socketFd << " | serverFd " << serverFd << std::endl;
+	std::cout << PURPLE << "  fdListened (fd,events,revents): "<< PURPLE << "[";
+	for (std::vector<pollfd>::iterator it=this->fdListened.begin(); it != this->fdListened.end(); it++)
+	{
+		std::cout << "(" << it->fd << "," << it->events << "," << it->revents << ")";
+		if(it + 1 != this->fdListened.end())
+			std::cout << ", ";
+		else
+			std::cout << "]";
+	}
+	std::cout << RESET << std::endl;
+
+	std::cout << BOLD_GREEN << "  Clients" << RESET << std::endl;
+	std::cout << GREEN << "  clientList (by fd):" << "[";
+	if (this->clientList.begin() == this->clientList.end())
+	{
+		std::cout << "empty";
+	}
+	else
+	{
+		for (std::vector<Client>::iterator it=this->clientList.begin(); it != this->clientList.end(); it++)
+		{
+			std::cout << it->socketFd;
+			if(it + 1 != this->clientList.end())
+				std::cout << ", ";
+		}
+	}
+	std::cout << "]";
+	std::cout << RESET << std::endl;
+
+	std::cout << BOLD_YELLOW << "  Channels" << RESET << std::endl;
+	std::cout << YELLOW << "  Channels (by name):" << "[";
+	if (this->channelList.begin() == this->channelList.end())
+	{
+		std::cout << "empty";
+	}
+	else
+	{
+		for (std::map<std::string, Channel>::iterator it=this->channelList.begin(); it != this->channelList.end(); it++)
+		{
+			std::cout << it->first;
+			if(++it != this->channelList.end())
+				std::cout << ", ";
+			--it;
+		}
+	}
+	std::cout << "]";
+
+	std::cout << RESET << std::endl << std::endl;
+
+
+}
