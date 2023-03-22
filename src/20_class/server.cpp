@@ -144,7 +144,7 @@ void Server::manage_poll_event()
 		}
 	}
 	
-	std::vector<pollfd>::iterator ite = this->fdListened.begin();
+	/*std::vector<pollfd>::iterator ite = this->fdListened.begin();
 	for (size_t i = 0; i < fdListened.size(); i++, ite++)
 	{
 		if(ite->revents == -1)
@@ -158,7 +158,7 @@ void Server::manage_poll_event()
 				this->clientList.erase(it);
 			}
 		}
-	}
+	}*/
 }
 
 void Server::addNewClient()
