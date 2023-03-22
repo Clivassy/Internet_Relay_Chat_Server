@@ -150,7 +150,6 @@ void Server::manage_poll_event()
 	{
 		if(ite->revents == -1)
 		{
-			std::cout << "event : " << ite->revents << std::endl; 
 			close(ite->fd);
 			this->fdListened.erase(ite);
 
@@ -203,7 +202,6 @@ void Server::listen_client(Client &client)
 		client.authentification += client.buffer;
 		if (client.authentification.find("\r"))
 		{
-			std::cout << "need split\n";
 			tmp = split(client.authentification, '\r');
 			for (std::vector<std::string>::iterator it = tmp.begin(); it != tmp.end() ; it++)
 			{
@@ -212,7 +210,6 @@ void Server::listen_client(Client &client)
 
 				if (!tmp.empty())
 				{
-					std::cout << YELLOW << "|" << tmp << "|" << RESET << std::endl;
 					client.authentificationCmd.push_back(tmp);
 				}	
 			}

@@ -72,7 +72,7 @@ class Client {
         void    			sendResponse( void );
         bool    			getNickName( std::string toSplit );
         bool    			getUserInfos( std::string toSplit);
-		bool	    		getPassword( std::string toSplit );
+		std::string 	    getPassword( std::string toSplit );
 		std::string			getPrefix( void );
 		void				errorAuthentification ( void );
 		void				errorPassword( void );

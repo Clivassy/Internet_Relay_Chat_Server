@@ -47,7 +47,6 @@ void    Client::sendResponse( void )
 	+ "@" + this->userInfos.serverName
 	+ "\r\n" ;
 
-	std::cout << RED << this->userInfos.userMessage << std::endl;
 	if (send(this->socketFd, this->userInfos.userMessage.c_str(), this->userInfos.userMessage.size(), 0) < 0)
 	{
 		std::cout << BOLD_RED << "Error with send()" << std::endl;
@@ -67,7 +66,7 @@ std::string		removeLines( std::string toSplit )
 	return(toSplit);
 }
 
-bool    Client::getPassword( std::string toSplit )
+std::string   Client::getPassword( std::string toSplit )
 {
 	std::vector<std::string> result;
 
@@ -76,12 +75,10 @@ bool    Client::getPassword( std::string toSplit )
 	{
 		if ( result.size() == 2)
 		{
-			if (result[0].compare("PASS") == 0 and result[1].compare(this->server.password) != 0)
-				this->isValidPassword = false;
-			return (true);
+			return (result[1]);
 		}
 	}
-	return (false);
+	return (NULL);
 }
 
 bool    Client::getNickName( std::string toSplit )
@@ -118,12 +115,6 @@ bool    Client::getUserInfos( std::string toSplit )
 				this->userInfos.serverName = username[3];
 			}
 			this->userInfos.realName = result[1];
-			
-			// DEBEUG
-			std::cout << "userName : " << this->userInfos.userName << std::endl;
-			std::cout << "HostName : " << this->userInfos.hostName<< std::endl;
-			std::cout << "ServerName : " << this->userInfos.serverName<< std::endl;
-			std::cout << "RealName : " << this->userInfos.realName << std::endl;
 			return(true);
 		}
 	}
@@ -132,34 +123,22 @@ bool    Client::getUserInfos( std::string toSplit )
 
 void    Client::fillDataUser( void )
 {
-
-/* 	std::cout  << RED << this->authentificationCmd[0] << RESET << std::endl;
-	std::cout  << RED << this->authentificationCmd[1] << RESET << std::endl;
-	std::cout  << RED << this->authentificationCmd[2] << RESET << std::endl;
-	std::cout  << RED << this->authentificationCmd[3] << RESET << std::endl; */
 	if (this->authentificationCmd.size() > 0)
 	{
-		std::cout << "size: " << this->authentificationCmd.size() << std::endl;
 		if (this->authentificationCmd[0].compare("CAP LS") == 0)
 		{
 			if (this->Password == false)
 			{
 				if (authentificationCmd.size() > 1 )
 				{
-					if (getPassword(authentificationCmd[1]) == true)
-						this->Password = true;
-					else
-						this->errorAuthentification();
-					//std::string ret = getPassword(authentificationCmd[1]);
-					//std::cout << ret << std::endl;
-					//this->Password = true;
-					//if (ret.compare(this->server.password) != 0)
-					//	this->isValidPassword = false;
+					std::string ret = getPassword(authentificationCmd[1]);
+					this->Password = true;
+					if (ret.compare(this->server.password) != 0)
+						this->isValidPassword = false;
 				}
 			}
 			if ( this->NICK == false)
 			{
-				std::cout << RED << "HERE" << std::endl;
 				if (authentificationCmd.size() > 2 )
 				{
 					if (this->getNickName(this->authentificationCmd[2]) == true)
