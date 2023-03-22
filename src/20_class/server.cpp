@@ -264,6 +264,7 @@ void Server::printState()
 			std::cout << it->first;
 			if(++it != this->channelList.end())
 				std::cout << ", ";
+			--it;
 		}
 	}
 	std::cout << "]";
