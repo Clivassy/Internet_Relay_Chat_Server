@@ -111,7 +111,7 @@ class Client {
 	// Authentication
 		bool CAP_LS;
 		bool Password;
-		bool NICK;
+		bool NICK2;
 		bool USER;
 
 };

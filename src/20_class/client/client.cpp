@@ -2,7 +2,7 @@
 
 Client::Client(Server& serv):
 server(serv), bufferSize(BUFFER_SIZE), isAuthentified(false), isConnected(false), isOperator(false),
-isValidPassword(true), CAP_LS(false), Password(false), NICK(false), USER(false)
+isValidPassword(true), CAP_LS(false), Password(false), NICK2(false), USER(false)
 { }
 
 Client::~Client(){ }
@@ -137,14 +137,14 @@ void    Client::fillDataUser( void )
 						this->isValidPassword = false;
 				}
 			}
-			if ( this->NICK == false)
+			if ( this->NICK2 == false)
 			{
 				if (authentificationCmd.size() > 2 )
 				{
 					if (this->getNickName(this->authentificationCmd[2]) == true)
 					{
 						std::cout << this->userInfos.nickName << std::endl;
-						this->NICK = true;
+						this->NICK2 = true;
 					}
 					else
 					{
@@ -182,7 +182,7 @@ void    Client::fillDataUser( void )
 		//}
 		//if (authentificationCmd.size() == 3)
 		//{
-		//	std::cout << RED << "NICK : OK" << RESET << std::endl;
+		//	std::cout << RED << "NICK2 : OK" << RESET << std::endl;
 		//	// get nickname 
 		//	if (this->getNickName(this->authentificationCmd[2]) == true)
 		//		std::cout  << GREEN << this->userInfos.nickName << RESET << std::endl;
