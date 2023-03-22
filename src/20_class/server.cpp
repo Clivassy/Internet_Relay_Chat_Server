@@ -230,9 +230,9 @@ void Server::listen_client(Client &client)
 		recv(client.socketFd, client.buffer, client.bufferSize - 1, 0);
 		std::cout << BOLD_YELLOW << "buffer read: -->" << YELLOW << client.buffer << BOLD_YELLOW << "<--" << RESET << std::endl;
 		client.cmd += client.buffer;
-		if (client.cmd.find("\r\n"))
+		replace_rn_by_n(client.cmd);
+		if (client.cmd.find("\n") != std::string::npos)
 		{
-			split(client.cmd, "\r\n");
 			std::string cc = pop_command(client.cmd);
 			std::cout << BOLD_YELLOW << "launched command: -->" << YELLOW << cc << BOLD_YELLOW << "<--" << RESET << std::endl;
 			client.launchCommand(cc);
