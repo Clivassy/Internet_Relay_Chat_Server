@@ -112,6 +112,7 @@ class Client {
 		bool						isOperator;
 		bool						isValidPassword;
 		int							status;
+		std::vector<std::string>	authentificationCmd;
 
 };
     std::string                 removeLines(std::string);

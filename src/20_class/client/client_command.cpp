@@ -91,7 +91,7 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 	this->userInfos.nickName = cmd[1];
 
 	sendMessage(NICK(this->userInfos.nickName, cmd[1]));
-	sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost");
+	//sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost");
 	//The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, and to inform other clients about the change of nickname. In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.
 	return (true);
 }
@@ -99,24 +99,24 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 bool	Client::cmdUSER(std::vector<std::string> &cmd)
 {
 	// Deja enregistrer
-	if (cmd[1].empty() || cmd[2].empty() || cmd[3].empty() || cmd[4].empty())
+	/*if (cmd[1].empty() || cmd[2].empty() || cmd[3].empty() || cmd[4].empty())
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("USER"));
 		return (false);
-	}
-	if (cmd[2] != "0" || cmd[3] != "*")
+	}*/
+	/*if (cmd[2] != "0" || cmd[3] != "*")
 	{
 		sendMessage("USER :Parameters incorrect");
 		return (false);
-	}
+	}*/
 
 	//If a client tries to send the USER command after they have already completed registration with the server, the ERR_ALREADYREGISTERED reply should be sent and the attempt should fail.
 
 	//If the client sends a USER command after the server has successfully received a username using the Ident Protocol, the <username> parameter from this command should be ignored in favour of the one received from the identity server.
 
-	this->userInfos.userName = cmd[4];
+	this->userInfos.userName = cmd[1];
 	this->userInfos.realName = cmd[4];
-	sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost");
+	sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost\r\n");
 	//Clients SHOULD use the nickname as a fallback value for <username> and <realname> when they don’t have a meaningful value to use.
 	return (true);
 }
@@ -277,7 +277,7 @@ bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 //- PASS, NICK, USER, PING, OPER, QUIT, JOIN, PART, PRIVMSG, NOTICE, MODE, INVITE. KICK, WHOIS
 bool	Client::launchCommand(std::string command)
 {
-	std::cout << "HERE launchCommand => " << command << std::endl;
+	//std::cout << "HERE launchCommand => " << command << std::endl;
 	
 	std::vector<std::string> ccmd = split(command, ':');
 	std::vector<std::string> vecmd = split(ccmd[0], ' ');
@@ -291,13 +291,13 @@ bool	Client::launchCommand(std::string command)
 		return (false);
 	std::cout <<  "COMMANDE = " << vecmd[0] << std::endl;
 	//sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost\r\n");
-	/*while (i < 13)
+	while (i < 14)
 	{
 		if (vecmd[0].compare("CAP") == 0)
 		{
 			return (this->cmdCAP(vecmd));
 		}
-		else if (vecmd[0].compare("PASS") == 0)
+		if (vecmd[0].compare("PASS") == 0)
 		{
 			return (this->cmdPASS(vecmd));
 		}
@@ -307,7 +307,7 @@ bool	Client::launchCommand(std::string command)
 			return (this->*f[i])(vecmd);
 		}
 		i++;
-	}*/
+	}
 	//sendMessage("Command not found");
 	return (false);
 }
