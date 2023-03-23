@@ -25,111 +25,133 @@ void	Client::sendOtherClient(std::string str)
 
 bool	Client::cmdPASS(std::vector<std::string> &cmd)
 {
-	if (cmd[1].empty())
+
+	/*if (cmd.empty())
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
 		return (false);
-	}
-	if (this->status == COMING)
+	}*/
+	if (cmd.size() == 1 or cmd.size() == 0 )
 	{
-		if (this->server.get_password().compare(cmd[1]) == 0)
-		{
-			std::cout << "PASSWORD IS OK" << std::endl;
-			this->status = REGISTERED;
-			return (true);
-		}
-		else
-			this->status = BAD_PASSWORD;
-	}
-	if (this->status == REGISTERED)
-	{
-		sendMessage(ERR_ALREADYREGISTERED);
-		return (true);
-	}
-	if (this->status == BAD_PASSWORD)
-	{
-		sendMessage(ERR_PASSWDMISMATCH);
-		this->status = COMING;
+		std::cout << YELLOW << "here" << RESET << std::endl;
+		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
 		return (false);
 	}
-	return (true);
+	if (cmd.size() == 2)
+	{
+		if (this->status == REGISTERED)
+		{
+			sendMessage(ERR_ALREADYREGISTERED);
+			return (true);
+		}
+		else if (this->status == COMING)
+		{
+			if (this->server.get_password().compare(cmd[1]) == 0)
+			{
+				std::cout << "PASSWORD IS OK" << std::endl;
+				this->status = REGISTERED;
+				return (true);
+			}
+			else
+			{
+				this->status = COMING;
+				sendMessage(ERR_PASSWDMISMATCH);
+				return(false);
+			}
+		}
+	}
+	return (false);
 }
 
 bool	Client::cmdNICK(std::vector<std::string> &cmd)
 {
-	// Cas d'erreur généralistes
-	if (cmd[1].empty())
+	if (cmd.size() == 1)
 	{
 		sendMessage(ERR_NONICKNAMEGIVEN);
 		return (false);
 	}
-		if (cmd.size() > 2)
+	if (cmd.size() > 2)
 	{
 		sendMessage(ERR_ERRONEUSNICKNAME(cmd[1])); 
 		return (false);
 	}
-
-	// ici gérer le stockage du nickname a l'authentification 
-	if (this->status == REGISTERED)
+	if (cmd.size() == 2)
 	{
-		this->userInfos.nickName = cmd[1];
-	}
-
-	// ici gérer le changement de nickname 
-	if (this->status == CONNECTED)
-	{
-		// si nickname deja present
-		for (int i = 0; i < (int)this->server.clientList.size(); i++)
+		if (this->status == REGISTERED)
 		{
-			if (cmd[1] == this->server.clientList[i].userInfos.nickName)
-			{
-				sendMessage(ERR_NICKNAMEINUSE(cmd[1]));
-				return (false);
-			}
+			this->userInfos.nickName = cmd[1];
+			sendMessage(NICK(this->userInfos.nickName, cmd[1]));
+			//sendMessage(RPL_WELCOME(this->userInfos.nickName, " " , "localhost"));
+			return (true);
 		}
 	}
-	this->userInfos.nickName = cmd[1];
-
-	sendMessage(NICK(this->userInfos.nickName, cmd[1]));
-	//sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost");
-	//The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, and to inform other clients about the change of nickname. In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.
 	return (true);
 }
+	//this->userInfos.nickName = cmd[1];
+
+	//sendMessage(NICK(this->userInfos.nickName, cmd[1]));
+	//sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost");
+	//The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, and to inform other clients about the change of nickname. In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.}
 
 bool	Client::cmdUSER(std::vector<std::string> &cmd)
 {
 	// Deja enregistrer
-	/*if (cmd[1].empty() || cmd[2].empty() || cmd[3].empty() || cmd[4].empty())
+	if (this->status == REGISTERED)
 	{
-		sendMessage(ERR_NEEDMOREPARAMS("USER"));
-		return (false);
-	}*/
-	/*if (cmd[2] != "0" || cmd[3] != "*")
-	{
-		sendMessage("USER :Parameters incorrect");
-		return (false);
-	}*/
-
+		std::cout << BOLD_RED << cmd.size() << std::endl;
+		if(cmd.size() < 5)
+		{
+			sendMessage(ERR_NEEDMOREPARAMS("USER"));
+		}
+		sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost\r\n");
+		if (cmd.size() == 5)
+		{
+			if (cmd[1].empty() || cmd[2].empty() || cmd[3].empty() || cmd[4].empty())
+			{
+				sendMessage(ERR_NEEDMOREPARAMS("USER"));
+				return (false);
+			}
+			else
+			{
+				std::cout << "*******Nombre d'argument OK *********" << std::endl;
+				this->userInfos.userName = cmd[1];
+				this->userInfos.hostName = cmd[2];
+				this->userInfos.realName = cmd[4];
+				sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost\r\n");
+				this->status = CONNECTED;
+			}
+		}
+		//this->userInfos.userName = cmd[1];
+		//this->userInfos.hostName = cmd[2];
+		//this->userInfos.realName = cmd[4];
+		//if (!this->userInfos.userName.empty())
+			//sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost\r\n");
+		//this->status = CONNECTED;
+	}
+	return (true);
+}
 	//If a client tries to send the USER command after they have already completed registration with the server, the ERR_ALREADYREGISTERED reply should be sent and the attempt should fail.
 
 	//If the client sends a USER command after the server has successfully received a username using the Ident Protocol, the <username> parameter from this command should be ignored in favour of the one received from the identity server.
 
-	this->userInfos.userName = cmd[1];
-	this->userInfos.realName = cmd[4];
-	sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost\r\n");
+
+	//sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost\r\n");
 	//Clients SHOULD use the nickname as a fallback value for <username> and <realname> when they don’t have a meaningful value to use.
-	return (true);
-}
+
 
 bool	Client::cmdPING(std::vector<std::string> &cmd)
 {
-	if (cmd[1].empty())
+	if (this->status == CONNECTED)
 	{
-		sendMessage(ERR_NEEDMOREPARAMS("PING"));
-		return (false);
+		if (cmd[1].empty())
+		{
+			sendMessage(ERR_NEEDMOREPARAMS("PING"));
+			return (false);
+		}
+		std::cout << "PONG " + cmd[1] + "\r" << std::endl;
+		sendMessage("PONG " + cmd[1] + "\r");
 	}
-	std::cout << "PONG " + cmd[1] + "\r" << std::endl;
-	sendMessage("PONG " + cmd[1] + "\r");
+
 	return (true);
 }
 
@@ -260,12 +282,11 @@ bool	Client::cmdCAP(std::vector<std::string> &cmd)
 		std::cout << RED << cmd[1] << std::endl;
 		if (cmd[1].compare("LS") == 0)
 		{
-			std::cout << RED << "here" << std::endl;
 			this->status = COMING;
 			return true;
 		}
 	}
-	return false;
+	return (false);
 }
 
 bool	Client::cmdJOIN(std::vector<std::string> &cmd)
@@ -288,9 +309,10 @@ bool	Client::launchCommand(std::string command)
 //	if (!ccmd[1].empty())
 //		vecmd.push_back(ccmd[1]);
 	if (vecmd.empty())
+	{
 		return (false);
+	}
 	std::cout <<  "COMMANDE = " << vecmd[0] << std::endl;
-	//sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost\r\n");
 	while (i < 14)
 	{
 		if (vecmd[0].compare("CAP") == 0)
@@ -308,6 +330,6 @@ bool	Client::launchCommand(std::string command)
 		}
 		i++;
 	}
-	//sendMessage("Command not found");
+	// sendMessage("Command not found");
 	return (false);
 }
