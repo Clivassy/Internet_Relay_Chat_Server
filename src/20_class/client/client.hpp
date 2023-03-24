@@ -107,10 +107,6 @@ class Client {
 		char				        buffer[BUFFER_SIZE];
    		std::string                 authentification;
         std::string                 cmd;
-		bool                        isAuthentified;
-		bool                        isConnected;
-		bool						isOperator;
-		bool						isValidPassword;
 		int							status;
 		std::vector<std::string>	authentificationCmd;
 

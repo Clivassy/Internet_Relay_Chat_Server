@@ -1,8 +1,7 @@
 #include "client.hpp"
 
 Client::Client(Server& serv):
-server(serv), bufferSize(BUFFER_SIZE), isAuthentified(false), isConnected(false), isOperator(false),
-isValidPassword(false), status(COMING)
+server(serv), bufferSize(BUFFER_SIZE), status(COMING)
 { }
 
 Client::~Client(){ }
@@ -12,19 +11,11 @@ std::string	Client::getPrefix( void )
 	return(":" + this->userInfos.nickName + "!" + this->userInfos.userName + "@" + this->userInfos.hostName); // add espace quand error.hpp added
 }
 
-void	Client::errorAuthentification( void )
-{
-	std::cout << BOLD_RED << "Error: client cannot authenticate" << RESET << std::endl;
-	this->server.terminate();
-	exit(EXIT_FAILURE);
-}
-
 void	Client::errorPassword( void )
 {
 	std::string msg(this->getPrefix() + " 464 " + this->userInfos.nickName + " :Password incorrect\r\n");
 	send(this->socketFd, msg.c_str(), msg.size(), 0);
 
-	// recupérer le fd dans pollfd
 	for (std::vector<pollfd>::iterator it = this->server.fdListened.begin(); it != this->server.fdListened.end(); it++)
 	{
 		if (this->socketFd == it->fd)
@@ -32,7 +23,26 @@ void	Client::errorPassword( void )
 	}
 }
 
-void    Client::sendResponse( void )
+std::string		removeLines( std::string toSplit )
+{
+	for (size_t i = 0; i < toSplit.size(); i++) {
+        if (toSplit[i] == '\n') {
+            toSplit.erase(i, 1);
+        }
+    }
+	return(toSplit);
+}
+
+// TO REMOVE 
+
+/*void	Client::errorAuthentification( void )
+{
+	std::cout << BOLD_RED << "Error: client cannot authenticate" << RESET << std::endl;
+	this->server.terminate();
+	exit(EXIT_FAILURE);
+}*/
+
+/*void    Client::sendResponse( void )
 {
 	this->userInfos.userMessage = 
 	":" + this->userInfos.nickName 
@@ -56,15 +66,6 @@ void    Client::sendResponse( void )
 	}
 }
 
-std::string		removeLines( std::string toSplit )
-{
-	for (size_t i = 0; i < toSplit.size(); i++) {
-        if (toSplit[i] == '\n') {
-            toSplit.erase(i, 1);
-        }
-    }
-	return(toSplit);
-}
 
 std::string   Client::getPassword( std::string toSplit )
 {
@@ -119,7 +120,7 @@ bool    Client::getUserInfos( std::string toSplit )
 		}
 	}
 	return (false);
-}
+}*/
 /*
 void    Client::fillDataUser( void )
 {
@@ -193,7 +194,7 @@ void    Client::fillDataUser( void )
 		//	// get userName
 		//	std::cout  << GREEN << this->authentificationCmd[3] << RESET << std::endl;
 		//}
-	//}
+	//}*/
 
 
 

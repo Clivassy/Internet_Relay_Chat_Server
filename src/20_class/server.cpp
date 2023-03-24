@@ -118,8 +118,6 @@ void Server::run()
 			std::cout << BOLD_BLUE << "Poll delay expired \n\n" << RESET;
 
 		}
-
-		
 		// temporisation pour debug (TBD a enlever a la fin)
 		sleep(1); // sleep 1s
 		i++;
@@ -184,34 +182,12 @@ void Server::addNewClient()
 	//this->authentication(*(--this->clientList.end()));
 }
 
-/*	if (client.authentification.find("\r"))
-	{
-		std::cout << "need split\n";
-		tmp = split(client.authentification, '\r');
-		for (std::vector<std::string>::iterator it = tmp.begin(); it != tmp.end() ; it++)
-		{
-			std::string tmp = *it;
-			tmp = removeLines(tmp);
-			if (!tmp.empty())
-			{
-				std::cout << YELLOW << "|" << tmp << "|" << RESET << std::endl;
-				client.authentificationCmd.push_back(tmp);
-			}	
-		}
-	}
-	else
-	{
-		tmp = split(client.authentification, "\n");
-		client.authentificationCmd.push_back(tmp[0]);
-	}
-*/
 void Server::listen_client(Client &client)
 {
 		memset(client.buffer, 0, client.bufferSize);
 		client.authentificationCmd.clear();
 		std::vector<std::string> tmp;
 		
-		//clear_str(client.buffer, client.bufferSize);
 		recv(client.socketFd, client.buffer, client.bufferSize - 1, 0);
 		std::cout << BOLD_YELLOW << "buffer read: -->" << YELLOW << client.buffer << BOLD_YELLOW << "<--" << RESET << std::endl;
 		client.cmd += client.buffer;
@@ -240,14 +216,6 @@ void Server::listen_client(Client &client)
 		for (std::vector<std::string>::iterator it = client.authentificationCmd.begin(); it != client.authentificationCmd.end(); it++)
 			client.launchCommand(*it);
 		client.cmd.clear();
-		/*replace_rn_by_n(client.cmd);
-		if (client.cmd.find("\n") != std::string::npos)
-		{
-			std::string cc = pop_command(client.cmd);
-			std::cout << YELLOW << cc << BOLD_YELLOW << RESET << std::endl;
-			std::cout << BOLD_YELLOW << "launched command: -->" << YELLOW << cc << BOLD_YELLOW << "<--" << RESET << std::endl;
-			client.launchCommand(cc);
-		}*/
 }
 
 void Server::terminate()
@@ -338,6 +306,4 @@ void Server::printState()
 	std::cout << "]";
 
 	std::cout << RESET << std::endl << std::endl;
-
-
 }
