@@ -31,7 +31,7 @@ bool	Client::cmdPASS(std::vector<std::string> &cmd)
 		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
 		return (false);
 	}
-	if (cmd.size() == 1 or cmd.size() == 0 )
+	/*if (cmd.size() == 1 or cmd.size() == 0 )
 	{
 		std::cout << YELLOW << "here" << RESET << std::endl;
 		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
@@ -59,7 +59,7 @@ bool	Client::cmdPASS(std::vector<std::string> &cmd)
 				return(false);
 			}
 		}
-	}
+	}*/
 	return (true);
 }
 
@@ -73,7 +73,7 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 		sendMessage(ERR_NONICKNAMEGIVEN);
 		return (false);
 	}
-	if (cmd.size() > 2)
+	/*if (cmd.size() > 2)
 	{
 		sendMessage(ERR_ERRONEUSNICKNAME(cmd[1])); 
 		return (false);
@@ -92,15 +92,27 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 			sendMessage(RPL_WELCOME(this->userInfos.nickName, this->userInfos.userName ,this->userInfos.hostName ));
 			return (true);
 		}
-	}
+	}*/
 	return (true);
 }
 
 
 bool	Client::cmdUSER(std::vector<std::string> &cmd)
 {
-	std::vector<std::string> user; 
+	std::vector<std::string> user;
+	//------- Pré authentification pout Yann et Marie (TEMPORAIRE) ----// 
 
+	if (this->status == REGISTERED)
+	{
+		this->userInfos.nickName = "jbatoro";
+		this->userInfos.userName = "jbatoro";
+		this->userInfos.hostName = "jbatoro";
+		this->userInfos.realName = "Julia Batoro"; 
+		sendMessage(RPL_WELCOME(this->userInfos.nickName, this->userInfos.userName ,this->userInfos.hostName));
+		this->status = CONNECTED;
+	} 
+	//------------------------------------------------------------ //
+	
 	/*std::cout << BOLD_PURPLE << cmd[0] << RESET << std::endl;
 	if (cmd.size() == 1)
 	{
@@ -111,7 +123,7 @@ bool	Client::cmdUSER(std::vector<std::string> &cmd)
 		std::cout << BOLD_PURPLE << "CAS a gerer dans IRSSI =>  " <<  cmd[0] << " | " << cmd[1] << RESET << std::endl;
 	}*/
 	
-	std::cout << BOLD_RED << cmd.size() << std::endl;
+	/*std::cout << BOLD_RED << cmd.size() << std::endl;
 	if (this->status == REGISTERED and !cmd.empty())
 	{
 		user = split(cmd[0], ' ');
@@ -143,7 +155,8 @@ bool	Client::cmdUSER(std::vector<std::string> &cmd)
 	{
 		sendMessage(ERR_ALREADYREGISTERED);
 		return(false);
-	}
+	}*/
+	(void)cmd;
 	return (true);
 }
 
@@ -317,17 +330,11 @@ bool	Client::launchCommand(std::string command)
 		return (false);
 	}
 	std::cout << RED << "STATUS :" << this->status << std::endl;
-
+	
 	//------- Pré authentification pout Yann et Marie (TEMPORAIRE) ----// 
-
-	/*if (this->status == COMING)
-	{
-		std::cout<< RED << "here" << std::endl;
-		sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost\r\n");
-		this->status = CONNECTED;
-	}*/
+	if (this->status == COMING)
+		this->status = REGISTERED;
 	//------------------------------------------------------------ //
-
 	while (i < 14)
 	{
 		if (vecmd[0].compare("CAP") == 0)
@@ -343,7 +350,7 @@ bool	Client::launchCommand(std::string command)
 			std::cout << BOLD_CYAN << "Command called -----> " << choice[i] <<  std::endl;
 			return(this->cmdUSER(ccmd));
 		}
-		else if (vecmd[0] == choice[i])
+		if (vecmd[0] == choice[i])
 		{
 			std::cout << BOLD_CYAN << "Command called -----> " << choice[i] <<  std::endl;
 			return (this->*f[i])(vecmd);
