@@ -20,6 +20,7 @@ void	Client::sendOtherClient(std::string str)
 {
 	for (std::vector<Client>::iterator it = this->server.clientList.begin(); it != this->server.clientList.end(); it++)
 	{
+		if (it->socketFd != this->socketFd)
 			send(it->socketFd, str.c_str(), str.size(), 0);
 	}
 }
@@ -27,7 +28,12 @@ void	Client::sendOtherClient(std::string str)
 
 bool	Client::cmdPASS(std::vector<std::string> &cmd)
 {
-	if (cmd[1] == "\0")
+	if (this->isAuthentified)
+	{
+		sendMessage(ERR_ALREADYREGISTERED);
+		return (false);
+	}
+	if (cmd.size() < 2)
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
 		return (false);
@@ -44,15 +50,12 @@ bool	Client::cmdPASS(std::vector<std::string> &cmd)
 
 bool	Client::cmdNICK(std::vector<std::string> &cmd)
 {
-	std::cout << "in cmdPASS " << cmd[0] << std::endl;
-	std::cout << "in cmdPASS " << cmd[1] << std::endl;
-	std::cout << "size of cmd " << cmd.size() << std::endl;
-	if (cmd[1].empty())
+	if (cmd.size() < 2)
 	{
 		sendMessage(ERR_NONICKNAMEGIVEN);
 		return (false);
 	}
-	if (cmd.size() < 3)
+	if (cmd.size() > 2)
 	{
 		sendMessage(ERR_ERRONEUSNICKNAME(cmd[1])); 
 		return (false);
@@ -65,6 +68,7 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 			return (false);
 		}
 	}
+	// ERR_RESTRICTED Sent by the server to a user upon connection to indicate the restricted nature of the connection (user mode "+r")
 	sendMessage(NICK(this->userInfos.nickName, cmd[1]));
 	sendOtherClient(NICK_INFORM(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, cmd[1]));
 	this->userInfos.nickName = cmd[1];
@@ -73,20 +77,20 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 
 bool	Client::cmdUSER(std::vector<std::string> &cmd)
 {
-	if (cmd[1].empty() || cmd[2].empty() || cmd[3].empty() || cmd[4].empty())
+	if (this->isAuthentified)
+	{
+		sendMessage(ERR_ALREADYREGISTERED);
+		return (false);
+	if (cmd.size() < 5)
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("USER"));
 		return (false);
 	}
 	if (cmd[2] != "0" || cmd[3] != "*")
 	{
-		sendMessage("USER :Parameters incorrect");
+		sendMessage("USER :Parameters incorrect\r\n");
 		return (false);
 	}
-	if (this->isAuthentified)
-	{
-		sendMessage(ERR_ALREADYREGISTERED);
-		return (false);
 	}
 	this->userInfos.userName = cmd[4];
 	this->userInfos.realName = cmd[4];
@@ -95,7 +99,7 @@ bool	Client::cmdUSER(std::vector<std::string> &cmd)
 
 bool	Client::cmdPING(std::vector<std::string> &cmd)
 {
-	if (cmd[1].empty())
+	if (cmd.size() < 2)
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("PING"));
 		return (false);
@@ -107,7 +111,7 @@ bool	Client::cmdPING(std::vector<std::string> &cmd)
 
 bool	Client::cmdOPER(std::vector<std::string> &cmd)
 {
-	if (cmd[1].empty() || cmd[2].empty())
+	if (cmd.size() < 3)
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("OPER"));
 		return (false);
@@ -141,7 +145,7 @@ bool	Client::cmdQUIT(std::vector<std::string> &cmd)
 // Supprime un client ou des channels
 bool	Client::cmdPART(std::vector<std::string> &cmd)
 {
-	if (cmd[1].empty())
+	if (cmd.size() < 2)
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("PART"));
 		return (false);
@@ -157,7 +161,7 @@ bool	Client::cmdPART(std::vector<std::string> &cmd)
 // The PRIVMSG command is used to send private messages between users, as well as to send messages to channels. <target> is the nickname of a client or the name of a channel.
 bool	Client::cmdPRIVMSG(std::vector<std::string> &cmd)
 {
-	if (cmd[2].empty())
+	if (cmd.size() < 3)
 	{
 		std::cout << ERR_NEEDMOREPARAMS("PRIVMSG");
 		return (false);
@@ -175,7 +179,7 @@ bool	Client::cmdNOTICE(std::vector<std::string> &cmd)
 {
 	//The difference between NOTICE and PRIVMSG is that automatic replies must never be sent in response to a NOTICE message.This rule also applies to servers – they must not send any error back to the client on receipt of a NOTICE command.
 	// SI j'ai bien compris un NOTICE est un PRIVMSG sans message d'erreur
-	if (cmd[2].empty())
+	if (cmd.size() < 3)
 		return (false);
 	// Envoyer le message
 	return (true);
@@ -184,7 +188,7 @@ bool	Client::cmdNOTICE(std::vector<std::string> &cmd)
 ////////////////////////////////////////////////////////////////////////////
 bool	Client::cmdMODE(std::vector<std::string> &cmd)
 {
-	if (cmd[1].empty())
+	if (cmd.size() < 2)
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("MODE"));
 		return (false);
@@ -195,7 +199,7 @@ bool	Client::cmdMODE(std::vector<std::string> &cmd)
 // Parameters: <nickname> <channel>
 bool	Client::cmdINVITE(std::vector<std::string> &cmd)
 {
-	if (cmd[2].empty())
+	if (cmd.size() < 3)
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("INVITE"));
 		return (false);
@@ -211,7 +215,7 @@ bool	Client::cmdINVITE(std::vector<std::string> &cmd)
 //  Parameters: <channel> <user> [<comment>]
 bool	Client::cmdKICK(std::vector<std::string> &cmd)
 {
-	if (cmd[2].empty())
+	if (cmd.size() < 3)
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("KICK"));
 		return (false);
@@ -223,7 +227,7 @@ bool	Client::cmdKICK(std::vector<std::string> &cmd)
 ////////////////////////////////////////////////////////////////////////////
 bool	Client::cmdWHOIS(std::vector<std::string> &cmd)
 {
-	if (cmd[1].empty())
+	if (cmd.size() < 2)
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("WHOIS"));
 		return (false);
@@ -235,7 +239,9 @@ bool	Client::cmdWHOIS(std::vector<std::string> &cmd)
 bool	Client::launchCommand(std::string command)
 {
 	std::cout << "HERE launchCommand => " << command << std::endl;
-	
+
+	if (command.empty())
+		return (true);
 	std::vector<std::string> ccmd = split(command, ':');
 	std::vector<std::string> vecmd = split(ccmd[0], ' ');
 	std::string	choice[14] = {"PASS", "NICK", "USER", "PING", "OPER", "QUIT", "JOIN", "PART", "PRIVMSG", "NOTICE", "MODE", "INVITE", "KICK", "WHOIS"};
@@ -246,15 +252,11 @@ bool	Client::launchCommand(std::string command)
 //		vecmd.push_back(ccmd[1]);
 	if (vecmd.empty())
 		return (false);
-	std::cout << "vecmd " << vecmd[0] << std::endl;
+	std::cout << "vecmd size " << vecmd.size() << std::endl;
 	while (i < 13)
 	{
-		std::cout << "choice[i]" << choice[i] << std::endl;
 		if (vecmd[0] == choice[i])
-		{
-			std::cout << "bouhhhh" << std::endl;
 			return (this->*f[i])(vecmd);
-		}
 		i++;
 	}
 	sendMessage("Command not found\r\n");
