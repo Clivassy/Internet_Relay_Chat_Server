@@ -63,9 +63,12 @@ bool	Client::cmdPASS(std::vector<std::string> &cmd)
 	return (true);
 }
 
+// The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, 
+// and to inform other clients about the change of nickname. 
+// In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.}
 bool	Client::cmdNICK(std::vector<std::string> &cmd)
 {
-	/*if (cmd.size() == 1)
+	if (cmd.size() == 1)
 	{
 		sendMessage(ERR_NONICKNAMEGIVEN);
 		return (false);
@@ -74,72 +77,75 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 	{
 		sendMessage(ERR_ERRONEUSNICKNAME(cmd[1])); 
 		return (false);
-	}*/
+	}
 	if (cmd.size() == 2)
 	{
 		if (this->status == REGISTERED)
 		{
 			this->userInfos.nickName = cmd[1];
-			//sendMessage(NICK(this->userInfos.nickName, cmd[1]));
-			//sendMessage(RPL_WELCOME(this->userInfos.nickName, " " , "localhost"));
+			return (true);
+		}
+		if (this->status == CONNECTED)
+		{
+			this->userInfos.nickName = cmd[1];
+			sendMessage(NICK(this->userInfos.nickName, cmd[1]));
+			sendMessage(RPL_WELCOME(this->userInfos.nickName, this->userInfos.userName ,this->userInfos.hostName ));
 			return (true);
 		}
 	}
 	return (true);
 }
-	//this->userInfos.nickName = cmd[1];
 
-	//sendMessage(NICK(this->userInfos.nickName, cmd[1]));
-	//sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost");
-	//The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, and to inform other clients about the change of nickname. In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.}
 
 bool	Client::cmdUSER(std::vector<std::string> &cmd)
 {
-	//envoi de l'entiereté de la commande 
-	// split a faire ici en fonction de nc ou irssi
-	// Deja enregistrer
-	if (this->status == REGISTERED)
+	std::vector<std::string> user; 
+
+	/*std::cout << BOLD_PURPLE << cmd[0] << RESET << std::endl;
+	if (cmd.size() == 1)
 	{
-		std::cout << BOLD_RED << cmd.size() << std::endl;
-		if(cmd.size() < 5)
+		std::cout << BOLD_PURPLE << "CAS a gerer dans NC =>  " << cmd[0] << RESET << std::endl;
+	}
+	if (cmd.size() == 2) //cas de irssi ou c'est separé par deux points
+	{
+		std::cout << BOLD_PURPLE << "CAS a gerer dans IRSSI =>  " <<  cmd[0] << " | " << cmd[1] << RESET << std::endl;
+	}*/
+	
+	std::cout << BOLD_RED << cmd.size() << std::endl;
+	if (this->status == REGISTERED and !cmd.empty())
+	{
+		user = split(cmd[0], ' ');
+
+		if (cmd.size() == 1)
 		{
-			sendMessage(ERR_NEEDMOREPARAMS("USER"));
-		}
-		//sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost\r\n");
-		if (cmd.size() == 5)
-		{
-			if (cmd[1].empty() || cmd[2].empty() || cmd[3].empty() || cmd[4].empty())
+			if (user.size() != 5)
 			{
 				sendMessage(ERR_NEEDMOREPARAMS("USER"));
 				return (false);
 			}
-			else
-			{
-				std::cout << "*******Nombre d'argument OK *********" << std::endl;
-				this->userInfos.userName = cmd[1];
-				this->userInfos.hostName = cmd[2];
-				this->userInfos.realName = cmd[4];
-				sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost\r\n");
-				this->status = CONNECTED;
-			}
+			this->userInfos.realName = user[3];
 		}
-		//this->userInfos.userName = cmd[1];
-		//this->userInfos.hostName = cmd[2];
-		//this->userInfos.realName = cmd[4];
-		//if (!this->userInfos.userName.empty())
-			//sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost\r\n");
-		//this->status = CONNECTED;
+		else if (cmd.size() == 2)
+		{
+			if (cmd[1].empty())
+			{
+				sendMessage(ERR_NEEDMOREPARAMS("USER"));
+				return (false);
+			}
+			this->userInfos.realName = cmd[1];
+		}
+		this->userInfos.userName = user[1];
+		this->userInfos.hostName = user[2];
+		sendMessage(RPL_WELCOME(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName));
+		this->status = CONNECTED;
+	}
+	else if (this->status == CONNECTED)
+	{
+		sendMessage(ERR_ALREADYREGISTERED);
+		return(false);
 	}
 	return (true);
 }
-	//If a client tries to send the USER command after they have already completed registration with the server, the ERR_ALREADYREGISTERED reply should be sent and the attempt should fail.
-
-	//If the client sends a USER command after the server has successfully received a username using the Ident Protocol, the <username> parameter from this command should be ignored in favour of the one received from the identity server.
-
-
-	//sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost\r\n");
-	//Clients SHOULD use the nickname as a fallback value for <username> and <realname> when they don’t have a meaningful value to use.
-
 
 bool	Client::cmdPING(std::vector<std::string> &cmd)
 {
@@ -300,27 +306,28 @@ bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 //- PASS, NICK, USER, PING, OPER, QUIT, JOIN, PART, PRIVMSG, NOTICE, MODE, INVITE. KICK, WHOIS
 bool	Client::launchCommand(std::string command)
 {
-	//std::cout << "HERE launchCommand => " << command << std::endl;
 	std::vector<std::string> ccmd = split(command, ':');
 	std::vector<std::string> vecmd = split(ccmd[0], ' ');
 	std::string	choice[15] = {"CAP", "PASS", "NICK", "USER", "PING", "OPER", "QUIT", "JOIN", "PART", "PRIVMSG", "NOTICE", "MODE", "INVITE", "KICK", "WHOIS"};
 	bool	(Client::*f[15])(std::vector<std::string> &) = {&Client::cmdCAP, &Client::cmdPASS, &Client::cmdNICK, &Client::cmdUSER, &Client::cmdPING, &Client::cmdOPER, &Client::cmdQUIT, &Client::cmdJOIN, &Client::cmdPART, &Client::cmdPRIVMSG, &Client::cmdNOTICE, &Client::cmdMODE, &Client::cmdINVITE, &Client::cmdKICK, &Client::cmdWHOIS};
 	int i = 0;
 
-//	if (!ccmd[1].empty())
-//		vecmd.push_back(ccmd[1]);
 	if (vecmd.empty())
 	{
 		return (false);
 	}
 	std::cout << RED << "STATUS :" << this->status << std::endl;
+
+	//------- Pré authentification pout Yann et Marie (TEMPORAIRE) ----// 
+
 	/*if (this->status == COMING)
 	{
 		std::cout<< RED << "here" << std::endl;
 		sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost\r\n");
 		this->status = CONNECTED;
 	}*/
-	//std::cout <<  "COMMANDE = " << vecmd[0] << std::endl;
+	//------------------------------------------------------------ //
+
 	while (i < 14)
 	{
 		if (vecmd[0].compare("CAP") == 0)
@@ -333,6 +340,7 @@ bool	Client::launchCommand(std::string command)
 		}
 		if (vecmd[0].compare("USER") == 0)
 		{
+			std::cout << BOLD_CYAN << "Command called -----> " << choice[i] <<  std::endl;
 			return(this->cmdUSER(ccmd));
 		}
 		else if (vecmd[0] == choice[i])
@@ -342,7 +350,6 @@ bool	Client::launchCommand(std::string command)
 		}
 		i++;
 	}
-
 	// sendMessage("Command not found");
 	return (false);
 }
