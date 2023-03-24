@@ -10,6 +10,7 @@
 
 //source https://modern.ircdocs.horse/#client-messages
 
+/////////////////////////////////////////////////////////
 void	Client::sendMessage(std::string str)
 {
 	send(this->socketFd, str.c_str(), str.size(), 0);
@@ -19,9 +20,11 @@ void	Client::sendOtherClient(std::string str)
 {
 	for (std::vector<Client>::iterator it = this->server.clientList.begin(); it != this->server.clientList.end(); it++)
 	{
+		if (it->socketFd != this->socketFd)
 			send(it->socketFd, str.c_str(), str.size(), 0);
 	}
 }
+////////////////////////////////////////////////////////
 
 bool	Client::cmdPASS(std::vector<std::string> &cmd)
 {
@@ -163,23 +166,19 @@ bool	Client::cmdUSER(std::vector<std::string> &cmd)
 
 bool	Client::cmdPING(std::vector<std::string> &cmd)
 {
-	if (this->status == CONNECTED)
+	if (cmd.size() < 2)
 	{
-		if (cmd[1].empty())
-		{
-			sendMessage(ERR_NEEDMOREPARAMS("PING"));
-			return (false);
-		}
-		std::cout << "PONG " + cmd[1] + "\r" << std::endl;
-		sendMessage("PONG " + cmd[1] + "\r");
+		sendMessage(ERR_NEEDMOREPARAMS("PING"));
+		return (false);
 	}
-
+	std::cout << "PONG " + cmd[1] + "\r" << std::endl;
+	sendMessage("PONG " + cmd[1] + "\r");
 	return (true);
 }
 
 bool	Client::cmdOPER(std::vector<std::string> &cmd)
 {
-	if (cmd[1].empty() || cmd[2].empty())
+	if (cmd.size() < 3)
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("OPER"));
 		return (false);
@@ -196,10 +195,16 @@ bool	Client::cmdOPER(std::vector<std::string> &cmd)
 
 bool	Client::cmdQUIT(std::vector<std::string> &cmd)
 {
-	// This is typically only dispatched to clients that share a channel with the exiting user.
-	// Envoye Quit :<reason> au autres clients
-	(void) cmd;
-	sendMessage("QUIT : Bye for now");
+	if (cmd.size() == 1)
+	{
+		sendMessage(QUIT(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName));
+		sendOtherClient(QUIT(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName));
+	}
+	else
+	{
+		sendMessage(QUIT_REASON(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, cmd[1]));	
+		sendOtherClient(QUIT_REASON(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, cmd[1]));	
+	}
 	return (true);
 }
 
@@ -207,7 +212,7 @@ bool	Client::cmdQUIT(std::vector<std::string> &cmd)
 // Supprime un client ou des channels
 bool	Client::cmdPART(std::vector<std::string> &cmd)
 {
-	if (cmd[1].empty())
+	if (cmd.size() < 2)
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("PART"));
 		return (false);
@@ -223,7 +228,7 @@ bool	Client::cmdPART(std::vector<std::string> &cmd)
 // The PRIVMSG command is used to send private messages between users, as well as to send messages to channels. <target> is the nickname of a client or the name of a channel.
 bool	Client::cmdPRIVMSG(std::vector<std::string> &cmd)
 {
-	if (cmd[2].empty())
+	if (cmd.size() < 3)
 	{
 		std::cout << ERR_NEEDMOREPARAMS("PRIVMSG");
 		return (false);
@@ -241,7 +246,7 @@ bool	Client::cmdNOTICE(std::vector<std::string> &cmd)
 {
 	//The difference between NOTICE and PRIVMSG is that automatic replies must never be sent in response to a NOTICE message.This rule also applies to servers – they must not send any error back to the client on receipt of a NOTICE command.
 	// SI j'ai bien compris un NOTICE est un PRIVMSG sans message d'erreur
-	if (cmd[2].empty())
+	if (cmd.size() < 3)
 		return (false);
 	// Envoyer le message
 	return (true);
@@ -250,7 +255,7 @@ bool	Client::cmdNOTICE(std::vector<std::string> &cmd)
 ////////////////////////////////////////////////////////////////////////////
 bool	Client::cmdMODE(std::vector<std::string> &cmd)
 {
-	if (cmd[1].empty())
+	if (cmd.size() < 2)
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("MODE"));
 		return (false);
@@ -261,7 +266,7 @@ bool	Client::cmdMODE(std::vector<std::string> &cmd)
 // Parameters: <nickname> <channel>
 bool	Client::cmdINVITE(std::vector<std::string> &cmd)
 {
-	if (cmd[2].empty())
+	if (cmd.size() < 3)
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("INVITE"));
 		return (false);
@@ -277,7 +282,7 @@ bool	Client::cmdINVITE(std::vector<std::string> &cmd)
 //  Parameters: <channel> <user> [<comment>]
 bool	Client::cmdKICK(std::vector<std::string> &cmd)
 {
-	if (cmd[2].empty())
+	if (cmd.size() < 3)
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("KICK"));
 		return (false);
@@ -289,7 +294,7 @@ bool	Client::cmdKICK(std::vector<std::string> &cmd)
 ////////////////////////////////////////////////////////////////////////////
 bool	Client::cmdWHOIS(std::vector<std::string> &cmd)
 {
-	if (cmd[1].empty())
+	if (cmd.size() < 2)
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("WHOIS"));
 		return (false);
