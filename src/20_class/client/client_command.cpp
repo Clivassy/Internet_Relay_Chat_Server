@@ -312,24 +312,33 @@ bool	Client::launchCommand(std::string command)
 	{
 		return (false);
 	}
-	std::cout <<  "COMMANDE = " << vecmd[0] << std::endl;
-	while (i < 14)
+	//std::cout <<  "COMMANDE = " << vecmd[0] << std::endl;
+	if (this->status == COMING)
 	{
-		if (vecmd[0].compare("CAP") == 0)
-		{
-			return (this->cmdCAP(vecmd));
-		}
-		if (vecmd[0].compare("PASS") == 0)
-		{
-			return (this->cmdPASS(vecmd));
-		}
-		else if (vecmd[0] == choice[i])
-		{
-			std::cout << "bouhhhh" << std::endl;
-			return (this->*f[i])(vecmd);
-		}
-		i++;
+		sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost\r\n");
+		this->status = CONNECTED;
 	}
+	else
+	{
+		while (i < 14)
+		{
+			if (vecmd[0].compare("CAP") == 0)
+			{
+				return (this->cmdCAP(vecmd));
+			}
+			if (vecmd[0].compare("PASS") == 0)
+			{
+				return (this->cmdPASS(vecmd));
+			}
+			else if (vecmd[0] == choice[i])
+			{
+				std::cout << "bouhhhh" << std::endl;
+				return (this->*f[i])(vecmd);
+			}
+			i++;
+		}
+	}
+
 	// sendMessage("Command not found");
 	return (false);
 }
