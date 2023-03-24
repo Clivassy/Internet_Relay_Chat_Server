@@ -99,8 +99,8 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 
 bool	Client::cmdUSER(std::vector<std::string> &cmd)
 {
-	std::vector<std::string> user;
-	//------- Pré authentification pout Yann et Marie (TEMPORAIRE) ----// 
+	(void)cmd;
+	//------- Pré authentification pour Yann et Arzu (TEMPORAIRE) ----// 
 
 	if (this->status == REGISTERED)
 	{
@@ -112,8 +112,9 @@ bool	Client::cmdUSER(std::vector<std::string> &cmd)
 		this->status = CONNECTED;
 	} 
 	//------------------------------------------------------------ //
+	/*std::vector<std::string> user;
 	
-	/*std::cout << BOLD_PURPLE << cmd[0] << RESET << std::endl;
+	std::cout << BOLD_PURPLE << cmd[0] << RESET << std::endl;
 	if (cmd.size() == 1)
 	{
 		std::cout << BOLD_PURPLE << "CAS a gerer dans NC =>  " << cmd[0] << RESET << std::endl;
@@ -156,7 +157,7 @@ bool	Client::cmdUSER(std::vector<std::string> &cmd)
 		sendMessage(ERR_ALREADYREGISTERED);
 		return(false);
 	}*/
-	(void)cmd;
+
 	return (true);
 }
 
@@ -331,7 +332,7 @@ bool	Client::launchCommand(std::string command)
 	}
 	std::cout << RED << "STATUS :" << this->status << std::endl;
 	
-	//------- Pré authentification pout Yann et Marie (TEMPORAIRE) ----// 
+	//------- Pré authentification pour Yann et Arzu (TEMPORAIRE) ----// 
 	if (this->status == COMING)
 		this->status = REGISTERED;
 	//------------------------------------------------------------ //
