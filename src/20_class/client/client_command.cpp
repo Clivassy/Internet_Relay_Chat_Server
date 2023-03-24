@@ -34,7 +34,7 @@ bool	Client::cmdPASS(std::vector<std::string> &cmd)
 		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
 		return (false);
 	}
-	/*if (cmd.size() == 1 or cmd.size() == 0 )
+	if (cmd.size() == 1 or cmd.size() == 0 )
 	{
 		std::cout << YELLOW << "here" << RESET << std::endl;
 		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
@@ -62,7 +62,7 @@ bool	Client::cmdPASS(std::vector<std::string> &cmd)
 				return(false);
 			}
 		}
-	}*/
+	}
 	return (true);
 }
 
@@ -76,7 +76,7 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 		sendMessage(ERR_NONICKNAMEGIVEN);
 		return (false);
 	}
-	/*if (cmd.size() > 2)
+	if (cmd.size() > 2)
 	{
 		sendMessage(ERR_ERRONEUSNICKNAME(cmd[1])); 
 		return (false);
@@ -95,17 +95,16 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 			sendMessage(RPL_WELCOME(this->userInfos.nickName, this->userInfos.userName ,this->userInfos.hostName ));
 			return (true);
 		}
-	}*/
+	}
 	return (true);
 }
 
 
 bool	Client::cmdUSER(std::vector<std::string> &cmd)
 {
-	(void)cmd;
 	//------- Pré authentification pour Yann et Arzu (TEMPORAIRE) ----// 
 
-	if (this->status == REGISTERED)
+	/*if (this->status == REGISTERED)
 	{
 		this->userInfos.nickName = "jbatoro";
 		this->userInfos.userName = "jbatoro";
@@ -113,11 +112,11 @@ bool	Client::cmdUSER(std::vector<std::string> &cmd)
 		this->userInfos.realName = "Julia Batoro"; 
 		sendMessage(RPL_WELCOME(this->userInfos.nickName, this->userInfos.userName ,this->userInfos.hostName));
 		this->status = CONNECTED;
-	} 
+	} */
 	//------------------------------------------------------------ //
-	/*std::vector<std::string> user;
+	std::vector<std::string> user;
 	
-	std::cout << BOLD_PURPLE << cmd[0] << RESET << std::endl;
+	/*std::cout << BOLD_PURPLE << cmd[0] << RESET << std::endl;
 	if (cmd.size() == 1)
 	{
 		std::cout << BOLD_PURPLE << "CAS a gerer dans NC =>  " << cmd[0] << RESET << std::endl;
@@ -127,7 +126,7 @@ bool	Client::cmdUSER(std::vector<std::string> &cmd)
 		std::cout << BOLD_PURPLE << "CAS a gerer dans IRSSI =>  " <<  cmd[0] << " | " << cmd[1] << RESET << std::endl;
 	}*/
 	
-	/*std::cout << BOLD_RED << cmd.size() << std::endl;
+	std::cout << BOLD_RED << cmd.size() << std::endl;
 	if (this->status == REGISTERED and !cmd.empty())
 	{
 		user = split(cmd[0], ' ');
@@ -159,7 +158,7 @@ bool	Client::cmdUSER(std::vector<std::string> &cmd)
 	{
 		sendMessage(ERR_ALREADYREGISTERED);
 		return(false);
-	}*/
+	}
 
 	return (true);
 }

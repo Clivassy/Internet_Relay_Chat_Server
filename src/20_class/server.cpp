@@ -205,38 +205,17 @@ void Server::addNewClient()
 
 void Server::listen_client(Client &client)
 {
-		memset(client.buffer, 0, client.bufferSize);
-		client.authentificationCmd.clear();
-		std::vector<std::string> tmp;
-		
-		recv(client.socketFd, client.buffer, client.bufferSize - 1, 0);
-		std::cout << BOLD_YELLOW << "buffer read: -->" << YELLOW << client.buffer << BOLD_YELLOW << "<--" << RESET << std::endl;
-		client.cmd += client.buffer;
-		std::cout << "client.cmd:" << client.cmd << std::endl;
-		if (client.cmd.find("\r"))
-		{
-			std::cout << "here split" << std::endl;
-			tmp = split(client.cmd, '\r');
-			for (std::vector<std::string>::iterator it = tmp.begin(); it != tmp.end() ; it++)
-			{
-				std::string tmp = *it;
-				tmp = removeLines(tmp);
-				if (!tmp.empty())
-				{
-					std::cout << YELLOW << "|" << tmp << "|" << RESET << std::endl;
-					client.authentificationCmd.push_back(tmp);
-				}	
-			}
-		}
-		else
-		{
-			std::cout << "here" << std::endl;
-			tmp = split(client.authentification, "\n");
-			client.authentificationCmd.push_back(tmp[0]);
-		}
-		for (std::vector<std::string>::iterator it = client.authentificationCmd.begin(); it != client.authentificationCmd.end(); it++)
-			client.launchCommand(*it);
-		client.cmd.clear();
+	clear_str(client.buffer, client.bufferSize);
+	recv(client.socketFd, client.buffer, client.bufferSize - 1, 0);
+	//std::cout << BOLD_PURPLE << "read buffer: " << client.buffer << RESET << std::endl;
+	client.cmd += client.buffer;
+	replace_rn_by_n(client.cmd);
+	while (client.cmd.find("\n") != std::string::npos)
+	{
+		std::string cc = pop_command(client.cmd);
+		std::cout << BOLD_YELLOW << "launched command: -->" << YELLOW << cc << BOLD_YELLOW << "<--" << RESET << std::endl;
+		client.launchCommand(cc);
+	}
 }
 
 void Server::terminate()
@@ -268,8 +247,6 @@ Channel& Server::getChannel(std::string name)
 {
 	return((this->channelList.find(name))->second);
 }
-
-
 
 void Server::printState()
 {
