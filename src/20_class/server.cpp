@@ -208,6 +208,7 @@ void Server::addNewClient()
 void Server::listen_client(Client &client)
 {
 		memset(client.buffer, 0, client.bufferSize);
+		client.authentificationCmd.clear();
 		std::vector<std::string> tmp;
 		
 		//clear_str(client.buffer, client.bufferSize);

@@ -2,7 +2,7 @@
 
 Client::Client(Server& serv):
 server(serv), bufferSize(BUFFER_SIZE), isAuthentified(false), isConnected(false), isOperator(false),
-isValidPassword(false), status(WAITING)
+isValidPassword(false), status(COMING)
 { }
 
 Client::~Client(){ }

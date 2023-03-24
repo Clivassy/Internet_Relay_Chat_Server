@@ -26,11 +26,11 @@ void	Client::sendOtherClient(std::string str)
 bool	Client::cmdPASS(std::vector<std::string> &cmd)
 {
 
-	/*if (cmd.empty())
+	if (cmd.empty())
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
 		return (false);
-	}*/
+	}
 	if (cmd.size() == 1 or cmd.size() == 0 )
 	{
 		std::cout << YELLOW << "here" << RESET << std::endl;
@@ -60,12 +60,12 @@ bool	Client::cmdPASS(std::vector<std::string> &cmd)
 			}
 		}
 	}
-	return (false);
+	return (true);
 }
 
 bool	Client::cmdNICK(std::vector<std::string> &cmd)
 {
-	if (cmd.size() == 1)
+	/*if (cmd.size() == 1)
 	{
 		sendMessage(ERR_NONICKNAMEGIVEN);
 		return (false);
@@ -74,13 +74,13 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 	{
 		sendMessage(ERR_ERRONEUSNICKNAME(cmd[1])); 
 		return (false);
-	}
+	}*/
 	if (cmd.size() == 2)
 	{
 		if (this->status == REGISTERED)
 		{
 			this->userInfos.nickName = cmd[1];
-			sendMessage(NICK(this->userInfos.nickName, cmd[1]));
+			//sendMessage(NICK(this->userInfos.nickName, cmd[1]));
 			//sendMessage(RPL_WELCOME(this->userInfos.nickName, " " , "localhost"));
 			return (true);
 		}
@@ -95,6 +95,8 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 
 bool	Client::cmdUSER(std::vector<std::string> &cmd)
 {
+	//envoi de l'entiereté de la commande 
+	// split a faire ici en fonction de nc ou irssi
 	// Deja enregistrer
 	if (this->status == REGISTERED)
 	{
@@ -103,7 +105,7 @@ bool	Client::cmdUSER(std::vector<std::string> &cmd)
 		{
 			sendMessage(ERR_NEEDMOREPARAMS("USER"));
 		}
-		sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost\r\n");
+		//sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost\r\n");
 		if (cmd.size() == 5)
 		{
 			if (cmd[1].empty() || cmd[2].empty() || cmd[3].empty() || cmd[4].empty())
@@ -299,11 +301,10 @@ bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 bool	Client::launchCommand(std::string command)
 {
 	//std::cout << "HERE launchCommand => " << command << std::endl;
-	
 	std::vector<std::string> ccmd = split(command, ':');
 	std::vector<std::string> vecmd = split(ccmd[0], ' ');
 	std::string	choice[15] = {"CAP", "PASS", "NICK", "USER", "PING", "OPER", "QUIT", "JOIN", "PART", "PRIVMSG", "NOTICE", "MODE", "INVITE", "KICK", "WHOIS"};
-	bool	(Client::*f[14])(std::vector<std::string> &) = {&Client::cmdPASS, &Client::cmdNICK, &Client::cmdUSER, &Client::cmdPING, &Client::cmdOPER, &Client::cmdQUIT, &Client::cmdJOIN, &Client::cmdPART, &Client::cmdPRIVMSG, &Client::cmdNOTICE, &Client::cmdMODE, &Client::cmdINVITE, &Client::cmdKICK, &Client::cmdWHOIS};
+	bool	(Client::*f[15])(std::vector<std::string> &) = {&Client::cmdCAP, &Client::cmdPASS, &Client::cmdNICK, &Client::cmdUSER, &Client::cmdPING, &Client::cmdOPER, &Client::cmdQUIT, &Client::cmdJOIN, &Client::cmdPART, &Client::cmdPRIVMSG, &Client::cmdNOTICE, &Client::cmdMODE, &Client::cmdINVITE, &Client::cmdKICK, &Client::cmdWHOIS};
 	int i = 0;
 
 //	if (!ccmd[1].empty())
@@ -312,31 +313,34 @@ bool	Client::launchCommand(std::string command)
 	{
 		return (false);
 	}
-	//std::cout <<  "COMMANDE = " << vecmd[0] << std::endl;
-	if (this->status == COMING)
+	std::cout << RED << "STATUS :" << this->status << std::endl;
+	/*if (this->status == COMING)
 	{
+		std::cout<< RED << "here" << std::endl;
 		sendMessage("001 jbatoro :Welcome to the Internet Relay Network jbatoro!jbatoro@locahost\r\n");
 		this->status = CONNECTED;
-	}
-	else
+	}*/
+	//std::cout <<  "COMMANDE = " << vecmd[0] << std::endl;
+	while (i < 14)
 	{
-		while (i < 14)
+		if (vecmd[0].compare("CAP") == 0)
 		{
-			if (vecmd[0].compare("CAP") == 0)
-			{
-				return (this->cmdCAP(vecmd));
-			}
-			if (vecmd[0].compare("PASS") == 0)
-			{
-				return (this->cmdPASS(vecmd));
-			}
-			else if (vecmd[0] == choice[i])
-			{
-				std::cout << "bouhhhh" << std::endl;
-				return (this->*f[i])(vecmd);
-			}
-			i++;
+			return (this->cmdCAP(vecmd));
 		}
+		if (vecmd[0].compare("PASS") == 0)
+		{
+			return (this->cmdPASS(vecmd));
+		}
+		if (vecmd[0].compare("USER") == 0)
+		{
+			return(this->cmdUSER(ccmd));
+		}
+		else if (vecmd[0] == choice[i])
+		{
+			std::cout << BOLD_CYAN << "Command called -----> " << choice[i] <<  std::endl;
+			return (this->*f[i])(vecmd);
+		}
+		i++;
 	}
 
 	// sendMessage("Command not found");
