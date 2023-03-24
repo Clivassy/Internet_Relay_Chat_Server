@@ -13,7 +13,7 @@ Channel::~Channel( void )
 // Ajouter le fd du clien qui se connecte au serveur dans la liste des clients connectés
 void Channel::addClient(Client& client)
 {
-	clientConnected.insert(client.userInfos.userName);
+	clientConnected.insert(client.userInfos.nickName);
 }
 
 // recevoir une string et send a tous les clients connectés
