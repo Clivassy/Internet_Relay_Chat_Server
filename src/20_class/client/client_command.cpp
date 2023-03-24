@@ -34,9 +34,8 @@ bool	Client::cmdPASS(std::vector<std::string> &cmd)
 		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
 		return (false);
 	}
-	/*if (cmd.size() == 1 or cmd.size() == 0 )
-	{
-		std::cout << YELLOW << "here" << RESET << std::endl;
+	/*if (cmd.size() == 1)
+	{	
 		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
 		return (false);
 	}
@@ -57,8 +56,15 @@ bool	Client::cmdPASS(std::vector<std::string> &cmd)
 			}
 			else
 			{
-				this->status = COMING;
+				std::cout << BOLD_RED << "WRONG PASSWORD" << RESET << std::endl;
 				sendMessage(ERR_PASSWDMISMATCH);
+				if (this->isIrssi == true)
+				{
+					this->status = BAD_PASSWORD;
+					this->deconnectClient();
+					return(false);
+				}
+				this->status = COMING;
 				return(false);
 			}
 		}
@@ -95,16 +101,22 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 			sendMessage(RPL_WELCOME(this->userInfos.nickName, this->userInfos.userName ,this->userInfos.hostName ));
 			return (true);
 		}
+	}
+	if (this->isIrssi == true)
+	{
+		this->status = BAD_PASSWORD;
+		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
+		this->deconnectClient();
+		return(false);
 	}*/
-	return (true);
+	return (false);
 }
 
 
 bool	Client::cmdUSER(std::vector<std::string> &cmd)
 {
-	(void)cmd;
 	//------- Pré authentification pour Yann et Arzu (TEMPORAIRE) ----// 
-
+	(void)cmd;
 	if (this->status == REGISTERED)
 	{
 		this->userInfos.nickName = "jbatoro";
@@ -115,9 +127,9 @@ bool	Client::cmdUSER(std::vector<std::string> &cmd)
 		this->status = CONNECTED;
 	} 
 	//------------------------------------------------------------ //
-	/*std::vector<std::string> user;
+	//std::vector<std::string> user;
 	
-	std::cout << BOLD_PURPLE << cmd[0] << RESET << std::endl;
+	/*std::cout << BOLD_PURPLE << cmd[0] << RESET << std::endl;
 	if (cmd.size() == 1)
 	{
 		std::cout << BOLD_PURPLE << "CAS a gerer dans NC =>  " << cmd[0] << RESET << std::endl;
@@ -160,7 +172,6 @@ bool	Client::cmdUSER(std::vector<std::string> &cmd)
 		sendMessage(ERR_ALREADYREGISTERED);
 		return(false);
 	}*/
-
 	return (true);
 }
 
@@ -335,7 +346,7 @@ bool	Client::launchCommand(std::string command)
 	{
 		return (false);
 	}
-	std::cout << RED << "STATUS :" << this->status << std::endl;
+	//std::cout << RED << "STATUS :" << this->status << std::endl;
 	
 	//------- Pré authentification pour Yann et Arzu (TEMPORAIRE) ----// 
 	if (this->status == COMING)
@@ -353,12 +364,12 @@ bool	Client::launchCommand(std::string command)
 		}
 		if (vecmd[0].compare("USER") == 0)
 		{
-			std::cout << BOLD_CYAN << "Command called -----> " << choice[i] <<  std::endl;
+			//std::cout << BOLD_CYAN << "Command called -----> " << choice[i] <<  std::endl;
 			return(this->cmdUSER(ccmd));
 		}
 		if (vecmd[0] == choice[i])
 		{
-			std::cout << BOLD_CYAN << "Command called -----> " << choice[i] <<  std::endl;
+			//std::cout << BOLD_CYAN << "Command called -----> " << choice[i] <<  std::endl;
 			return (this->*f[i])(vecmd);
 		}
 		i++;

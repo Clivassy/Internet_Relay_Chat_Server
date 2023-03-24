@@ -46,6 +46,21 @@ std::string Server::get_password(void)
 	return (this->password);
 }
 
+bool operator==( Client& other, const Client& rhs) 
+{
+    return (other.socketFd == rhs.socketFd);
+}
+
+bool operator==( const Client& other, Client& rhs) 
+{
+    return (other.socketFd == rhs.socketFd);
+}
+
+bool operator==( const Client& other, const Client& rhs) 
+{
+    return (other.socketFd == rhs.socketFd);
+}
+
 void Server::init()
 {
 	//memset(this->buffer, 0, bufferSize); // TBD voir si il faut pas remplir de bufferS0ze * sizeof(int)
@@ -162,8 +177,7 @@ void Server::manage_poll_event()
 			}
 		}
 	}
-	
-	/*std::vector<pollfd>::iterator ite = this->fdListened.begin();
+	std::vector<pollfd>::iterator ite = this->fdListened.begin();
 	for (size_t i = 0; i < fdListened.size(); i++, ite++)
 	{
 		if(ite->revents == -1)
@@ -177,7 +191,7 @@ void Server::manage_poll_event()
 				this->clientList.erase(it);
 			}
 		}
-	}*/
+	}
 }
 
 void Server::addNewClient()
@@ -234,6 +248,8 @@ void Server::listen_client(Client &client)
 			tmp = split(client.authentification, "\n");
 			client.authentificationCmd.push_back(tmp[0]);
 		}
+		if (client.authentificationCmd.size() > 1)
+			client.isIrssi = true;
 		for (std::vector<std::string>::iterator it = client.authentificationCmd.begin(); it != client.authentificationCmd.end(); it++)
 			client.launchCommand(*it);
 		client.cmd.clear();

@@ -81,7 +81,7 @@ class Client {
 		std::string 	    getPassword( std::string toSplit );
 		std::string			getPrefix( void );
 		void				errorAuthentification ( void );
-		void				errorPassword( void );
+		void				deconnectClient( void );
 
         //-- Getters
         //std::string    getUserName( void );
@@ -109,6 +109,7 @@ class Client {
         std::string                 cmd;
 		int							status;
 		std::vector<std::string>	authentificationCmd;
+		bool						isIrssi;
 
 };
     std::string                 removeLines(std::string);

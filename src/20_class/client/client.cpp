@@ -1,7 +1,7 @@
 #include "client.hpp"
 
 Client::Client(Server& serv):
-server(serv), bufferSize(BUFFER_SIZE), status(COMING)
+server(serv), bufferSize(BUFFER_SIZE), status(COMING),isIrssi(false)
 { }
 
 Client::~Client(){ }
@@ -11,11 +11,10 @@ std::string	Client::getPrefix( void )
 	return(":" + this->userInfos.nickName + "!" + this->userInfos.userName + "@" + this->userInfos.hostName); // add espace quand error.hpp added
 }
 
-void	Client::errorPassword( void )
+void	Client::deconnectClient( void )
 {
-	std::string msg(this->getPrefix() + " 464 " + this->userInfos.nickName + " :Password incorrect\r\n");
-	send(this->socketFd, msg.c_str(), msg.size(), 0);
-
+	//std::cout << BOLD_RED << "DISCONNECTING CLIENT" << RESET << std::endl;
+	//sendMessage(this->getPrefix() + " 464 " + this->userInfos.nickName + ERR_PASSWDMISMATCH);
 	for (std::vector<pollfd>::iterator it = this->server.fdListened.begin(); it != this->server.fdListened.end(); it++)
 	{
 		if (this->socketFd == it->fd)
@@ -32,6 +31,7 @@ std::string		removeLines( std::string toSplit )
     }
 	return(toSplit);
 }
+
 
 // TO REMOVE 
 
