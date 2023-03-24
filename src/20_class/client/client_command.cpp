@@ -117,9 +117,15 @@ bool	Client::cmdUSER(std::vector<std::string> &cmd)
 {
 	//------- Pré authentification pour Yann et Arzu (TEMPORAIRE) ----// 
 	(void)cmd;
+
+	srand((unsigned) time(NULL));
+	int random = rand() % 1000;
+	std::stringstream r;
+	r << std::setfill('0') << std::setw(3) << random;
+	std::string random_str = r.str();
 	if (this->status == REGISTERED)
 	{
-		this->userInfos.nickName = "jbatoro";
+		this->userInfos.nickName = "jbatoro_" + random_str;
 		this->userInfos.userName = "jbatoro";
 		this->userInfos.hostName = "jbatoro";
 		this->userInfos.realName = "Julia Batoro"; 
@@ -236,22 +242,6 @@ bool	Client::cmdPART(std::vector<std::string> &cmd)
 	return (true);
 }
 
-// The PRIVMSG command is used to send private messages between users, as well as to send messages to channels. <target> is the nickname of a client or the name of a channel.
-bool	Client::cmdPRIVMSG(std::vector<std::string> &cmd)
-{
-	if (cmd.size() < 3)
-	{
-		std::cout << ERR_NEEDMOREPARAMS("PRIVMSG");
-		return (false);
-	}
-	//If <target> is a channel name and the client is banned and not covered by a ban exception, the message will not be delivered and the command will silently fail.
-	// Si le message ne peut pas etre envoye ERR_CANNOTSENDTOCHAN
-	// If <target> is a channel name, it may be prefixed with one or more channel membership prefix character (@, +, etc) and the message will be delivered only to the members of that channel with the given or higher status in the channel. Servers that support this feature will list the prefixes which this is supported for in the STATUSMSG RPL_ISUPPORT parameter, and this SHOULD NOT be attempted by clients unless the prefix has been advertised in this token.
-	// If <target> is a user and that user has been set as away, the server may reply with an RPL_AWAY (301) numeric and the command will continue.
-
-	// When the PRIVMSG message is sent from a server to a client and <target> starts with a dollar character ('$', 0x24), the message is a broadcast sent to all clients on one or multiple servers.
-	return (true);
-}
 
 bool	Client::cmdNOTICE(std::vector<std::string> &cmd)
 {
@@ -325,12 +315,6 @@ bool	Client::cmdCAP(std::vector<std::string> &cmd)
 		}
 	}
 	return (false);
-}
-
-bool	Client::cmdJOIN(std::vector<std::string> &cmd)
-{
-	(void)cmd;
-	return true;
 }
 
 //- PASS, NICK, USER, PING, OPER, QUIT, JOIN, PART, PRIVMSG, NOTICE, MODE, INVITE. KICK, WHOIS

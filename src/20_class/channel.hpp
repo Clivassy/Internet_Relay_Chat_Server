@@ -25,7 +25,7 @@ class Client;
 class Channel
 {
 	public:
-		Channel( Server& serv );
+		Channel( Server& serv, std::string channel_name );
 		~Channel( void );
 		void	sendMessageToClients( std::string msg);
 		void	addMsgToHistory(std::string msg);
@@ -33,6 +33,7 @@ class Channel
 
 	public: // TBD remettre en protected avec friend ou getteur
 		Server&						server;
+		std::string					name;
 		std::set<std::string>				clientConnected; // userName is used to identify a client
 };
 

@@ -1,6 +1,7 @@
 #include "channel.hpp"
 
-Channel::Channel( Server& serv ) : server(serv)
+Channel::Channel( Server& serv, std::string channel_name):
+server(serv), name(channel_name)
 {
     
 }
@@ -22,7 +23,14 @@ void    Channel::sendMessageToClients( std::string msg )
 	//STEP  Parcourir le tableau de clientConnected from begin() to end() -> send(message) a chaque client.
 	for( std::set<std::string>::iterator it = clientConnected.begin(); it != clientConnected.end(); it++ )
 	{
-		send(this->server.getClient(*it)->socketFd , msg.c_str(), msg.size(), 0);
+		std::string fomatedMessage = "PRIVMSG #" + this->name + " :" + msg + "\r\n"; // TBD faire fonction de creation message createChannelMsg(channelName, msg)
+		//std::cout << "msg: " << fomatedMessage << " - fd: " << this->server.getClient(*it)->socketFd << std::endl;
+		send(this->server.getClient(*it)->socketFd , fomatedMessage.c_str(), fomatedMessage.size(), 0);
 	}   
 
+
 }
+
+
+
+
