@@ -15,6 +15,8 @@ Channel::~Channel( void )
 void Channel::addClient(Client& client)
 {
 	clientConnected.insert(client.userInfos.nickName);
+			// TBD ajout message annonce arrivee client
+	
 }
 
 // Send msg a tous les clients connectés sauf a sender
@@ -28,7 +30,7 @@ void    Channel::sendMessageToClients(std::string msg, std::string sender)
 		{
 			//std::cout << BOLD_YELLOW << "msg: " << YELLOW << fomatedMessage << RESET << std::endl;
 			//std::cout << BOLD_YELLOW  " - sent to fd " << YELLOW << this->server.getClient(*it)->socketFd << RESET << std::endl;
-			std::string pingmessaage = "PING\r\n"; // ping avant sinon 1er message non recu apres inactivité
+			std::string pingmessaage = "PING\r\n"; // ping avant sinon 1er message non recu apres inactivité TBD a sup qd ca marchera sans
 			send(this->server.getClient(*it)->socketFd , pingmessaage.c_str(), pingmessaage.size(), 0);
 			if (send(this->server.getClient(*it)->socketFd , fomatedMessage.c_str(), fomatedMessage.size(), 0) == -1)
 				perror("error sending message: ");

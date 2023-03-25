@@ -22,6 +22,11 @@
 class Server;
 class Client;
 
+// Regles selon norme pour nommage channel :
+// Commence par '&', '#', '+' ou '!'
+// longueur max 50 characteres
+// ne contient pas d'espace ' ', control G (^G / ASCII 7) ou virgule (',')
+// non sensible a la casse
 class Channel
 {
 	public:
