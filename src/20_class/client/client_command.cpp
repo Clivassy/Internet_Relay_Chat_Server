@@ -28,82 +28,83 @@ void	Client::sendOtherClient(std::string str)
 
 bool	Client::cmdPASS(std::vector<std::string> &cmd)
 {
-
-	if (cmd.empty())
+	if (this->status == COMING)
 	{
-		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
-		return (false);
-	}
-	if (cmd.size() == 1 or cmd.size() == 0 )
-	{
-		std::cout << YELLOW << "here" << RESET << std::endl;
-		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
-		return (false);
-	}
-	if (cmd.size() == 2)
-	{
-		if (this->status == REGISTERED)
+		if (cmd.empty() or cmd.size() == 1)
 		{
-			sendMessage(ERR_ALREADYREGISTERED);
-			return (true);
+			sendMessage(ERR_NEEDMOREPARAMS("PASS"));
+			return (false);
 		}
-		else if (this->status == COMING)
+		if (cmd.size() == 2)
 		{
+			if (this->status == REGISTERED)
+			{
+				sendMessage(ERR_ALREADYREGISTERED);
+				return (true);
+			}
 			if (this->server.get_password().compare(cmd[1]) == 0)
 			{
-				std::cout << "PASSWORD IS OK" << std::endl;
+				//std::cout << "PASSWORD IS OK" << std::endl; //JULIA 
 				this->status = REGISTERED;
 				return (true);
 			}
 			else
 			{
+				//std::cout << BOLD_RED << "WRONG PASSWORD" << RESET << std::endl; //JULIA
+				sendMessage(this->getPrefix() + " 464 " + this->userInfos.nickName + ERR_PASSWDMISMATCH);
 				this->status = COMING;
-				sendMessage(ERR_PASSWDMISMATCH);
+				//this->deconnectClient(); // no need to deconnect? version Marie + William : a discuter //JULIA
 				return(false);
 			}
-		}
+		}		
 	}
-	return (true);
+	return (false);
 }
 
-// The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, 
-// and to inform other clients about the change of nickname. 
-// In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.}
+// The NICK message may be sent from the server to clients to acknowledge their NICK command was successful,  // ARZU
+// and to inform other clients about the change of nickname. // ARZU
+// In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.}// ARZU
 bool	Client::cmdNICK(std::vector<std::string> &cmd)
 {
-	if (cmd.size() == 1)
+	if (this->status == REGISTERED or this->status == CONNECTED)
 	{
-		sendMessage(ERR_NONICKNAMEGIVEN);
-		return (false);
-	}
-	if (cmd.size() > 2)
-	{
-		sendMessage(ERR_ERRONEUSNICKNAME(cmd[1])); 
-		return (false);
-	}
-	if (cmd.size() == 2)
-	{
-		if (this->status == REGISTERED)
+		if (cmd.size() == 1)
 		{
-			this->userInfos.nickName = cmd[1];
-			return (true);
+			sendMessage(ERR_NONICKNAMEGIVEN);
+			return (false);
 		}
-		if (this->status == CONNECTED)
+		if (cmd.size() > 2)
 		{
+			sendMessage(ERR_ERRONEUSNICKNAME(cmd[1])); 
+			return (false);
+		}
+	if (this->status == REGISTERED )
+	{
+		if (cmd.size() == 2)
+		{
+
 			this->userInfos.nickName = cmd[1];
-			sendMessage(NICK(this->userInfos.nickName, cmd[1]));
-			sendMessage(RPL_WELCOME(this->userInfos.nickName, this->userInfos.userName ,this->userInfos.hostName ));
+			this->hasNick = true;
 			return (true);
 		}
 	}
-	return (true);
+	}
+	if (this->status == CONNECTED)
+	{
+		std::cout << BOLD_PURPLE << "NICKNAME CHANGE" << RESET << std::endl;
+		// FIX : affichage x2 du changement de nickname // OU Pas d'affichage du tout 
+		//sendMessage(NICK_INFORM(this->userInfos.nickName,this->userInfos.userName,this->userInfos.hostName,cmd[1]));
+		sendMessage(NICK(this->userInfos.nickName, cmd[1]));
+		this->userInfos.nickName = cmd[1];
+		return (true);
+	}
+	return (false);
 }
 
 
 bool	Client::cmdUSER(std::vector<std::string> &cmd)
 {
-	//------- Pré authentification pour Yann et Arzu (TEMPORAIRE) ----// 
-
+	//------- Pré authentification pour Yann et Arzu (TEMPORAIRE) ----// JULIA
 	/*if (this->status == REGISTERED)
 	{
 		this->userInfos.nickName = "jbatoro";
@@ -114,9 +115,8 @@ bool	Client::cmdUSER(std::vector<std::string> &cmd)
 		this->status = CONNECTED;
 	} */
 	//------------------------------------------------------------ //
-	std::vector<std::string> user;
 	
-	/*std::cout << BOLD_PURPLE << cmd[0] << RESET << std::endl;
+	/*std::cout << BOLD_PURPLE << cmd[0] << RESET << std::endl; // JULIA ::commentaire debeug
 	if (cmd.size() == 1)
 	{
 		std::cout << BOLD_PURPLE << "CAS a gerer dans NC =>  " << cmd[0] << RESET << std::endl;
@@ -125,42 +125,29 @@ bool	Client::cmdUSER(std::vector<std::string> &cmd)
 	{
 		std::cout << BOLD_PURPLE << "CAS a gerer dans IRSSI =>  " <<  cmd[0] << " | " << cmd[1] << RESET << std::endl;
 	}*/
-	
-	std::cout << BOLD_RED << cmd.size() << std::endl;
-	if (this->status == REGISTERED and !cmd.empty())
+	if (this->status == REGISTERED && this->hasNick == true)
 	{
-		user = split(cmd[0], ' ');
-
-		if (cmd.size() == 1)
+		if (!cmd.empty())
 		{
-			if (user.size() != 5)
+			if (cmd.size() != 5)
 			{
 				sendMessage(ERR_NEEDMOREPARAMS("USER"));
 				return (false);
 			}
-			this->userInfos.realName = user[3];
+			this->userInfos.userName = cmd[1];
+			this->userInfos.hostName = cmd[2];
+			this->userInfos.realName = cmd[4];
+			sendMessage(RPL_WELCOME(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName));
+			this->status = CONNECTED;
+			return(true);
 		}
-		else if (cmd.size() == 2)
+		else if (this->status == CONNECTED)
 		{
-			if (cmd[1].empty())
-			{
-				sendMessage(ERR_NEEDMOREPARAMS("USER"));
-				return (false);
-			}
-			this->userInfos.realName = cmd[1];
+			sendMessage(ERR_ALREADYREGISTERED);
+			return(false);
 		}
-		this->userInfos.userName = user[1];
-		this->userInfos.hostName = user[2];
-		sendMessage(RPL_WELCOME(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName));
-		this->status = CONNECTED;
 	}
-	else if (this->status == CONNECTED)
-	{
-		sendMessage(ERR_ALREADYREGISTERED);
-		return(false);
-	}
-
-	return (true);
+	return (false);
 }
 
 bool	Client::cmdPING(std::vector<std::string> &cmd)
@@ -309,7 +296,7 @@ bool	Client::cmdCAP(std::vector<std::string> &cmd)
 		if (cmd[1].compare("LS") == 0)
 		{
 			this->status = COMING;
-			return true;
+			return (true);
 		}
 	}
 	return (false);
@@ -324,44 +311,41 @@ bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 //- PASS, NICK, USER, PING, OPER, QUIT, JOIN, PART, PRIVMSG, NOTICE, MODE, INVITE. KICK, WHOIS
 bool	Client::launchCommand(std::string command)
 {
+	if (command.empty())
+		return (true);
+	
 	std::vector<std::string> ccmd = split(command, ':');
 	std::vector<std::string> vecmd = split(ccmd[0], ' ');
 	std::string	choice[15] = {"CAP", "PASS", "NICK", "USER", "PING", "OPER", "QUIT", "JOIN", "PART", "PRIVMSG", "NOTICE", "MODE", "INVITE", "KICK", "WHOIS"};
 	bool	(Client::*f[15])(std::vector<std::string> &) = {&Client::cmdCAP, &Client::cmdPASS, &Client::cmdNICK, &Client::cmdUSER, &Client::cmdPING, &Client::cmdOPER, &Client::cmdQUIT, &Client::cmdJOIN, &Client::cmdPART, &Client::cmdPRIVMSG, &Client::cmdNOTICE, &Client::cmdMODE, &Client::cmdINVITE, &Client::cmdKICK, &Client::cmdWHOIS};
 	int i = 0;
 
+	if (ccmd.size() != 1 && ccmd.size() != 2)
+	{
+		sendMessage("Arguments incorrect : Too many ':'");
+	}
+	if (ccmd.size() == 2)
+		vecmd.push_back(ccmd[1]);
+
+
 	if (vecmd.empty())
 	{
 		return (false);
 	}
-	std::cout << RED << "STATUS :" << this->status << std::endl;
-	
-	//------- Pré authentification pour Yann et Arzu (TEMPORAIRE) ----// 
-	if (this->status == COMING)
-		this->status = REGISTERED;
-	//------------------------------------------------------------ //
+
+	//------- Pré authentification pour Yann et Arzu (TEMPORAIRE) ----// JULIA::commentaire
+	//	if (this->status == WAITING)
+	//	this->status = REGISTERED;
+	//	this->hasNick == true;
+	////------------------------------------------------------------ //
 	while (i < 14)
 	{
-		if (vecmd[0].compare("CAP") == 0)
-		{
-			return (this->cmdCAP(vecmd));
-		}
-		if (vecmd[0].compare("PASS") == 0)
-		{
-			return (this->cmdPASS(vecmd));
-		}
-		if (vecmd[0].compare("USER") == 0)
-		{
-			std::cout << BOLD_CYAN << "Command called -----> " << choice[i] <<  std::endl;
-			return(this->cmdUSER(ccmd));
-		}
 		if (vecmd[0] == choice[i])
 		{
-			std::cout << BOLD_CYAN << "Command called -----> " << choice[i] <<  std::endl;
 			return (this->*f[i])(vecmd);
 		}
 		i++;
 	}
-	// sendMessage("Command not found");
+	// sendMessage("Command not found"); //ARZU: commentaire
 	return (false);
 }
