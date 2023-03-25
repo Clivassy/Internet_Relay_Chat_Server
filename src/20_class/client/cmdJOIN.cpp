@@ -54,13 +54,20 @@ bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 	}
 
 	std::string channel_name = cmd[1];
-	if (isChannelFlag(cmd[1][0]))
-		channel_name = channel_name.substr(1);
+	//if (isChannelFlag(cmd[1][0]))
+	//	channel_name = channel_name.substr(1);
 
-	for (std::vector<std::string>::iterator it_cmd = ++cmd.begin(); it_cmd != cmd.end(); it_cmd++)
+	if (isChannelName(cmd[1]))
 	{
-		this->server.addChannel(channel_name);
-		this->server.getChannel(channel_name)->second.addClient(*this);
+		for (std::vector<std::string>::iterator it_cmd = ++cmd.begin(); it_cmd != cmd.end(); it_cmd++)
+		{
+			this->server.addChannel(channel_name);
+			this->server.getChannel(channel_name)->second.addClient(*this);
+		}
+	}
+	else
+	{
+		// TBD gestion erreur si nom de serveur incorrect
 	}
 	
 	

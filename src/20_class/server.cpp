@@ -106,7 +106,7 @@ void Server::run()
 	// TBD redefinir ctrl+C pour close les fd (evite de bloquer les ports en debug)
 	
 	int pollreturn = -1;
-	while (i < 30)
+	while (1)
 	{
 		// pour tests yann
 		//Client cl1(Client(*this));
@@ -149,7 +149,7 @@ void Server::run()
 
 		
 		// temporisation pour debug (TBD a enlever a la fin)
-		sleep(1); // sleep 1s
+		//sleep(1); // sleep 1s
 		i++;
 	}
 }

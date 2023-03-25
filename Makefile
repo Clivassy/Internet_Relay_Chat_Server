@@ -35,7 +35,7 @@ CFLAGS = -g3 -Wall -Wextra -std=c++98
 ##########   RULES   ##########
 all: $(NAME)
 
-$(NAME): $(OBJS)
+$(NAME): $(OBJS) $(HEADER)
 	${CC} ${SRCS} -o ${NAME} ${CFLAGS}
 
 %.o: %.cpp $(HEADER)

@@ -17,15 +17,23 @@ void Channel::addClient(Client& client)
 	clientConnected.insert(client.userInfos.nickName);
 }
 
-// recevoir une string et send a tous les clients connectés
-void    Channel::sendMessageToClients( std::string msg )
+// Send msg a tous les clients connectés sauf a sender
+// si sender == "" -> envoie a tous les clients sur le channel
+void    Channel::sendMessageToClients(std::string msg, std::string sender)
 {
-	//STEP  Parcourir le tableau de clientConnected from begin() to end() -> send(message) a chaque client.
 	for( std::set<std::string>::iterator it = clientConnected.begin(); it != clientConnected.end(); it++ )
 	{
-		std::string fomatedMessage = "PRIVMSG #" + this->name + " :" + msg + "\r\n"; // TBD faire fonction de creation message createChannelMsg(channelName, msg)
-		//std::cout << "msg: " << fomatedMessage << " - fd: " << this->server.getClient(*it)->socketFd << std::endl;
-		send(this->server.getClient(*it)->socketFd , fomatedMessage.c_str(), fomatedMessage.size(), 0);
+		std::string fomatedMessage = ":" + sender + " PRIVMSG " + this->name + " :" + msg + "\r\n"; // TBD faire fonction de creation message createChannelMsg(channelName, msg)
+		if (this->server.getClient(*it)->userInfos.nickName != sender)
+		{
+			//std::cout << BOLD_YELLOW << "msg: " << YELLOW << fomatedMessage << RESET << std::endl;
+			//std::cout << BOLD_YELLOW  " - sent to fd " << YELLOW << this->server.getClient(*it)->socketFd << RESET << std::endl;
+			std::string pingmessaage = "PING\r\n"; // ping avant sinon 1er message non recu apres inactivité
+			send(this->server.getClient(*it)->socketFd , pingmessaage.c_str(), pingmessaage.size(), 0);
+			if (send(this->server.getClient(*it)->socketFd , fomatedMessage.c_str(), fomatedMessage.size(), 0) == -1)
+				perror("error sending message: ");
+		}
+
 	}   
 
 

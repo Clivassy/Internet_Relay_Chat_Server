@@ -27,7 +27,7 @@ class Channel
 	public:
 		Channel( Server& serv, std::string channel_name );
 		~Channel( void );
-		void	sendMessageToClients( std::string msg);
+		void	sendMessageToClients( std::string msg, std::string sender);
 		void	addMsgToHistory(std::string msg);
 		void	addClient(Client& client);
 

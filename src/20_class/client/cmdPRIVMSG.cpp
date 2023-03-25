@@ -32,12 +32,12 @@ bool	Client::cmdPRIVMSG(std::vector<std::string> &cmd)
 
 	if (isChannelName(cmd[1]))
 	{
-		std::string channelName = cmd[1].substr(1);
-		//std::string msg = cmd[2];
+		std::string channelName = cmd[1]; //.substr(1);
+		std::string msg = cmd[2];
 		std::cout << "channel name: " << channelName << std::endl;
 		if (this->server.isChannelExisting(channelName))
 		{
-			this->server.getChannel(channelName)->second.sendMessageToClients("coucou"); //TBD remettre message ad cmd ok
+			this->server.getChannel(channelName)->second.sendMessageToClients(msg, this->userInfos.nickName); //TBD remettre message ad cmd ok
 		}
 		else
 		{
