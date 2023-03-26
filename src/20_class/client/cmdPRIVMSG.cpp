@@ -30,6 +30,7 @@ bool	Client::cmdPRIVMSG(std::vector<std::string> &cmd)
 	//	return (false);
 	//}
 
+	// check dans le sens inverse (check + envoie message erreur si check non valid)
 	if (isChannelName(cmd[1]))
 	{
 		std::string channelName = cmd[1]; //.substr(1);
@@ -37,7 +38,11 @@ bool	Client::cmdPRIVMSG(std::vector<std::string> &cmd)
 		std::cout << "channel name: " << channelName << std::endl;
 		if (this->server.isChannelExisting(channelName))
 		{
-			this->server.getChannel(channelName)->second.sendMessageToClients(msg, this->userInfos.nickName); //TBD remettre message ad cmd ok
+			// TBD check si client est dans channel sinon ERR_CANNOTSENDTOCHAN
+			std::string msgToSend = ":" + this->userInfos.nickName + " PRIVMSG " + channelName + " :" + msg + "\r\n";
+		//std::string fomatedMessage = ":" + sender + " PRIVMSG " + this->name + " :" + msg + "\r\n"; // TBD faire fonction de creation message createChannelMsg(channelName, msg)
+
+			this->server.getChannel(channelName)->second.sendMessageToClients(msgToSend, this->userInfos.nickName);
 		}
 		else
 		{

@@ -32,14 +32,18 @@ class Channel
 	public:
 		Channel( Server& serv, std::string channel_name );
 		~Channel( void );
+		bool	isClientBanned(std::string client);
 		void	sendMessageToClients( std::string msg, std::string sender);
-		void	addMsgToHistory(std::string msg);
 		void	addClient(Client& client);
+		
 
 	public: // TBD remettre en protected avec friend ou getteur
 		Server&						server;
 		std::string					name;
-		std::set<std::string>				clientConnected; // userName is used to identify a client
+		std::string					topic; // TBD voir on implemente le topic et de cette facon (c'est actuellement utilise pour l'arrivee dans un channel)
+		std::set<std::string>		clientConnected; // userName is used to identify a client
+		std::set<std::string>		clientBanned; // userName is used to identify a client
+		bool						isInviteOnly;
 };
 
 #endif

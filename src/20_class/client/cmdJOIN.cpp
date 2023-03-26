@@ -42,7 +42,7 @@
 // suivi d'un RPL_ENDOFNAMES)
 
 //comportement
-// rejoind le channel dans cmd[1]. les channels suivants (cmd[2], cmd[3]...) ne sont pas rejoinds
+// rejoind le channel dans cmd[1]. les channels suivants (cmd[2], cmd[3]...) ne sont pas rejoints
 // pour coller au comportement d'irssi
 bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 {
@@ -51,30 +51,16 @@ bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 		sendMessage(ERR_NEEDMOREPARAMS("JOIN"));
 		return (false);
 	}
-	if (cmd[1].size() <= 1 || !isChannelFlag(cmd[1][0]))
+	std::string channel_name = cmd[1];
+	if (cmd[1].size() <= 1 || !isChannelName(channel_name))
 	{
-		sendMessage(ERR_BADCHANMASK(cmd[1]));
+		this->sendMessage(ERR_BADCHANMASK(cmd[1]));
 		return (false);
 	}
-	std::cout << "command size: " << cmd.size() << std::endl;
-	std::string channel_name = cmd[1];
-	toLowerStr(channel_name); // TBD a check
-	//if (isChannelFlag(cmd[1][0]))
-	//	channel_name = channel_name.substr(1);
+	toLowerStr(channel_name);
+	this->server.addChannel(channel_name); // check existence channel fait dans addChannel
+	this->server.getChannel(channel_name)->second.addClient(*this);
 
-	if (isChannelName(channel_name))
-	{
-		// TBD ajout check si serveur existe
-			this->server.addChannel(channel_name);
-			this->server.getChannel(channel_name)->second.addClient(*this);
-	}
-	else
-	{
-		this->sendMessage(ERR_BADCHANMASK(channel_name));
-
-		//ERR_BADCHANMASK()
-		// TBD gestion erreur si nom de serveur incorrect
-	}
 	
 	
 	return (true);
