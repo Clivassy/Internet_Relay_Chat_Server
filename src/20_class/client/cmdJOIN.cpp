@@ -1,13 +1,5 @@
 #include "client.hpp"
 
-
-bool isChannelFlag(char flag)
-{
-	if (flag == '&' || flag == '#' || flag == '+' || flag == '?')
-		return (true);
-	return (false);
-}
-
 // INFO POUR LES CHANNELS 
 // Servers MUST process the parameters of this command as lists on incoming commands from
 // clients, with the first <key> being used for the first <channel>, the second <key> being
@@ -48,7 +40,7 @@ bool isChannelFlag(char flag)
 // Des qu'il a rejoint on doit envoyer une message "<source> joined the channel" doit etre envoye
 // ainsi que le topic du channel (avec RPL_TOPIC) et la liste des utilisateurs connectes (avc RPL_NAMREPLY
 // suivi d'un RPL_ENDOFNAMES)
-/*bool	Client::cmdJOIN(std::vector<std::string> &cmd)
+bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 {
 	if (cmd.size() <=1)
 	{
@@ -62,15 +54,22 @@ bool isChannelFlag(char flag)
 	}
 
 	std::string channel_name = cmd[1];
-	if (isChannelFlag(cmd[1][0]))
-		channel_name = channel_name.substr(1);
+	//if (isChannelFlag(cmd[1][0]))
+	//	channel_name = channel_name.substr(1);
 
-	for (std::vector<std::string>::iterator it_cmd = ++cmd.begin(); it_cmd != cmd.end(); it_cmd++)
+	if (isChannelName(cmd[1]))
 	{
-		this->server.addChannel(channel_name);
-		this->server.getChannel(channel_name).addClient(*this);
+		for (std::vector<std::string>::iterator it_cmd = ++cmd.begin(); it_cmd != cmd.end(); it_cmd++)
+		{
+			this->server.addChannel(channel_name);
+			this->server.getChannel(channel_name)->second.addClient(*this);
+		}
+	}
+	else
+	{
+		// TBD gestion erreur si nom de serveur incorrect
 	}
 	
 	
 	return (true);
-}*/
+}

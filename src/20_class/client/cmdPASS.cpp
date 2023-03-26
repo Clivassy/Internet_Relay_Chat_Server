@@ -1,37 +1,36 @@
-/*#include "client.hpp"
+#include "client.hpp"
 
 bool	Client::cmdPASS(std::vector<std::string> &cmd)
 {
-	int pos = 0;
-	int tmp_pos = 0;
-
-	if (cmd[1].empty())
+	if (this->status == COMING)
 	{
-		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
-		return (false);
-	}
-	// Check avec espace
-	if ((pos = this->server.get_password().find(" ")) == (int)std::string::npos)
-	{
-		if (cmd[1] != this->server.get_password())
+		if (cmd.empty() or cmd.size() == 1)
 		{
-			sendMessage(ERR_PASSWDMISMATCH);
+			sendMessage(ERR_NEEDMOREPARAMS("PASS"));
 			return (false);
 		}
-	}
-	else
-	{
-		for (int i = 1; i < (int)cmd.size(); i++)
+		if (cmd.size() == 2)
 		{
-			if (cmd[i] != this->server.get_password().substr(tmp_pos, pos))
+			if (this->status == REGISTERED)
 			{
-				sendMessage(ERR_PASSWDMISMATCH);
-				return (false);
+				sendMessage(ERR_ALREADYREGISTERED);
+				return (true);
 			}
-			tmp_pos = pos + 1;
-		}
+			if (this->server.get_password().compare(cmd[1]) == 0)
+			{
+				//std::cout << "PASSWORD IS OK" << std::endl; //JULIA 
+				this->status = REGISTERED;
+				return (true);
+			}
+			else
+			{
+				//std::cout << BOLD_RED << "WRONG PASSWORD" << RESET << std::endl; //JULIA
+				sendMessage(this->getPrefix() + " 464 " + this->userInfos.nickName + ERR_PASSWDMISMATCH);
+				this->status = COMING;
+				//this->deconnectClient(); // no need to deconnect? version Marie + William : a discuter //JULIA
+				return(false);
+			}
+		}		
 	}
-	this->isConnected = true;
-	sendMessage("Connection established \r\n");
-	return (true);
-}*/
+	return (false);
+}

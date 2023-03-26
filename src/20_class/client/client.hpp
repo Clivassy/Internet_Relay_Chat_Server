@@ -5,6 +5,9 @@
 # include <iostream>
 # include <string>
 # include <string.h>
+# include <sstream>
+# include <iostream>
+# include <iomanip>
 # include <sys/types.h>
 # include <sys/socket.h>
 # include <netinet/in.h>
@@ -32,6 +35,8 @@ class Channel;
 # define REGISTERED 2
 # define BAD_PASSWORD 3
 # define CONNECTED 4
+# define PRINT_STATUS(value) ((value == COMING) ? "Coming \U0000231B" : ((value == REGISTERED) ? "Registered \U000023F3" : ((value == BAD_PASSWORD) ? "Bad password \U0000274C" : ((value == CONNECTED) ? "Connected \U00002705" : "Unknown status"))))
+
 
 class Client {
 

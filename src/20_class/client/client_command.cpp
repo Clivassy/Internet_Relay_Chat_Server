@@ -24,131 +24,6 @@ void	Client::sendOtherClient(std::string str)
 			send(it->socketFd, str.c_str(), str.size(), 0);
 	}
 }
-////////////////////////////////////////////////////////
-
-bool	Client::cmdPASS(std::vector<std::string> &cmd)
-{
-	if (this->status == COMING)
-	{
-		if (cmd.empty() or cmd.size() == 1)
-		{
-			sendMessage(ERR_NEEDMOREPARAMS("PASS"));
-			return (false);
-		}
-		if (cmd.size() == 2)
-		{
-			if (this->status == REGISTERED)
-			{
-				sendMessage(ERR_ALREADYREGISTERED);
-				return (true);
-			}
-			if (this->server.get_password().compare(cmd[1]) == 0)
-			{
-				//std::cout << "PASSWORD IS OK" << std::endl; //JULIA 
-				this->status = REGISTERED;
-				return (true);
-			}
-			else
-			{
-				//std::cout << BOLD_RED << "WRONG PASSWORD" << RESET << std::endl; //JULIA
-				sendMessage(this->getPrefix() + " 464 " + this->userInfos.nickName + ERR_PASSWDMISMATCH);
-				this->status = COMING;
-				//this->deconnectClient(); // no need to deconnect? version Marie + William : a discuter //JULIA
-				return(false);
-			}
-		}		
-	}
-	return (false);
-}
-
-// The NICK message may be sent from the server to clients to acknowledge their NICK command was successful,  // ARZU
-// and to inform other clients about the change of nickname. // ARZU
-// In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.}// ARZU
-bool	Client::cmdNICK(std::vector<std::string> &cmd)
-{
-	if (this->status == REGISTERED or this->status == CONNECTED)
-	{
-		if (cmd.size() == 1)
-		{
-			sendMessage(ERR_NONICKNAMEGIVEN);
-			return (false);
-		}
-		if (cmd.size() > 2)
-		{
-			sendMessage(ERR_ERRONEUSNICKNAME(cmd[1])); 
-			return (false);
-		}
-	if (this->status == REGISTERED )
-	{
-		if (cmd.size() == 2)
-		{
-
-			this->userInfos.nickName = cmd[1];
-			this->hasNick = true;
-			return (true);
-		}
-	}
-	}
-	if (this->status == CONNECTED)
-	{
-		std::cout << BOLD_PURPLE << "NICKNAME CHANGE" << RESET << std::endl;
-		// FIX : affichage x2 du changement de nickname // OU Pas d'affichage du tout 
-		//sendMessage(NICK_INFORM(this->userInfos.nickName,this->userInfos.userName,this->userInfos.hostName,cmd[1]));
-		sendMessage(NICK(this->userInfos.nickName, cmd[1]));
-		this->userInfos.nickName = cmd[1];
-		return (true);
-	}
-	return (false);
-}
-
-
-bool	Client::cmdUSER(std::vector<std::string> &cmd)
-{
-	//------- Pré authentification pour Yann et Arzu (TEMPORAIRE) ----// JULIA
-	/*if (this->status == REGISTERED)
-	{
-		this->userInfos.nickName = "jbatoro";
-		this->userInfos.userName = "jbatoro";
-		this->userInfos.hostName = "jbatoro";
-		this->userInfos.realName = "Julia Batoro"; 
-		sendMessage(RPL_WELCOME(this->userInfos.nickName, this->userInfos.userName ,this->userInfos.hostName));
-		this->status = CONNECTED;
-	} */
-	//------------------------------------------------------------ //
-	
-	/*std::cout << BOLD_PURPLE << cmd[0] << RESET << std::endl; // JULIA ::commentaire debeug
-	if (cmd.size() == 1)
-	{
-		std::cout << BOLD_PURPLE << "CAS a gerer dans NC =>  " << cmd[0] << RESET << std::endl;
-	}
-	if (cmd.size() == 2) //cas de irssi ou c'est separé par deux points
-	{
-		std::cout << BOLD_PURPLE << "CAS a gerer dans IRSSI =>  " <<  cmd[0] << " | " << cmd[1] << RESET << std::endl;
-	}*/
-	if (this->status == REGISTERED && this->hasNick == true)
-	{
-		if (!cmd.empty())
-		{
-			if (cmd.size() != 5)
-			{
-				sendMessage(ERR_NEEDMOREPARAMS("USER"));
-				return (false);
-			}
-			this->userInfos.userName = cmd[1];
-			this->userInfos.hostName = cmd[2];
-			this->userInfos.realName = cmd[4];
-			sendMessage(RPL_WELCOME(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName));
-			this->status = CONNECTED;
-			return(true);
-		}
-		else if (this->status == CONNECTED)
-		{
-			sendMessage(ERR_ALREADYREGISTERED);
-			return(false);
-		}
-	}
-	return (false);
-}
 
 bool	Client::cmdPING(std::vector<std::string> &cmd)
 {
@@ -211,22 +86,6 @@ bool	Client::cmdPART(std::vector<std::string> &cmd)
 	return (true);
 }
 
-// The PRIVMSG command is used to send private messages between users, as well as to send messages to channels. <target> is the nickname of a client or the name of a channel.
-bool	Client::cmdPRIVMSG(std::vector<std::string> &cmd)
-{
-	if (cmd.size() < 3)
-	{
-		std::cout << ERR_NEEDMOREPARAMS("PRIVMSG");
-		return (false);
-	}
-	//If <target> is a channel name and the client is banned and not covered by a ban exception, the message will not be delivered and the command will silently fail.
-	// Si le message ne peut pas etre envoye ERR_CANNOTSENDTOCHAN
-	// If <target> is a channel name, it may be prefixed with one or more channel membership prefix character (@, +, etc) and the message will be delivered only to the members of that channel with the given or higher status in the channel. Servers that support this feature will list the prefixes which this is supported for in the STATUSMSG RPL_ISUPPORT parameter, and this SHOULD NOT be attempted by clients unless the prefix has been advertised in this token.
-	// If <target> is a user and that user has been set as away, the server may reply with an RPL_AWAY (301) numeric and the command will continue.
-
-	// When the PRIVMSG message is sent from a server to a client and <target> starts with a dollar character ('$', 0x24), the message is a broadcast sent to all clients on one or multiple servers.
-	return (true);
-}
 
 bool	Client::cmdNOTICE(std::vector<std::string> &cmd)
 {
@@ -235,17 +94,6 @@ bool	Client::cmdNOTICE(std::vector<std::string> &cmd)
 	if (cmd.size() < 3)
 		return (false);
 	// Envoyer le message
-	return (true);
-}
-
-////////////////////////////////////////////////////////////////////////////
-bool	Client::cmdMODE(std::vector<std::string> &cmd)
-{
-	if (cmd.size() < 2)
-	{
-		sendMessage(ERR_NEEDMOREPARAMS("MODE"));
-		return (false);
-	}
 	return (true);
 }
 
@@ -300,12 +148,6 @@ bool	Client::cmdCAP(std::vector<std::string> &cmd)
 		}
 	}
 	return (false);
-}
-
-bool	Client::cmdJOIN(std::vector<std::string> &cmd)
-{
-	(void)cmd;
-	return true;
 }
 
 //- PASS, NICK, USER, PING, OPER, QUIT, JOIN, PART, PRIVMSG, NOTICE, MODE, INVITE. KICK, WHOIS

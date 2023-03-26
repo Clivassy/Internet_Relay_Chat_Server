@@ -67,6 +67,27 @@ std::string pop_command(std::string& cmd)
 	return (output[0]);
 }
 
+bool isChannelFlag(char flag)
+{
+	if (flag == '&' || flag == '#' || flag == '+' || flag == '?')
+		return (true);
+	return (false);
+}
+
+// is considered as a channel name if :
+// len > 1
+// has no space
+// 1st char is a channel flag
+bool isChannelName(std::string str)
+{
+	if (str.size() == 0 || str.size() == 1)
+		return (false);
+	if (str.find(" ") !=  std::string::npos)
+		return (false);
+	if (!isChannelFlag(str[0]))
+		return (false);
+	return (true);
+}
 // split arzu
 //std::vector<std::string> split(std::string &s)
 //{
@@ -91,10 +112,7 @@ std::string pop_command(std::string& cmd)
 //	return (cmd);
 //}
 
-void test()
-{
-	
-}
+
 template<typename T>
 void print_vector(std::vector<T> vec)
 {
