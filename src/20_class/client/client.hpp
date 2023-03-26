@@ -114,7 +114,7 @@ class Client {
         std::string                 cmd;
 		int							status;
 		std::vector<std::string>	authentificationCmd;
-		bool						isIrssi;
+		bool						hasNick;
 
 };
     std::string                 removeLines(std::string);

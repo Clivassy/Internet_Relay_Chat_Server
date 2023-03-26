@@ -24,162 +24,6 @@ void	Client::sendOtherClient(std::string str)
 			send(it->socketFd, str.c_str(), str.size(), 0);
 	}
 }
-////////////////////////////////////////////////////////
-
-bool	Client::cmdPASS(std::vector<std::string> &cmd)
-{
-
-	if (cmd.empty())
-	{
-		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
-		return (false);
-	}
-	/*if (cmd.size() == 1)
-	{	
-		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
-		return (false);
-	}
-	if (cmd.size() == 2)
-	{
-		if (this->status == REGISTERED)
-		{
-			sendMessage(ERR_ALREADYREGISTERED);
-			return (true);
-		}
-		else if (this->status == COMING)
-		{
-			if (this->server.get_password().compare(cmd[1]) == 0)
-			{
-				std::cout << "PASSWORD IS OK" << std::endl;
-				this->status = REGISTERED;
-				return (true);
-			}
-			else
-			{
-				std::cout << BOLD_RED << "WRONG PASSWORD" << RESET << std::endl;
-				sendMessage(ERR_PASSWDMISMATCH);
-				if (this->isIrssi == true)
-				{
-					this->status = BAD_PASSWORD;
-					this->deconnectClient();
-					return(false);
-				}
-				this->status = COMING;
-				return(false);
-			}
-		}
-	}*/
-	return (true);
-}
-
-// The NICK message may be sent from the server to clients to acknowledge their NICK command was successful, 
-// and to inform other clients about the change of nickname. 
-// In these cases, the <source> of the message will be the old nickname [ [ "!" user ] "@" host ] of the user who is changing their nickname.}
-bool	Client::cmdNICK(std::vector<std::string> &cmd)
-{
-	if (cmd.size() == 1)
-	{
-		sendMessage(ERR_NONICKNAMEGIVEN);
-		return (false);
-	}
-	/*if (cmd.size() > 2)
-	{
-		sendMessage(ERR_ERRONEUSNICKNAME(cmd[1])); 
-		return (false);
-	}
-	if (cmd.size() == 2)
-	{
-		if (this->status == REGISTERED)
-		{
-			this->userInfos.nickName = cmd[1];
-			return (true);
-		}
-		if (this->status == CONNECTED)
-		{
-			this->userInfos.nickName = cmd[1];
-			sendMessage(NICK(this->userInfos.nickName, cmd[1]));
-			sendMessage(RPL_WELCOME(this->userInfos.nickName, this->userInfos.userName ,this->userInfos.hostName ));
-			return (true);
-		}
-	}
-	if (this->isIrssi == true)
-	{
-		this->status = BAD_PASSWORD;
-		sendMessage(ERR_NEEDMOREPARAMS("PASS"));
-		this->deconnectClient();
-		return(false);
-	}*/
-	return (false);
-}
-
-
-bool	Client::cmdUSER(std::vector<std::string> &cmd)
-{
-	//------- Pré authentification pour Yann et Arzu (TEMPORAIRE) ----// 
-	(void)cmd;
-
-	srand((unsigned) time(NULL));
-	int random = rand() % 1000;
-	std::stringstream r;
-	r << std::setfill('0') << std::setw(3) << random;
-	std::string random_str = r.str();
-	if (this->status == REGISTERED)
-	{
-		this->userInfos.nickName = "jbatoro_" + random_str;
-		this->userInfos.userName = "jbatoro";
-		this->userInfos.hostName = "jbatoro";
-		this->userInfos.realName = "Julia Batoro"; 
-		sendMessage(RPL_WELCOME(this->userInfos.nickName, this->userInfos.userName ,this->userInfos.hostName));
-		this->status = CONNECTED;
-	} 
-	//------------------------------------------------------------ //
-	//std::vector<std::string> user;
-	
-	/*std::cout << BOLD_PURPLE << cmd[0] << RESET << std::endl;
-	if (cmd.size() == 1)
-	{
-		std::cout << BOLD_PURPLE << "CAS a gerer dans NC =>  " << cmd[0] << RESET << std::endl;
-	}
-	if (cmd.size() == 2) //cas de irssi ou c'est separé par deux points
-	{
-		std::cout << BOLD_PURPLE << "CAS a gerer dans IRSSI =>  " <<  cmd[0] << " | " << cmd[1] << RESET << std::endl;
-	}*/
-	
-	/*std::cout << BOLD_RED << cmd.size() << std::endl;
-	if (this->status == REGISTERED and !cmd.empty())
-	{
-		user = split(cmd[0], ' ');
-
-		if (cmd.size() == 1)
-		{
-			if (user.size() != 5)
-			{
-				sendMessage(ERR_NEEDMOREPARAMS("USER"));
-				return (false);
-			}
-			this->userInfos.realName = user[3];
-		}
-		else if (cmd.size() == 2)
-		{
-			if (cmd[1].empty())
-			{
-				sendMessage(ERR_NEEDMOREPARAMS("USER"));
-				return (false);
-			}
-			this->userInfos.realName = cmd[1];
-		}
-		this->userInfos.userName = user[1];
-		this->userInfos.hostName = user[2];
-		sendMessage(RPL_WELCOME(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName));
-		this->status = CONNECTED;
-	}
-	else if (this->status == CONNECTED)
-	{
-		sendMessage(ERR_ALREADYREGISTERED);
-		return(false);
-	}*/
-	return (true);
-}
 
 bool	Client::cmdPING(std::vector<std::string> &cmd)
 {
@@ -253,17 +97,6 @@ bool	Client::cmdNOTICE(std::vector<std::string> &cmd)
 	return (true);
 }
 
-////////////////////////////////////////////////////////////////////////////
-bool	Client::cmdMODE(std::vector<std::string> &cmd)
-{
-	if (cmd.size() < 2)
-	{
-		sendMessage(ERR_NEEDMOREPARAMS("MODE"));
-		return (false);
-	}
-	return (true);
-}
-
 // Parameters: <nickname> <channel>
 bool	Client::cmdINVITE(std::vector<std::string> &cmd)
 {
@@ -311,7 +144,7 @@ bool	Client::cmdCAP(std::vector<std::string> &cmd)
 		if (cmd[1].compare("LS") == 0)
 		{
 			this->status = COMING;
-			return true;
+			return (true);
 		}
 	}
 	return (false);
@@ -341,34 +174,20 @@ bool	Client::launchCommand(std::string command)
 	{
 		return (false);
 	}
-	//std::cout << RED << "STATUS :" << this->status << std::endl;
-	
-	//------- Pré authentification pour Yann et Arzu (TEMPORAIRE) ----// 
-	if (this->status == COMING)
-		this->status = REGISTERED;
-	//------------------------------------------------------------ //
+
+	//------- Pré authentification pour Yann et Arzu (TEMPORAIRE) ----// JULIA::commentaire
+	//	if (this->status == WAITING)
+	//	this->status = REGISTERED;
+	//	this->hasNick == true;
+	////------------------------------------------------------------ //
 	while (i < 14)
 	{
-		if (vecmd[0].compare("CAP") == 0)
-		{
-			return (this->cmdCAP(vecmd));
-		}
-		if (vecmd[0].compare("PASS") == 0)
-		{
-			return (this->cmdPASS(vecmd));
-		}
-		if (vecmd[0].compare("USER") == 0)
-		{
-			//std::cout << BOLD_CYAN << "Command called -----> " << choice[i] <<  std::endl;
-			return(this->cmdUSER(ccmd));
-		}
 		if (vecmd[0] == choice[i])
 		{
-			//std::cout << BOLD_CYAN << "Command called -----> " << choice[i] <<  std::endl;
 			return (this->*f[i])(vecmd);
 		}
 		i++;
 	}
-	// sendMessage("Command not found");
+	// sendMessage("Command not found"); //ARZU: commentaire
 	return (false);
 }
