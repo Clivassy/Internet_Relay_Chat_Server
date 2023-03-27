@@ -97,7 +97,7 @@ std::string		removeLines( std::string toSplit )
 	+ "@" + this->userInfos.serverName
 	+ "\r\n" ;
 
-	if (send(this->socketFd, this->userInfos.userMessage.c_str(), this->userInfos.userMessage.size(), 0) < 0)
+	if (sendCustom(this->socketFd, this->userInfos.userMessage.c_str(), this->userInfos.userMessage.size(), 0) < 0)
 	{
 		std::cout << BOLD_RED << "Error with send()" << std::endl;
 		perror("send");

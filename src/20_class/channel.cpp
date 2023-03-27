@@ -30,6 +30,7 @@ void Channel::addClient(Client& client)
 		this->clientConnected.insert(client.userInfos.nickName);
 		// messages de welcome envoyes selon norme IRC 1459 et http://chi.cs.uchicago.edu/chirc/assignment3.html7
 		// TBD a confirmer ce qu'il faut afficher
+		// TBD RPL_TOPIC ne marche pas (il est bien envoyé mais pas affiché coté irssi)
 		client.sendMessage(RPL_TOPIC(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, this->name, this->topic));
 		std::string clientList;
 		for( std::set<std::string>::iterator it = clientConnected.begin(); it != clientConnected.end(); it++ )
@@ -54,9 +55,9 @@ void    Channel::sendMessageToClients(std::string msg, std::string sender)
 	{
 		if (this->server.getClient(*it)->userInfos.nickName != sender)
 		{
-			std::string pingmessaage = "PING\r\n"; // ping avant sinon 1er message non recu apres inactivité TBD a sup qd ca marchera sans
-			send(this->server.getClient(*it)->socketFd , pingmessaage.c_str(), pingmessaage.size(), 0);
-			if (send(this->server.getClient(*it)->socketFd , msg.c_str(), msg.size(), 0) == -1)
+			std::string pingmessaage = "PING\r\n"; // TBD ping avant sinon 1er message non recu apres inactivité -> a sup qd ca marchera sans
+			sendCustom(this->server.getClient(*it)->socketFd , pingmessaage.c_str(), pingmessaage.size(), 0);
+			if (sendCustom(this->server.getClient(*it)->socketFd , msg.c_str(), msg.size(), 0) == -1)
 				perror("error sending message: ");
 		}
 

@@ -215,13 +215,13 @@ void Server::listen_client(Client &client)
 {
 	clear_str(client.buffer, client.bufferSize);
 	recv(client.socketFd, client.buffer, client.bufferSize - 1, 0);
-	//std::cout << BOLD_PURPLE << "read buffer: " << client.buffer << RESET << std::endl;
+	std::cout << BOLD_RED << "<= " << BOLD_YELLOW << "Message received on fd " << client.socketFd << ": " << BOLD_BLACK "-->" << YELLOW << client.buffer << BOLD_BLACK << "<--" << RESET << std::endl;
 	client.cmd += client.buffer;
 	replace_rn_by_n(client.cmd);
 	while (client.cmd.find("\n") != std::string::npos)
 	{
 		std::string cc = pop_command(client.cmd);
-		std::cout << BOLD_YELLOW << "launched command: -->" << YELLOW << cc << BOLD_YELLOW << "<--" << RESET << std::endl;
+		std::cout << BOLD_CYAN << "== "<< BOLD_YELLOW << "Launched command: " << BOLD_BLACK << "-->" << YELLOW << cc << BOLD_BLACK << "<--" << RESET << std::endl;
 		client.launchCommand(cc);
 	}
 }

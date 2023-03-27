@@ -24,15 +24,16 @@ bool	Client::cmdPRIVMSG(std::vector<std::string> &cmd)
 	std::cout << "size: " << cmd.size() << std::endl;
 	std::cout << "0: " << cmd[0] << std::endl;
 	std::cout << "1: " << cmd[1] << std::endl;
+	// TBD a decommenter ??
 	//if (cmd.size() < 3)
 	//{
 	//	std::cout << ERR_NEEDMOREPARAMS("PRIVMSG");
 	//	return (false);
 	//}
 
-	// check dans le sens inverse (check + envoie message erreur si check non valid)
 	if (isChannelName(cmd[1]))
 	{
+	// TBD check dans le sens inverse (check + envoie message erreur si check non valid)
 		std::string channelName = cmd[1]; //.substr(1);
 		std::string msg = cmd[2];
 		std::cout << "channel name: " << channelName << std::endl;
@@ -52,8 +53,8 @@ bool	Client::cmdPRIVMSG(std::vector<std::string> &cmd)
 	}
 	else
 	{
-		// TBD envoyer un message au client cmd[1]
-		return (false);
+		// TBD envoyer un message direct au client cmd[1]
+		return (true);
 	}
 	return (true);
 }

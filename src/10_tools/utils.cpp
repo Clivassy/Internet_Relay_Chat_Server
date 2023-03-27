@@ -103,6 +103,30 @@ bool isChannelName(std::string str)
 	return (true);
 }
 
+ssize_t sendCustom(int sockfd, const void *buf, size_t len, int flags)
+{
+	std::string msg;
+	const char* pt;
+	pt = static_cast <const char*> (buf);
+	for (size_t i = 0; i < len ; i++)
+	{
+		if (pt[i] == '\r')
+		{
+			msg.push_back('\\');
+			msg.push_back('r');
+		}
+		else if (pt[i] == '\n')
+		{
+			msg.push_back('\\');
+			msg.push_back('n');
+		}
+		else
+			msg.push_back(pt[i]);
+	}
+	std::cout << BOLD_GREEN << "=> " << BOLD_YELLOW << "Message sent to fd " << sockfd << BOLD_BLACK << ": -->" << YELLOW << msg << BOLD_BLACK << "<--" << RESET << std::endl;
+	return(send(sockfd, buf, len, flags));
+}
+
 template<typename T>
 void print_vector(std::vector<T> vec)
 {
