@@ -32,7 +32,8 @@ class Channel
 	public:
 		Channel( Server& serv, std::string channel_name );
 		~Channel( void );
-		bool	isClientBanned(std::string client);
+		bool	isclientConnected(std::string name);
+		bool	isClientBanned(std::string name);
 		void	sendMessageToClients( std::string msg, std::string sender);
 		void	addClient(Client& client);
 		

@@ -52,12 +52,12 @@ bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 		return (false);
 	}
 	std::string channel_name = cmd[1];
+	toLowerStr(channel_name);
 	if (cmd[1].size() <= 1 || !isChannelName(channel_name))
 	{
 		this->sendMessage(ERR_BADCHANMASK(cmd[1]));
 		return (false);
 	}
-	toLowerStr(channel_name);
 	this->server.addChannel(channel_name); // check existence channel fait dans addChannel
 	this->server.getChannel(channel_name)->second.addClient(*this);
 

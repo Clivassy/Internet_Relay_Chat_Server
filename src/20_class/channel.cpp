@@ -3,7 +3,7 @@
 Channel::Channel( Server& serv, std::string channel_name):
 server(serv), name(channel_name), isInviteOnly(false)
 {
-	this->topic = "Welcome to the channel '" + channel_name + "' !!";
+	this->topic = "Welcome to the channel " + channel_name + " !!";
 }
 
 Channel::~Channel( void )
@@ -11,9 +11,16 @@ Channel::~Channel( void )
 
 }
 
+bool	Channel::isclientConnected(std::string name)
+{
+	if (this->clientConnected.count(name) > 0)
+		return (true);
+	return false;
+}
+
 bool	Channel::isClientBanned(std::string name)
 {
-	if (this->clientBanned.count(name) >= 1)
+	if (this->clientBanned.count(name) > 0)
 		return (true);
 	return false;
 }
@@ -24,6 +31,7 @@ void Channel::addClient(Client& client)
 {
 	if (isClientBanned(client.userInfos.nickName))
 	{
+		// TBD a tester quand ban (commande KICK) fait
 		ERR_BANNEDFROMCHAN(client.userInfos.nickName, this->name);
 		return;
 	}
@@ -31,7 +39,8 @@ void Channel::addClient(Client& client)
 		// messages de welcome envoyes selon norme IRC 1459 et http://chi.cs.uchicago.edu/chirc/assignment3.html7
 		// TBD a confirmer ce qu'il faut afficher
 		// TBD RPL_TOPIC ne marche pas (il est bien envoyé mais pas affiché coté irssi)
-		client.sendMessage(RPL_TOPIC(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, this->name, this->topic));
+		std::string pingmessaage = "PING\r\n"; // TBD ping avant sinon 1er message non recu apres inactivité -> a sup qd ca marchera sans
+		sendCustom(client.socketFd , pingmessaage.c_str(), pingmessaage.size(), 0);client.sendMessage(RPL_TOPIC(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, this->name, this->topic));
 		std::string clientList;
 		for( std::set<std::string>::iterator it = clientConnected.begin(); it != clientConnected.end(); it++ )
 		{

@@ -40,7 +40,7 @@
 
 # define RPL_NOTOPIC(nick, user, host, chan) ("331 " + nick + "!" + user + "@" + host + " " + chan + " :No topic is set\r\n")
 
-# define TOPIC(nick, user, host, chan, topic) (":" + nick + "!" + user + "@" + host + " TOPIC " + chan + " :" + topic + "\n\r")
+# define TOPIC(nick, user, host, chan, topic) (":" + nick + "!" + user + "@" + host + " TOPIC " + chan + " :" + topic + "\r\n")
 
 # define RPL_TOPIC(nick, user, host, chan, topic) ("332 " + nick + "!" + user + "@" + host + " " + chan + " :" + topic + "\r\n")
 //ecrit le topic du channel si celui ci est set
