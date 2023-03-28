@@ -21,15 +21,11 @@
 
 bool	Client::cmdPRIVMSG(std::vector<std::string> &cmd)
 {
-	std::cout << "size: " << cmd.size() << std::endl;
-	std::cout << "0: " << cmd[0] << std::endl;
-	std::cout << "1: " << cmd[1] << std::endl;
-	// TBD a decommenter ??
-	//if (cmd.size() < 3)
-	//{
-	//	std::cout << ERR_NEEDMOREPARAMS("PRIVMSG");
-	//	return (false);
-	//}
+	if (cmd.size() < 3)
+	{
+		std::cout << ERR_NEEDMOREPARAMS("PRIVMSG");
+		return (false);
+	}
 
 	if (isChannelName(cmd[1]))
 	{
@@ -58,7 +54,18 @@ bool	Client::cmdPRIVMSG(std::vector<std::string> &cmd)
 	}
 	else
 	{
-		// TBD envoyer un message direct au client cmd[1]
+		std::string nickNameClientReceiver = cmd[1];
+		if (!this->server.isClientExisting(nickNameClientReceiver))
+		{
+			this->sendMessage(ERR_NOSUCHNICK(nickNameClientReceiver));
+			return (false);
+		}
+		std::string msg = cmd[2];
+		std::string pingmessaage = "PING\r\n"; // TBD ping avant sinon 1er message non recu apres inactivité -> a sup qd ca marchera sans
+		sendCustom(this->server.getClient(nickNameClientReceiver)->socketFd , pingmessaage.c_str(), pingmessaage.size(), 0); // TBD sup avec ping
+		std::string msgToSend = ":" + this->userInfos.nickName + " PRIVMSG " + nickNameClientReceiver + " :" + msg + "\r\n";
+		this->server.getClient(nickNameClientReceiver)->sendMessage(msgToSend);
+
 		return (true);
 	}
 	return (true);

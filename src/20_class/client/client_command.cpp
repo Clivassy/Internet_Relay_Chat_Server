@@ -86,17 +86,6 @@ bool	Client::cmdPART(std::vector<std::string> &cmd)
 	return (true);
 }
 
-
-bool	Client::cmdNOTICE(std::vector<std::string> &cmd)
-{
-	//The difference between NOTICE and PRIVMSG is that automatic replies must never be sent in response to a NOTICE message.This rule also applies to servers – they must not send any error back to the client on receipt of a NOTICE command.
-	// SI j'ai bien compris un NOTICE est un PRIVMSG sans message d'erreur
-	if (cmd.size() < 3)
-		return (false);
-	// Envoyer le message
-	return (true);
-}
-
 // Parameters: <nickname> <channel>
 bool	Client::cmdINVITE(std::vector<std::string> &cmd)
 {

@@ -65,7 +65,7 @@ void    Channel::sendMessageToClients(std::string msg, std::string sender)
 		if (this->server.getClient(*it)->userInfos.nickName != sender)
 		{
 			std::string pingmessaage = "PING\r\n"; // TBD ping avant sinon 1er message non recu apres inactivité -> a sup qd ca marchera sans
-			sendCustom(this->server.getClient(*it)->socketFd , pingmessaage.c_str(), pingmessaage.size(), 0);
+			sendCustom(this->server.getClient(*it)->socketFd , pingmessaage.c_str(), pingmessaage.size(), 0);// TBD sup avec ping
 			if (sendCustom(this->server.getClient(*it)->socketFd , msg.c_str(), msg.size(), 0) == -1)
 				perror("error sending message: ");
 		}
