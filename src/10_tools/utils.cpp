@@ -54,6 +54,22 @@ void replace_rn_by_n(std::string& str)
 	
 }
 
+void toUpperStr(std::string& str)
+{
+	for(std::string::iterator it = str.begin(); it != str.end(); ++it)
+	{
+		*it = toupper(*it);
+	}
+}
+
+void toLowerStr(std::string& str)
+{
+	for(std::string::iterator it = str.begin(); it != str.end(); ++it)
+	{
+		*it = tolower(*it);
+	}
+}
+
 // take a string, remove and return the part before the first occurence off /n
 std::string pop_command(std::string& cmd)
 {
@@ -67,6 +83,7 @@ std::string pop_command(std::string& cmd)
 	return (output[0]);
 }
 
+// regles de nommage dans channel.hpp
 bool isChannelFlag(char flag)
 {
 	if (flag == '&' || flag == '#' || flag == '+' || flag == '?')
@@ -74,44 +91,41 @@ bool isChannelFlag(char flag)
 	return (false);
 }
 
-// is considered as a channel name if :
-// len > 1
-// has no space
-// 1st char is a channel flag
+// regles de nommage dans channel.hpp
 bool isChannelName(std::string str)
 {
-	if (str.size() == 0 || str.size() == 1)
+	if (str.size() == 0 || str.size() == 1 || str.size() > 50)
 		return (false);
-	if (str.find(" ") !=  std::string::npos)
+	if (str.find(" ") !=  std::string::npos || str.find(7) !=  std::string::npos || str.find(',') !=  std::string::npos)
 		return (false);
 	if (!isChannelFlag(str[0]))
 		return (false);
 	return (true);
 }
-// split arzu
-//std::vector<std::string> split(std::string &s)
-//{
-//	std::vector<std::string> cmd;
-//	std::string	str;
-//	size_t	pos = 0;
-////	int i = 0;
 
-//	if (s.empty())
-//		return (cmd);
-//	while ((pos = s.find(" ")) != std::string::npos)
-//	{
-//		str = s.substr(0, pos);
-//		cmd.push_back(str);
-//	//	cmd[i++] = str;
-//		s.erase(0, pos + 1);
-//	}
-//	if (!s.empty())
-//		cmd.push_back(s);
-//	//cmd[i++] = s;
-//	cmd.push_back(std::string(""));
-//	return (cmd);
-//}
-
+ssize_t sendCustom(int sockfd, const void *buf, size_t len, int flags)
+{
+	std::string msg;
+	const char* pt;
+	pt = static_cast <const char*> (buf);
+	for (size_t i = 0; i < len ; i++)
+	{
+		if (pt[i] == '\r')
+		{
+			msg.push_back('\\');
+			msg.push_back('r');
+		}
+		else if (pt[i] == '\n')
+		{
+			msg.push_back('\\');
+			msg.push_back('n');
+		}
+		else
+			msg.push_back(pt[i]);
+	}
+	std::cout << BOLD_GREEN << "=> " << BOLD_YELLOW << "Message sent to fd " << sockfd << BOLD_BLACK << ": -->" << YELLOW << msg << BOLD_BLACK << "<--" << RESET << std::endl;
+	return(send(sockfd, buf, len, flags));
+}
 
 template<typename T>
 void print_vector(std::vector<T> vec)
@@ -127,7 +141,6 @@ void print_vector(std::vector<T> vec)
 	}
 	std::cout << "]" << std::endl;
 }
-
 
 template<typename key, typename T>
 void print_map(std::map<key, T> map)

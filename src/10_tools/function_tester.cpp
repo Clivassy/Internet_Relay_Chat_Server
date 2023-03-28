@@ -19,23 +19,34 @@
 
 int main()
 {
-	std::string str = "abcd\r\n123\r\n56789";
-	std::cout << BOLD_BLUE << "str before:\n" << RESET << str << std::endl;
+	// toupper
+	{
+		std::string str = "#abcd\r\n123ABcdEF\r\n56789a";
+		std::cout << BOLD_BLUE << "str before:\n" << RESET << str << std::endl;
+		toUpperStr(str);
+		std::cout << BOLD_BLUE << "str after:\n" << RESET << str << std::endl;
+	}
 
-	std::cout << BOLD_BLUE << "pop return:\n" << RESET << pop_command(str) << std::endl;
-	std::cout << BOLD_BLUE << "str after:\n" << RESET << str << std::endl;
-
-	std::cout << BOLD_BLUE << "pop return:\n" << RESET << pop_command(str) << std::endl;
-	std::cout << BOLD_BLUE << "str after:\n" << RESET << str << std::endl;
-
-	std::cout << BOLD_BLUE << "pop return:\n" << RESET << pop_command(str) << std::endl;
-	std::cout << BOLD_BLUE << "str after:\n" << RESET << str << std::endl;
-
-	std::cout << BOLD_BLUE << "pop return:\n" << RESET << pop_command(str) << std::endl;
-	std::cout << BOLD_BLUE << "str after:\n" << RESET << str << std::endl;
-
-	std::cout << BOLD_BLUE << "pop return:\n" << RESET << pop_command(str) << std::endl;
-	std::cout << BOLD_BLUE << "str after:\n" << RESET << str << std::endl;
 	
+	// pop_command
+	{
+		std::string str = "abcd\r\n123\r\n56789";
+		std::cout << BOLD_BLUE << "str before:\n" << RESET << str << std::endl;
+
+		std::cout << BOLD_BLUE << "pop return:\n" << RESET << pop_command(str) << std::endl;
+		std::cout << BOLD_BLUE << "str after:\n" << RESET << str << std::endl;
+
+		std::cout << BOLD_BLUE << "pop return:\n" << RESET << pop_command(str) << std::endl;
+		std::cout << BOLD_BLUE << "str after:\n" << RESET << str << std::endl;
+
+		std::cout << BOLD_BLUE << "pop return:\n" << RESET << pop_command(str) << std::endl;
+		std::cout << BOLD_BLUE << "str after:\n" << RESET << str << std::endl;
+
+		std::cout << BOLD_BLUE << "pop return:\n" << RESET << pop_command(str) << std::endl;
+		std::cout << BOLD_BLUE << "str after:\n" << RESET << str << std::endl;
+
+		std::cout << BOLD_BLUE << "pop return:\n" << RESET << pop_command(str) << std::endl;
+		std::cout << BOLD_BLUE << "str after:\n" << RESET << str << std::endl;
+	}
 	return (0);
 }

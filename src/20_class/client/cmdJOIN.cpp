@@ -40,6 +40,10 @@
 // Des qu'il a rejoint on doit envoyer une message "<source> joined the channel" doit etre envoye
 // ainsi que le topic du channel (avec RPL_TOPIC) et la liste des utilisateurs connectes (avc RPL_NAMREPLY
 // suivi d'un RPL_ENDOFNAMES)
+
+//comportement
+// rejoind le channel dans cmd[1]. les channels suivants (cmd[2], cmd[3]...) ne sont pas rejoints
+// pour coller au comportement d'irssi
 bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 {
 	if (cmd.size() <=1)
@@ -47,28 +51,16 @@ bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 		sendMessage(ERR_NEEDMOREPARAMS("JOIN"));
 		return (false);
 	}
-	if (cmd[1].size() <= 1 || !isChannelFlag(cmd[1][0]))
+	std::string channel_name = cmd[1];
+	toLowerStr(channel_name);
+	if (cmd[1].size() <= 1 || !isChannelName(channel_name))
 	{
-		sendMessage(ERR_BADCHANMASK(cmd[1]));
+		this->sendMessage(ERR_BADCHANMASK(cmd[1]));
 		return (false);
 	}
+	this->server.addChannel(channel_name); // check existence channel fait dans addChannel
+	this->server.getChannel(channel_name)->second.addClient(*this);
 
-	std::string channel_name = cmd[1];
-	//if (isChannelFlag(cmd[1][0]))
-	//	channel_name = channel_name.substr(1);
-
-	if (isChannelName(cmd[1]))
-	{
-		for (std::vector<std::string>::iterator it_cmd = ++cmd.begin(); it_cmd != cmd.end(); it_cmd++)
-		{
-			this->server.addChannel(channel_name);
-			this->server.getChannel(channel_name)->second.addClient(*this);
-		}
-	}
-	else
-	{
-		// TBD gestion erreur si nom de serveur incorrect
-	}
 	
 	
 	return (true);

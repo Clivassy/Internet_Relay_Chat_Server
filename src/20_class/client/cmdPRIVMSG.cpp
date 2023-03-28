@@ -24,6 +24,7 @@ bool	Client::cmdPRIVMSG(std::vector<std::string> &cmd)
 	std::cout << "size: " << cmd.size() << std::endl;
 	std::cout << "0: " << cmd[0] << std::endl;
 	std::cout << "1: " << cmd[1] << std::endl;
+	// TBD a decommenter ??
 	//if (cmd.size() < 3)
 	//{
 	//	std::cout << ERR_NEEDMOREPARAMS("PRIVMSG");
@@ -32,23 +33,33 @@ bool	Client::cmdPRIVMSG(std::vector<std::string> &cmd)
 
 	if (isChannelName(cmd[1]))
 	{
-		std::string channelName = cmd[1]; //.substr(1);
+		std::string channelName = cmd[1];
 		std::string msg = cmd[2];
-		std::cout << "channel name: " << channelName << std::endl;
-		if (this->server.isChannelExisting(channelName))
+		Channel& channel = this->server.getChannel(channelName)->second;
+		if (!this->server.isChannelExisting(channelName))
 		{
-			this->server.getChannel(channelName)->second.sendMessageToClients(msg, this->userInfos.nickName); //TBD remettre message ad cmd ok
-		}
-		else
-		{
-			// TBD envoyer erreur channel non existent
+			this->sendMessage(ERR_NOSUCHNICK(channelName));
 			return (false);
 		}
+		if (channel.isClientBanned(this->userInfos.nickName))
+		{
+			// TBD a tester quand ban (commande KICK) fait
+			this->sendMessage(ERR_BANNEDFROMCHAN(this->userInfos.nickName, channel.name));
+			return (false);
+		}
+		if (!channel.isclientConnected(this->userInfos.nickName))
+		{
+			this->sendMessage(ERR_CANNOTSENDTOCHAN(this->userInfos.nickName, channelName));
+			return (false);
+		}
+		std::string msgToSend = ":" + this->userInfos.nickName + " PRIVMSG " + channelName + " :" + msg + "\r\n";
+		this->server.getChannel(channelName)->second.sendMessageToClients(msgToSend, this->userInfos.nickName);
+		return (true);
 	}
 	else
 	{
-		// TBD envoyer un message au client cmd[1]
-		return (false);
+		// TBD envoyer un message direct au client cmd[1]
+		return (true);
 	}
 	return (true);
 }

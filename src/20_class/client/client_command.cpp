@@ -13,7 +13,7 @@
 /////////////////////////////////////////////////////////
 void	Client::sendMessage(std::string str)
 {
-	send(this->socketFd, str.c_str(), str.size(), 0);
+	sendCustom(this->socketFd, str.c_str(), str.size(), 0);
 }
 
 void	Client::sendOtherClient(std::string str)
@@ -21,7 +21,7 @@ void	Client::sendOtherClient(std::string str)
 	for (std::vector<Client>::iterator it = this->server.clientList.begin(); it != this->server.clientList.end(); it++)
 	{
 		if (it->socketFd != this->socketFd)
-			send(it->socketFd, str.c_str(), str.size(), 0);
+			sendCustom(it->socketFd, str.c_str(), str.size(), 0);
 	}
 }
 
@@ -32,7 +32,7 @@ bool	Client::cmdPING(std::vector<std::string> &cmd)
 		sendMessage(ERR_NEEDMOREPARAMS("PING"));
 		return (false);
 	}
-	std::cout << "PONG " + cmd[1] + "\r" << std::endl;
+	//std::cout << "PONG " + cmd[1] + "\r" << std::endl;
 	sendMessage("PONG " + cmd[1] + "\r");
 	return (true);
 }
@@ -140,7 +140,7 @@ bool	Client::cmdCAP(std::vector<std::string> &cmd)
 {
 	if (cmd.size() == 2)
 	{
-		std::cout << RED << cmd[1] << std::endl;
+		//std::cout << RED << cmd[1] << std::endl;
 		if (cmd[1].compare("LS") == 0)
 		{
 			this->status = COMING;
