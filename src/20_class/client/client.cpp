@@ -2,7 +2,11 @@
 
 Client::Client(Server& serv):
 server(serv), bufferSize(BUFFER_SIZE), status(WAITING),hasNick(false)
-{ }
+{ 
+	this->userInfos.invisibleMode = true;
+	this->userInfos.operatorMode = false;
+	this->userInfos.restrictedMode = false;
+}
 
 Client::~Client(){ }
 

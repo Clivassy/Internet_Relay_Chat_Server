@@ -47,7 +47,9 @@ class Client {
         std::string serverName;
         std::string realName;
         std::string userMessage;
-
+        bool        invisibleMode;
+        bool        restrictedMode;
+        bool        operatorMode;
 
     };
     public:
@@ -86,8 +88,9 @@ class Client {
 		std::string 	    getPassword( std::string toSplit );
 		std::string			getPrefix( void );
 		void				errorAuthentification ( void );
+        int		            updateMode(char sign, char argMode);
 		void				deconnectClient( void );
-
+        int		            parseModes(std::string modes);
         //-- Getters
         //std::string    getUserName( void );
         //std::string    gethostName( void );

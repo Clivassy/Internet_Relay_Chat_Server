@@ -27,7 +27,7 @@ bool	Client::cmdPASS(std::vector<std::string> &cmd)
 				//std::cout << BOLD_RED << "WRONG PASSWORD" << RESET << std::endl; //JULIA
 				sendMessage(this->getPrefix() + " 464 " + this->userInfos.nickName + ERR_PASSWDMISMATCH);
 				this->status = COMING;
-				//this->deconnectClient(); // no need to deconnect? version Marie + William : a discuter //JULIA
+				// this->deconnectClient(); // no need to deconnect? version Marie + William : a discuter //JULIA
 				return(false);
 			}
 		}		
