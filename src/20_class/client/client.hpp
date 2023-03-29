@@ -48,7 +48,6 @@ class Client {
         std::string realName;
         std::string userMessage;
         bool        invisibleMode;
-        bool        restrictedMode;
         bool        operatorMode;
 
     };
