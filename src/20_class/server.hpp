@@ -63,6 +63,7 @@ class Server
 
 		// channel
 		bool										isChannelExisting(std::string name);
+		bool										isClientExisting(std::string name);
 		void										addChannel(std::string name);
 		std::map<std::string, Channel>::iterator	getChannel(std::string name);
 		//Channel&	getChannel(std::string name);

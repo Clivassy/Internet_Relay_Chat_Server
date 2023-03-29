@@ -243,6 +243,17 @@ bool	Server::isChannelExisting(std::string name)
 	return false;
 }
 
+bool	Server::isClientExisting(std::string name)
+{
+	std::vector<Client>::iterator it;
+	for (it = this->clientList.begin(); it != this->clientList.end(); it++)
+		{
+			if (it->userInfos.nickName == name)
+				return (true);
+		}
+	return (false);
+}
+
 void	Server::addChannel(std::string name)
 {
 	if (this->isChannelExisting(name))
