@@ -312,7 +312,9 @@ void Server::printState()
 		std::cout << "nickName " << it->userInfos.nickName << " | ";
 		std::cout << "userName " << it->userInfos.userName << " | ";
 		std::cout << "socketFd " << it->socketFd << " | ";
-		std::cout << "status " << PRINT_STATUS(it->status) << " (" << it->status << "/4)" ;
+		std::cout << "status " << PRINT_STATUS(it->status) << " (" << it->status << "/4)" << " | " ;
+		std::cout << "invisible " << PRINT_BOOL(it->userInfos.invisibleMode) << " | " ;
+		std::cout << "operator " << PRINT_BOOL(it->userInfos.operatorMode);
 //		# define COMING 1
 //# define REGISTERED 2
 //# define BAD_PASSWORD 3

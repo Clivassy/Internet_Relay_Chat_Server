@@ -10,6 +10,7 @@ SRCS += ./src/20_class/client/client_command.cpp
 SRCS += ./src/20_class/client/cmdJOIN.cpp
 SRCS += ./src/20_class/client/cmdMODE.cpp
 SRCS += ./src/20_class/client/cmdNOTICE.cpp
+SRCS += ./src/20_class/client/cmdPART.cpp
 SRCS += ./src/20_class/client/cmdPASS.cpp
 SRCS += ./src/20_class/client/cmdPRIVMSG.cpp
 SRCS += ./src/20_class/client/cmdNICK.cpp

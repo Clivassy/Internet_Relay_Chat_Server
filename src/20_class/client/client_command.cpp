@@ -70,22 +70,6 @@ bool	Client::cmdQUIT(std::vector<std::string> &cmd)
 }
 
 
-// Supprime un client ou des channels
-bool	Client::cmdPART(std::vector<std::string> &cmd)
-{
-	if (cmd.size() < 2)
-	{
-		sendMessage(ERR_NEEDMOREPARAMS("PART"));
-		return (false);
-	}
-	// ERR_NOSUCHCHANNEL si le channel n'exidte pas 
-	// ERR_NOTONCHANNEL si le channel existe mais le client n'est pas dedans
-	
-	// the user will receive a PART message from the server for each channel they have been removed from. <reason> is the reason that the client has left the channel(s).
-	// Servers SHOULD NOT send multiple channels in this message to clients, and SHOULD distribute these multiple-channel JOIN messages as a series of messages with a single channel name on each.
-	return (true);
-}
-
 // Parameters: <nickname> <channel>
 bool	Client::cmdINVITE(std::vector<std::string> &cmd)
 {

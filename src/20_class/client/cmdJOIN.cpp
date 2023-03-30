@@ -42,26 +42,31 @@
 // suivi d'un RPL_ENDOFNAMES)
 
 //comportement
-// rejoind le channel dans cmd[1]. les channels suivants (cmd[2], cmd[3]...) ne sont pas rejoints
-// pour coller au comportement d'irssi
+// rejoind les channels dans cmd[1] avec , en separateur. 
+// Par exemple si cmd[1] = "#ch1,&ch2,#ch3" > les trois channels seront rejoints
+// return false si un channel n'a pas pu etre rejoint
 bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 {
+	bool toReturn = true;
 	if (cmd.size() <=1)
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("JOIN"));
 		return (false);
 	}
-	std::string channel_name = cmd[1];
-	toLowerStr(channel_name);
-	if (cmd[1].size() <= 1 || !isChannelName(channel_name))
-	{
-		this->sendMessage(ERR_BADCHANMASK(cmd[1]));
-		return (false);
-	}
-	this->server.addChannel(channel_name); // check existence channel fait dans addChannel
-	this->server.getChannel(channel_name)->second.addClient(*this);
+	std::vector<std::string> listOfChannelToAdd = split(cmd[1], ",");
+	std::string channel_name;
 
-	
-	
-	return (true);
+	for (std::vector<std::string>::iterator it = listOfChannelToAdd.begin(); it != listOfChannelToAdd.end(); it++)
+	{
+		channel_name = *it;
+		toLowerStr(channel_name);
+		if (channel_name.size() <= 1 || !isChannelName(channel_name))
+		{
+			this->sendMessage(ERR_BADCHANMASK(channel_name));
+			toReturn = false;
+		}
+		this->server.addChannel(channel_name); // check existence channel fait dans addChannel
+		this->server.getChannel(channel_name)->second.addClient(*this);
+	}
+	return (toReturn);
 }
