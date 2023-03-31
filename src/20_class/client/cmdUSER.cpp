@@ -3,13 +3,6 @@
 bool	Client::cmdUSER(std::vector<std::string> &cmd)
 {
 	//------- Pré authentification pour Yann et Arzu (TEMPORAIRE) ----// 
-	(void)cmd;
-
-	srand((unsigned) time(NULL));
-	int random = rand() % 1000;
-	std::stringstream r;
-	r << std::setfill('0') << std::setw(3) << random;
-	std::string random_str = r.str();
 	/*if (this->status == REGISTERED)
 	{
 		this->userInfos.nickName = "jbatoro_" + random_str;

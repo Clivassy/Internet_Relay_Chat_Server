@@ -90,6 +90,9 @@ class Client {
         int		            updateMode(char sign, char argMode);
 		void				deconnectClient( void );
         int		            parseModes(std::string modes);
+        void	            checkDoubleNICK(std::string cmd, std::string errMsg);
+        bool	            addUserMode(std::vector<std::string> cmd);
+        bool	            addChannelMode(std::vector<std::string> cmd);
         //-- Getters
         //std::string    getUserName( void );
         //std::string    gethostName( void );

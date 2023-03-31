@@ -1,4 +1,6 @@
 #include "client.hpp"
+#define TRUE 1
+#define FALSE 0
 
 int		Client::parseModes(std::string modes)
 {
@@ -26,7 +28,6 @@ int		Client::updateMode(char sign, char argMode)
 		{
 			this->userInfos.invisibleMode = true;
 			sendMessage(getPrefix() + " 221 " + this->userInfos.nickName + " " + "+" + character + "\r\n");
-			//std::cout << BOLD_WHITE << "Client Mode has been updated to : INVISIBLE" << std::endl;
 		}
 		else 
 		{
@@ -34,19 +35,17 @@ int		Client::updateMode(char sign, char argMode)
 				sendMessage(getPrefix() + " 472 " + character + " :is unknown mode char to me\r\n");
 		}
 	}
-	else
-	{
+	else 
+	{	
 		if (argMode == 'i')
 		{			
 			this->userInfos.invisibleMode = false;
 			sendMessage(getPrefix() + " 221 " + this->userInfos.nickName + " " + "-" + character + "\r\n");
-			//std::cout << BOLD_WHITE << "Client Mode has been updated to : NOT INVISIBLE" << std::endl;
 		}
 		if (argMode == 'o')
 		{
 			this->userInfos.invisibleMode = false;
 			sendMessage(getPrefix() + " 221 " + this->userInfos.nickName + " " + "-" + character + "\r\n");
-			//std::cout << BOLD_WHITE << "Client Mode has been updated to : NOT OPERATOR" << std::endl;
 		}
 		else if (argMode != 'i' and argMode != 'o')
 		{
@@ -56,8 +55,61 @@ int		Client::updateMode(char sign, char argMode)
 	return (1);
 }
 
+bool	Client::addUserMode(std::vector<std::string> cmd)
+{
+	if (cmd[1].compare(this->userInfos.nickName) != 0)
+	{
+		sendMessage(ERR_USERSDONTMATCH(this->userInfos.nickName));
+		return (false);
+	}
+	if (cmd.size() == 3)
+	{
+		parseModes(cmd[2]);
+		return(true);
+	}
+	else if (cmd.size() > 3)
+	{
+		for (std::vector<std::string>::iterator it = cmd.begin() ; it != cmd.end(); it++)
+			parseModes(*it);
+		return (true);
+	}
+	return (true);
+}
+
+bool	Client::addChannelMode(std::vector<std::string> cmd)
+{
+	(void)cmd;
+	std::cout << BOLD_RED << "CHANNEL MODE  " << RESET << std::endl;
+	/*
+	ERRORS : 
+	- ERR_CHANOPRIVNEEDED : user need to be operator
+	- ERR_NOSUCHNICK : user does not exist in server 
+	-> RECUPERER LE CHAN : 
+	- ERR_NOSUCHCHANNEL : channel does not exit 
+	- ERR_NOTONCHANNEL : user is not in the channel
+	ELSE 
+		-> PARSER LE MODE : UNIQUEMENT +I OU -I ACCEPTED
+		-> TURN BOLEEAN TRUE OR FALSE. 
+		-> SENDMESSAGE TO USER WHO CHANGED MODE : channel name + new mode. 
+	*/
+	return (true);
+}
+
 bool	Client::cmdMODE(std::vector<std::string> &cmd)
 {
+	if (this->status != CONNECTED)
+		return(false);
+	if (cmd.size() < 2)
+	{
+		sendMessage(ERR_NEEDMOREPARAMS("MODE"));
+		return (false);
+	}
+	if (cmd[1].find("#") != std::string::npos)
+    	this->addChannelMode(cmd);
+	else
+		this->addUserMode(cmd);
+	return (true);
+}
 	// cmd : MODE <target> <mode changes>
 	// ex : MODE nickname +i-o+
 	// NB : unlimited number of mode changes in the same command.
@@ -71,39 +123,3 @@ bool	Client::cmdMODE(std::vector<std::string> &cmd)
 	// 1) Parsing the Command 
 	// 2) Validating the Command
 	// 3) Updating Modes
-	std::cout << BOLD_RED << "SIZE = " << cmd.size() << RESET << std::endl;
-	if (cmd.size() <= 2)
-	{
-		sendMessage(ERR_NEEDMOREPARAMS("MODE"));
-		return (false);
-	}
-	if (cmd[1].compare(this->userInfos.nickName) != 0)
-	{
-		sendMessage(ERR_USERSDONTMATCH(this->userInfos.nickName));
-		return (false);
-	}
-	// /!\ gérer si on trouve aucun + ou - dans l'input ? 
-	if (cmd.size() == 3) // CAS ou un mode ou plusieurs modes sont collés : `MODE nickname +i-o`
-	{
-		parseModes(cmd[2]);
-		return(true);
-	}
-	else if (cmd.size() > 3) // CAS ou un mode ou plusieurs modes sont séparé en différents arg  : `MODE nickname +i -o`
-	{
-		std::cout << BOLD_GREEN << "Argument plusieurs  mots" << cmd[0] << RESET << std::endl;
-		for (std::vector<std::string>::iterator it = cmd.begin() ; it != cmd.end(); it++)
-			parseModes(*it);
-		return (true);
-	}
-	return (false);
-	
-	//----------------------------------------
-	// CODE ARZU : 
-	/*if (cmd.size() < 2)
-	{
-		sendMessage(ERR_NEEDMOREPARAMS("MODE"));
-		return (false);
-	}
-	return (true);
-	-------------------------------------------------*/
-}
