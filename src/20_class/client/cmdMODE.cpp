@@ -80,13 +80,19 @@ bool	Client::addChannelMode(std::vector<std::string> cmd)
 {
 	(void)cmd;
 	std::cout << BOLD_RED << "CHANNEL MODE  " << RESET << std::endl;
+	if (this->userInfos.operatorMode == false)
+		sendMessage(ERR_CHANOPRIVSNEEDED(this->server.getChannel(this->userInfos.nickName)->first));
 	/*
 	ERRORS : 
 	- ERR_CHANOPRIVNEEDED : user need to be operator
-	- ERR_NOSUCHNICK : user does not exist in server 
+	- ERR_NOSUCHNICK : user does not exist in server
+	Faire une fct pour checker si un client est present dans le server. 
 	-> RECUPERER LE CHAN : 
 	- ERR_NOSUCHCHANNEL : channel does not exit 
+	isChannelExisting(std::string name);
 	- ERR_NOTONCHANNEL : user is not in the channel
+	isClientExisting(std::string name);
+
 	ELSE 
 		-> PARSER LE MODE : UNIQUEMENT +I OU -I ACCEPTED
 		-> TURN BOLEEAN TRUE OR FALSE. 
