@@ -20,17 +20,12 @@ bool	Client::cmdPART(std::vector<std::string> &cmd)
 	}
 	std::vector<std::string> listOfChannelToRemove = split(cmd[1], ",");
 	std::string channel_name;
-	std::string leavingMessage;
-	std::string msgToSend;
 	// loop sur tous les channels a quitter
 	for (std::vector<std::string>::iterator it = listOfChannelToRemove.begin(); it != listOfChannelToRemove.end(); it++)
 	{
 		channel_name = *it;
 		toLowerStr(channel_name);
-		if (cmd.size() > 2)
-			leavingMessage = "User " + this->userInfos.nickName + " leaving channel " + channel_name + " with the message " + cmd[2];
-		else
-			leavingMessage = "User " + this->userInfos.nickName + " leaving channel " + channel_name;
+		
 		if (!this->server.isChannelExisting(channel_name))
 		{
 			this->sendMessage(ERR_NOSUCHCHANNEL(channel_name));
@@ -43,11 +38,13 @@ bool	Client::cmdPART(std::vector<std::string> &cmd)
 		}
 		else
 		{
-			// TBD diffusion message depart
-			// revoir message avec syntaxe specifique PART 
-			msgToSend = "PRIVMSG " + channel_name + " :" + leavingMessage + "\r\n";
-			this->server.getChannel(channel_name)->second.sendMessageToClients(msgToSend, "");
-
+			if (cmd.size() > 2)
+				{
+					std::string leavingReason = cmd[2];
+					this->server.getChannel(channel_name)->second.sendMessageToClients(PART_REASON(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, channel_name, leavingReason), "");
+				}
+			else
+				this->server.getChannel(channel_name)->second.sendMessageToClients(PART(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, channel_name), "");
 			this->server.getChannel(channel_name)->second.removeClient(*this);
 		}
 		// TBD supprimer channel vide  ?
