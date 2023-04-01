@@ -20,6 +20,7 @@
 # include <vector>
 # include <map>
 # include  <sstream>
+# include <ctime>
 # include "../../10_tools/colors.hpp"
 # include "../../10_tools/errors.hpp"
 # include "../../10_tools/utils.hpp"
@@ -69,6 +70,7 @@ class Client {
 		bool	cmdUSER(std::vector<std::string> &cmd);
 		bool	cmdNICK(std::vector<std::string> &cmd);
 		bool	cmdPING(std::vector<std::string> &cmd);
+		bool	cmdPONG(std::vector<std::string> &cmd);
 		bool	cmdOPER(std::vector<std::string> &cmd);
 		bool	cmdQUIT(std::vector<std::string> &cmd);
 		bool	cmdJOIN(std::vector<std::string> &cmd);
@@ -82,6 +84,7 @@ class Client {
 
         void    			fillDataUser( void );
         void    			sendResponse( void );
+		void				ping();
         bool    			getNickName( std::string toSplit );
         bool    			getUserInfos( std::string toSplit);
 		std::string 	    getPassword( std::string toSplit );
@@ -117,6 +120,9 @@ class Client {
 		int							status;
 		std::vector<std::string>	authentificationCmd;
 		bool						hasNick;
+		time_t						lastPingSent;
+		time_t						lastPongReceived;
+
 
 };
     std::string                 removeLines(std::string);

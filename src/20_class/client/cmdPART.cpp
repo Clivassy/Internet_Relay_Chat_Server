@@ -47,8 +47,6 @@ bool	Client::cmdPART(std::vector<std::string> &cmd)
 				this->server.getChannel(channel_name)->second.sendMessageToClients(PART(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, channel_name), "");
 			this->server.getChannel(channel_name)->second.removeClient(*this);
 		}
-		// TBD supprimer channel vide  ?
-
 	}
 
 	return (toReturn);

@@ -35,6 +35,13 @@ std::string		removeLines( std::string toSplit )
 	return(toSplit);
 }
 
+void	Client::ping()
+{
+	if (difftime(time(0), this->lastPong) > )
+	sendMessage(PING(this->userInfos.hostName));
+}
+
+
 // TO KEEP UNTIL WE FINISH 
 
 // ANCIENNE BOUCLE D'envoi de la commande // JULIA

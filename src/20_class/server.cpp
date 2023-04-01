@@ -31,6 +31,19 @@ std::vector<Client>::iterator Server::getClient(std::string user)
 	return (it); // return end si fd non trouvé
 }
 
+void	Server::pingAllClients()
+{
+	for(std::vector<Client>::iterator it = this->clientList.begin(); it != this->clientList.end(); it++)
+	{
+		it->ping();
+	}
+}
+
+void Server::checkAndRemoveInactiveClients()
+{
+	
+}
+
 void Server::set_port(int port)
 {
 	this->port = port; 
@@ -108,21 +121,6 @@ void Server::run()
 	int pollreturn = -1;
 	while (1)
 	{
-		// pour tests yann
-		//Client cl1(Client(*this));
-		//cl1.userInfos.nickName = "cl1";
-		//Client cl2(Client(*this));
-		//cl2.userInfos.nickName = "cl2";
-		//this->addChannel("chan1");
-		//this->getChannel("chan1").addClient(cl1);
-		//this->addChannel("chan2");
-		//this->addChannel("chan3");
-		//this->getChannel("chan3").addClient(cl1);
-		//this->getChannel("chan3").addClient(cl2);
-		//this->addChannel("chan4");
-		//this->printState();
-		// fin tests yann
-
 		std::cout << BOLD_BLUE << "-------------------------------------------------------------------------------------------------" << RESET << std::endl;
 		std::cout << BOLD_BLUE << "loop step " << i << BLUE << " (1 loop = " << LISTENING_TIMEOUT/1000 << "s)  Waiting for event ... \U0001F634" << RESET << std::endl;
 		pollreturn = poll(&(this->fdListened[0]), this->fdListened.size(), LISTENING_TIMEOUT);
@@ -143,7 +141,8 @@ void Server::run()
 			std::cout << BOLD_BLUE << "Poll delay expired \n\n" << RESET;
 
 		}
-
+		this->pingAllClients(); // TBD ajout check reponse (flag lastPong dans client + deco si delay depassé)
+		this->checkAndRemoveInactiveClients();
 		std::cout << BOLD_BLUE << "Server state at the end of the run loop " << RESET << std::endl;
 		this->printState();
 
