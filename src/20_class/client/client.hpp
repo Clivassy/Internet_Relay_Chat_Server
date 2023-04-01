@@ -97,6 +97,11 @@ class Client {
         bool	            checkDoubleNICK(std::string cmd, std::string errMsg);
         bool	            isClientInServer(std::string nickname);
 
+        //-- commandeKICK.cpp
+        bool                isValidParsingKICK(std::vector<std::string> &cmd);
+
+        //-- commandeINVITE.cpp
+        bool                isValidParsingINVITE(std::vector<std::string> &cmd);
         //-- Getters
         //std::string    getUserName( void );
         //std::string    gethostName( void );
@@ -119,14 +124,11 @@ class Client {
         User                        userInfos;
 		const int			        bufferSize;
 		char				        buffer[BUFFER_SIZE];
-   		std::string                 authentification;
         std::string                 cmd;
 		int							status;
-		std::vector<std::string>	authentificationCmd;
 		bool						hasNick;
 
 };
-    std::string                 removeLines(std::string);
     //std::vector<std::string>    splitCommand(std::string toSplit, char sep);
 
 

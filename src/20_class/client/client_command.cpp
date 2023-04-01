@@ -145,18 +145,10 @@ bool	Client::launchCommand(std::string command)
 	}
 	if (ccmd.size() == 2)
 		vecmd.push_back(ccmd[1]);
-
-
 	if (vecmd.empty())
 	{
 		return (false);
 	}
-
-	//------- Pré authentification pour Yann et Arzu (TEMPORAIRE) ----// JULIA::commentaire
-	//	if (this->status == WAITING)
-	//	this->status = REGISTERED;
-	//	this->hasNick == true;
-	////------------------------------------------------------------ //
 	while (i < 14)
 	{
 		if (vecmd[0] == choice[i])

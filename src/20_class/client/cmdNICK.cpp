@@ -32,13 +32,12 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 	}
 	if (this->status == CONNECTED)
 	{
-		//std::cout << BOLD_PURPLE << "NICKNAME CHANGE" << RESET << std::endl;
-		//sendMessage(NICK_INFORM(this->userInfos.nickName,this->userInfos.userName,this->userInfos.hostName,cmd[1]));
 		if (this->server.isClientExisting(cmd[1]))
 		{
 			sendMessage(this->getPrefix() + ERR_NICKNAMEINUSE(cmd[1]));
 			return (false);
 		}
+		//sendMessage(NICK_INFORM(this->userInfos.nickName,this->userInfos.userName,this->userInfos.hostName,cmd[1]));
 		sendMessage(NICK(this->userInfos.nickName, cmd[1]));
 		this->userInfos.nickName = cmd[1];
 		return (true);

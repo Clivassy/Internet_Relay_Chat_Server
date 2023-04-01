@@ -32,7 +32,7 @@ int		Client::updateChannelModes(char sign, char mode, std::string user)
 		else if (mode == 'o')
 		{
 			// pour l'instant la liste est vide et non initialisée
-			//this->server.getChannel(this->userInfos.nickName)->second.clientOperators.insert(user);
+		//	this->server.getChannel(this->userInfos.nickName)->second.clientOperators.insert(user);
 			sendMessage(this->getPrefix() + RPL_CHANNELMODEIS(this->userInfos.nickName, "+o", user));
 		}
 		else
@@ -142,7 +142,7 @@ bool	Client::parsingErrorChannel(std::vector<std::string> cmd)
 		return (false);
 	}
 	// checker si le client qui fait la commande est channel operator
-	//if (!this->server.getChannel(channelName)->second.isChannelOperators(this->userInfos.nickname]) ) //  client nickname pas présent dans la liste des opérators du channel.
+	//if (!this->server.getChannel(channelName)->second.isClientOperatorChannel(this->userInfos.nickName)) 
 	//	sendMessage(ERR_CHANOPRIVSNEEDED(channelName);
 	if (cmd.size() == 4)
 	{
@@ -194,4 +194,5 @@ bool	Client::cmdMODE(std::vector<std::string> &cmd)
 	
 	// 1) Parsing the Command 
 	// 2) Validating the Command
-	// 3) Updating Modes
+	// 3) Updating Modesmake
+	
