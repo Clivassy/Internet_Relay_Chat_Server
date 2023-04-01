@@ -56,7 +56,7 @@
 
 # define ERR_ERRONEUSNICKNAME(nick) ("432 " + nick + " :Erroneous nickname\r\n")
 /*NICKNAME ERROR*/
-# define ERR_NICKNAMEINUSE(nick) ("433 " + nick + ":Nickname is already in use\r\n")
+# define ERR_NICKNAMEINUSE(nick) (" 433 " + nick + " :Nickname is already in use\r\n")
 
 # define ERR_NOSUCHNICK(invitenick) ("401 " + invitenick + " :No such nick/channel\r\n")
 
@@ -92,9 +92,9 @@
 
 # define ERR_CANNOTSENDTOCHAN(nick, chan) ("404 " + nick + " " + chan + " :Cannot send to channel\r\n")
 
-
+#define RPL_CHANNELMODEIS(nick, mode, user) (" 324 " + nick + " " + mode + " " + user + "\r\n")
 # define ERR_USERSDONTMATCH(nick) ("502 " + nick + " :Cannot change change mode for other users\r\n")
-// #define RPL_UMODEIS()
+# define RPL_UMODEIS(nick, mode, char) (" 221 " + nick + " " + mode + char + "\r\n")
 # define ERR_USERONCHANNEL(nick, invitenick, chan) ("443 " + nick + " " + invitenick + " " + chan + ":is already on channel\r\n")
 
 #endif

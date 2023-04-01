@@ -1,53 +1,93 @@
 #include "client.hpp"
-#define TRUE 1
-#define FALSE 0
 
-int		Client::parseModes(std::string modes)
+#define USER_MODE 0
+#define CHANNEL_MODE 1
+
+int		Client::parseModes(std::string modes, int modeType, std::string user)
 {
 	size_t j = 0;
-	std::cout << BOLD_BLUE << "Argument en un seul mot" << modes << RESET << std::endl;
 	for (j = 0; j < modes.size(); j++)
 	{
 		if (modes[j] == '+' or modes[j] == '-')
 		{
-			//std::cout << BOLD_YELLOW << "----> SEND to UPDAT MODE "<< RESET << std::endl;
-			//std::cout << BOLD_YELLOW << "---->  " << cmd[2][j] << RESET << std::endl;
-			//std::cout << BOLD_YELLOW << "---->  " << cmd[2][j + 1] << RESET << std::endl;
-			updateMode(modes[j], modes[j + 1]);
-		}
+			if (modeType == USER_MODE)
+				updateUserModes(modes[j], modes[j + 1]);
+			else 
+				updateChannelModes(modes[j], modes[j + 1], user);
+		}		
 	}
 	return(0);
 }
 
-int		Client::updateMode(char sign, char argMode)
+int		Client::updateChannelModes(char sign, char mode, std::string user)
 {
-	std::string character(1, argMode);
+	switch (sign)
+	{
+	case '+':
+		if (mode == 'i')
+		{
+			this->server.getChannel(this->userInfos.nickName)->second.isInviteOnly = true;
+			sendMessage(this->getPrefix() + RPL_CHANNELMODEIS(this->userInfos.nickName, "+i", user));
+		}
+		else if (mode == 'o')
+		{
+			// pour l'instant la liste est vide et non initialisée
+			//this->server.getChannel(this->userInfos.nickName)->second.clientOperators.insert(user);
+			sendMessage(this->getPrefix() + RPL_CHANNELMODEIS(this->userInfos.nickName, "+o", user));
+		}
+		else
+			sendMessage(getPrefix() + " 472 " + mode + " :is unknown mode char to me\r\n");
+		break;
+	case '-':
+		if (mode == 'i')
+		{
+			this->server.getChannel(this->userInfos.nickName)->second.isInviteOnly = false;
+			sendMessage(this->getPrefix() + RPL_CHANNELMODEIS(this->userInfos.nickName, "-i", user));
+		}
+		else if (mode == 'o')
+		{
+			// pour l'instant la liste est vide et non initialisée
+			//this->server.getChannel(this->userInfos.nickName)->second.clientOperators.erase(user);
+			sendMessage(this->getPrefix() + RPL_CHANNELMODEIS(this->userInfos.nickName, "-o", user));
+		}
+		else
+			sendMessage(getPrefix() + " 472 " + mode + " :is unknown mode char to me\r\n");
+	default:
+		std::cout << BOLD_RED << "ERROR" << RESET << std::endl;
+		break;
+	}
+	return (0);
+}
+
+int		Client::updateUserModes(char sign, char mode)
+{
+	std::string character(1, mode);
 	if (sign == '+')
 	{
-		if (argMode == 'i')
+		if (mode == 'i')
 		{
 			this->userInfos.invisibleMode = true;
-			sendMessage(getPrefix() + " 221 " + this->userInfos.nickName + " " + "+" + character + "\r\n");
+			sendMessage(getPrefix() + RPL_UMODEIS(this->userInfos.nickName, "+", character));
 		}
 		else 
 		{
-			if (argMode !='o')
+			if (mode !='o')
 				sendMessage(getPrefix() + " 472 " + character + " :is unknown mode char to me\r\n");
 		}
 	}
 	else 
 	{	
-		if (argMode == 'i')
+		if (mode == 'i')
 		{			
 			this->userInfos.invisibleMode = false;
-			sendMessage(getPrefix() + " 221 " + this->userInfos.nickName + " " + "-" + character + "\r\n");
+			sendMessage(getPrefix() + RPL_UMODEIS(this->userInfos.nickName, "-", character));
 		}
-		if (argMode == 'o')
+		if (mode == 'o')
 		{
 			this->userInfos.invisibleMode = false;
-			sendMessage(getPrefix() + " 221 " + this->userInfos.nickName + " " + "-" + character + "\r\n");
+			sendMessage(getPrefix() + RPL_UMODEIS(this->userInfos.nickName, "-", character));
 		}
-		else if (argMode != 'i' and argMode != 'o')
+		else if (mode != 'i' and mode != 'o')
 		{
 			sendMessage(getPrefix() + " 472 " + character + " :is unknown mode char to me\r\n");
 		}
@@ -64,41 +104,66 @@ bool	Client::addUserMode(std::vector<std::string> cmd)
 	}
 	if (cmd.size() == 3)
 	{
-		parseModes(cmd[2]);
+		parseModes(cmd[2], USER_MODE, "");
 		return(true);
 	}
 	else if (cmd.size() > 3)
 	{
 		for (std::vector<std::string>::iterator it = cmd.begin() ; it != cmd.end(); it++)
-			parseModes(*it);
+			parseModes(*it, USER_MODE, "");
 		return (true);
+	}
+	return (true);
+}
+
+// CASE 1) Not enough parameter.
+// CASE 2) Channel does not exist.
+// CASE 3) Client asking is not on the channel. 
+// CASE 4) Client asking is not channel operator. 
+// CASE 5) If +o/-o, User we want to change mode is not on the channel.
+bool	Client::parsingErrorChannel(std::vector<std::string> cmd)
+{
+	std::string channelName = "";
+	if (cmd.size() < 3)
+	{
+		sendMessage(ERR_NEEDMOREPARAMS("MODE"));
+		return (false);
+	}
+	channelName = cmd[1];
+	toLowerStr(channelName);
+	if (!this->server.isChannelExisting(channelName))
+	{
+		sendMessage(ERR_NOSUCHCHANNEL(channelName));
+		return (false);
+	}
+	if (!this->server.getChannel(channelName)->second.isclientConnected(this->userInfos.nickName))
+	{
+		sendMessage(ERR_NOTONCHANNEL(channelName));
+		return (false);
+	}
+	// checker si le client qui fait la commande est channel operator
+	//if (!this->server.getChannel(channelName)->second.isChannelOperators(this->userInfos.nickname]) ) //  client nickname pas présent dans la liste des opérators du channel.
+	//	sendMessage(ERR_CHANOPRIVSNEEDED(channelName);
+	if (cmd.size() == 4)
+	{
+		if (!this->server.getChannel(channelName)->second.isclientConnected(cmd[3]))
+		{
+			sendMessage(ERR_NOSUCHNICK(cmd[3]));
+			return (false);
+		}
 	}
 	return (true);
 }
 
 bool	Client::addChannelMode(std::vector<std::string> cmd)
 {
-	(void)cmd;
-	std::cout << BOLD_RED << "CHANNEL MODE  " << RESET << std::endl;
-	if (this->userInfos.operatorMode == false)
-		sendMessage(ERR_CHANOPRIVSNEEDED(this->server.getChannel(this->userInfos.nickName)->first));
-	/*
-	ERRORS : 
-	- ERR_CHANOPRIVNEEDED : user need to be operator
-	- ERR_NOSUCHNICK : user does not exist in server
-	Faire une fct pour checker si un client est present dans le server. 
-	-> RECUPERER LE CHAN : 
-	- ERR_NOSUCHCHANNEL : channel does not exit 
-	isChannelExisting(std::string name);
-	- ERR_NOTONCHANNEL : user is not in the channel
-	isClientExisting(std::string name);
-
-	ELSE 
-		-> PARSER LE MODE : UNIQUEMENT +I OU -I ACCEPTED
-		-> TURN BOLEEAN TRUE OR FALSE. 
-		-> SENDMESSAGE TO USER WHO CHANGED MODE : channel name + new mode. 
-	*/
-	return (true);
+	if (!parsingErrorChannel(cmd))
+		return(false);
+	std::string targetName = "";
+	if (cmd.size() == 4)
+		targetName = cmd[3];
+	parseModes(cmd[2], CHANNEL_MODE, targetName);
+	return(true);
 }
 
 bool	Client::cmdMODE(std::vector<std::string> &cmd)
@@ -116,6 +181,7 @@ bool	Client::cmdMODE(std::vector<std::string> &cmd)
 		this->addUserMode(cmd);
 	return (true);
 }
+//------------------------------------------------------------------------
 	// cmd : MODE <target> <mode changes>
 	// ex : MODE nickname +i-o+
 	// NB : unlimited number of mode changes in the same command.

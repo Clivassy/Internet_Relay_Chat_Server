@@ -34,6 +34,7 @@ class Channel
 		~Channel( void );
 		bool	isclientConnected(std::string name);
 		bool	isClientBanned(std::string name);
+		bool	isClientOperatorChannel(std::string name);
 		void	sendMessageToClients( std::string msg, std::string sender);
 		void	addClient(Client& client);
 		
@@ -44,6 +45,7 @@ class Channel
 		std::string					topic; // TBD voir on implemente le topic et de cette facon (c'est actuellement utilise pour l'arrivee dans un channel)
 		std::set<std::string>		clientConnected; // userName is used to identify a client
 		std::set<std::string>		clientBanned; // userName is used to identify a client
+		std::set<std::string>		clientOperators; 
 		bool						isInviteOnly;
 };
 

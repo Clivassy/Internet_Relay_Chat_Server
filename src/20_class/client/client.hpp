@@ -80,19 +80,23 @@ class Client {
 		bool	cmdNOTICE(std::vector<std::string> &cmd);
 		bool	cmdWHOIS(std::vector<std::string> &cmd);
 
-        void    			fillDataUser( void );
-        void    			sendResponse( void );
-        bool    			getNickName( std::string toSplit );
-        bool    			getUserInfos( std::string toSplit);
-		std::string 	    getPassword( std::string toSplit );
-		std::string			getPrefix( void );
-		void				errorAuthentification ( void );
-        int		            updateMode(char sign, char argMode);
+        //-- client.cpp
 		void				deconnectClient( void );
-        int		            parseModes(std::string modes);
-        void	            checkDoubleNICK(std::string cmd, std::string errMsg);
+        std::string			getPrefix( void );
+       
+        //-- commandMODE.cpp
+        bool                parsingErrorChannel(std::vector<std::string> cmd);
+        int		            updateUserModes(char sign, char mode);
+        int                 updateChannelModes(char sign, char mode, std::string user);
+        int		            parseModes(std::string modes, int modeType, std::string user);
         bool	            addUserMode(std::vector<std::string> cmd);
         bool	            addChannelMode(std::vector<std::string> cmd);
+        std::string		    getChannelName(std::vector<std::string> cmd);
+
+        //-- commandeNICK.cpp
+        bool	            checkDoubleNICK(std::string cmd, std::string errMsg);
+        bool	            isClientInServer(std::string nickname);
+
         //-- Getters
         //std::string    getUserName( void );
         //std::string    gethostName( void );
