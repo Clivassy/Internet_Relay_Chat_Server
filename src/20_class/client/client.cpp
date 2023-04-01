@@ -37,7 +37,7 @@ std::string		removeLines( std::string toSplit )
 
 void	Client::ping()
 {
-	if (difftime(time(0), this->lastPong) > )
+	if (difftime(time(0), this->lastPingSent) > PING_FREQUENCY)
 	sendMessage(PING(this->userInfos.hostName));
 }
 

@@ -25,6 +25,7 @@
 
 # define BUFFER_SIZE 1024
 # define LISTENING_TIMEOUT 10000// delai d'ecoute dans poll() en ms
+# define PING_FREQUENCY 10000// frequence d'envoie de ping au clients en ms
 
 class Client;
 class Channel;

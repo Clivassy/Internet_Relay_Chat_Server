@@ -41,7 +41,7 @@ void	Server::pingAllClients()
 
 void Server::checkAndRemoveInactiveClients()
 {
-	
+
 }
 
 void Server::set_port(int port)
@@ -141,8 +141,8 @@ void Server::run()
 			std::cout << BOLD_BLUE << "Poll delay expired \n\n" << RESET;
 
 		}
-		this->pingAllClients(); // TBD ajout check reponse (flag lastPong dans client + deco si delay depassé)
-		this->checkAndRemoveInactiveClients();
+		//this->pingAllClients(); // TBD ajout check reponse (flag lastPong dans client + deco si delay depassé)
+		//this->checkAndRemoveInactiveClients();
 		std::cout << BOLD_BLUE << "Server state at the end of the run loop " << RESET << std::endl;
 		this->printState();
 
