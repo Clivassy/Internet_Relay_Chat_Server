@@ -27,6 +27,13 @@ void	Client::deconnectClient( void )
 	}
 }
 
+void	Client::ping()
+{
+	sendMessage(PING(this->userInfos.hostName));
+}
+
+
+// TO KEEP UNTIL WE FINISH 
 
 // TO KEEP UNTIL WE FINISH 
 // ANCIENNE BOUCLE D'envoi de la commande // JULIA
@@ -41,15 +48,7 @@ std::string		removeLines( std::string toSplit )
     }
 	return(toSplit);
 }
-
-void	Client::ping()
-{
-	sendMessage(PING(this->userInfos.hostName));
-}
-
-
-// TO KEEP UNTIL WE FINISH 
-
+*/
 // ANCIENNE BOUCLE D'envoi de la commande // JULIA
 /* 
 	memset(client.buffer, 0, client.bufferSize);

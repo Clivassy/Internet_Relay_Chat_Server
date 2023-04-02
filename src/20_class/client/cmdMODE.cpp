@@ -32,7 +32,8 @@ int		Client::updateChannelModes(char sign, char mode, std::string user)
 		else if (mode == 'o')
 		{
 			// pour l'instant la liste est vide et non initialisée
-		//	this->server.getChannel(this->userInfos.nickName)->second.clientOperators.insert(user);
+			if (this->server.getChannel(this->userInfos.nickName)->second.clientOperators.size() > 0)
+				this->server.getChannel(this->userInfos.nickName)->second.clientOperators.insert(user);
 			sendMessage(this->getPrefix() + RPL_CHANNELMODEIS(this->userInfos.nickName, "+o", user));
 		}
 		else
@@ -47,7 +48,8 @@ int		Client::updateChannelModes(char sign, char mode, std::string user)
 		else if (mode == 'o')
 		{
 			// pour l'instant la liste est vide et non initialisée
-			//this->server.getChannel(this->userInfos.nickName)->second.clientOperators.erase(user);
+			if (this->server.getChannel(this->userInfos.nickName)->second.clientOperators.size() > 0)
+				this->server.getChannel(this->userInfos.nickName)->second.clientOperators.erase(user);
 			sendMessage(this->getPrefix() + RPL_CHANNELMODEIS(this->userInfos.nickName, "-o", user));
 		}
 		else
@@ -142,8 +144,8 @@ bool	Client::parsingErrorChannel(std::vector<std::string> cmd)
 		return (false);
 	}
 	// checker si le client qui fait la commande est channel operator
-	//if (!this->server.getChannel(channelName)->second.isClientOperatorChannel(this->userInfos.nickName)) 
-	//	sendMessage(ERR_CHANOPRIVSNEEDED(channelName);
+	if (!this->server.getChannel(channelName)->second.isClientOperatorChannel(this->userInfos.nickName)) 
+		sendMessage(ERR_CHANOPRIVSNEEDED(channelName));
 	if (cmd.size() == 4)
 	{
 		if (!this->server.getChannel(channelName)->second.isclientConnected(cmd[3]))

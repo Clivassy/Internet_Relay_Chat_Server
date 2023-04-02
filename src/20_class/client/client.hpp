@@ -82,17 +82,9 @@ class Client {
 		bool	cmdNOTICE(std::vector<std::string> &cmd);
 		bool	cmdWHOIS(std::vector<std::string> &cmd);
 
-        void    			fillDataUser( void );
-        void    			sendResponse( void );
 		void				ping();
-        bool    			getNickName( std::string toSplit );
-        bool    			getUserInfos( std::string toSplit);
-		std::string 	    getPassword( std::string toSplit );
 		std::string			getPrefix( void );
-		void				errorAuthentification ( void );
-        int		            updateMode(char sign, char argMode);
 		void				deconnectClient( void );
-        std::string			getPrefix( void );
        
         //-- commandMODE.cpp
         bool                parsingErrorChannel(std::vector<std::string> cmd);

@@ -30,8 +30,8 @@ bool	Client::isValidParsingINVITE(std::vector<std::string> &cmd)
     }
     if (this->server.getChannel(cmd[2])->second.isInviteOnly == true)
     {
-	    //if (!this->server.getChannel(cmd[2])->second.isClientOperatorChannel(this->userInfos.nickName)) 
-	    //	sendMessage(ERR_CHANOPRIVSNEEDED(cmd[2]));
+	    if (!this->server.getChannel(cmd[2])->second.isClientOperatorChannel(this->userInfos.nickName)) 
+	    	sendMessage(ERR_CHANOPRIVSNEEDED(cmd[2]));
         return(false);
     }
     return (true);
@@ -43,7 +43,7 @@ bool	Client::cmdINVITE(std::vector<std::string> &cmd)
 		return(false);
     if (!isValidParsingINVITE(cmd))
 		return(false);
-	//this->server.getChannel(cmd[1])->second.addCLient(this->userInfos.nickName);
+	//this->server.getChannel(cmd[1])->second.addClient(this->userInfos.nickName);
 	//  => de Yann en passant le nickname du user. 
 	return(true);
  
