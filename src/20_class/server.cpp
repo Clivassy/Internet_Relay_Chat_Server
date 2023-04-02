@@ -31,17 +31,47 @@ std::vector<Client>::iterator Server::getClient(std::string user)
 	return (it); // return end si fd non trouvé
 }
 
+// ping les client connectés toutes les PING_FREQUENCY ms
 void	Server::pingAllClients()
 {
 	for(std::vector<Client>::iterator it = this->clientList.begin(); it != this->clientList.end(); it++)
 	{
-		it->ping();
+		if (it->status == 4)
+		{
+			if (difftime(time(0), it->lastPingSent) > PING_FREQUENCY / 1000)
+			{
+				it->ping();
+				it->lastPingSent = time(0);
+			}
+		}
+
 	}
 }
 
 void Server::checkAndRemoveInactiveClients()
 {
+	for(std::vector<Client>::iterator it = this->clientList.begin(); it != this->clientList.end(); it++)
+	{
+		// WAIT_TIME_BEFORE_KILL = xxxxxxx
+		// -----ping-pong---------ping-pong----------ping----time(0)
+		// -------|---|-------------|---|-------------|------|--------
+		// --------xxx---------------xxx---------------xxxxxxx <- kill
 
+		// 1er check equivaut a regarder si un ping a ete envoyé (ping>pong) sinon ca veut dire qu'on a deja eu la reponse au dernier ping
+		// 2n check pour voir si le pong met trop de temps a revenir apres le dernier ping
+		if (difftime(it->lastPingSent, it->lastPongReceived) > 0 && difftime(time(0), it->lastPingSent) > WAIT_TIME_BEFORE_KILL / 1000) 
+		{
+			this->killclient(it->userInfos.nickName, "No response to ping in time");
+		}
+	}
+}
+
+void Server::killclient(std::string name, std::string reason)
+{
+	(void)reason;
+	// TBD refaire kill du cient (suppression dans fdListened, clientList et de l'objet client si c'est pas auto)
+	// TBD attention, voir avant pourquoi irssi ne repond pas au 1er ping
+	std::cout << BOLD_RED << "TBD: fonction to kill Client: " << name << RESET << std::endl;
 }
 
 void Server::set_port(int port)
@@ -141,8 +171,8 @@ void Server::run()
 			std::cout << BOLD_BLUE << "Poll delay expired \n\n" << RESET;
 
 		}
-		//this->pingAllClients(); // TBD ajout check reponse (flag lastPong dans client + deco si delay depassé)
-		//this->checkAndRemoveInactiveClients();
+		this->pingAllClients(); // TBD ajout check reponse (flag lastPong dans client + deco si delay depassé)
+		this->checkAndRemoveInactiveClients();
 		std::cout << BOLD_BLUE << "Server state at the end of the run loop " << RESET << std::endl;
 		this->printState();
 

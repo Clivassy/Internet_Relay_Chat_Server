@@ -5,6 +5,9 @@ server(serv), bufferSize(BUFFER_SIZE), status(WAITING),hasNick(false)
 { 
 	this->userInfos.invisibleMode = true;
 	this->userInfos.operatorMode = false;
+	this->lastPingSent = time(0);
+	this->lastPongReceived = time(0);
+	
 }
 
 Client::~Client(){ }
@@ -37,7 +40,6 @@ std::string		removeLines( std::string toSplit )
 
 void	Client::ping()
 {
-	if (difftime(time(0), this->lastPingSent) > PING_FREQUENCY)
 	sendMessage(PING(this->userInfos.hostName));
 }
 
