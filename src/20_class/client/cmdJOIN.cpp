@@ -66,7 +66,7 @@ bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 			toReturn = false;
 		}
 		this->server.addChannel(channel_name); // check existence channel fait dans addChannel
-		this->server.getChannel(channel_name)->second.addClient(*this);
+		this->server.getChannel(channel_name)->second.addClient(this->userInfos.nickName);
 	}
 	return (toReturn);
 }

@@ -33,7 +33,7 @@ bool	Client::cmdPING(std::vector<std::string> &cmd)
 		return (false);
 	}
 	//std::cout << "PONG " + cmd[1] + "\r" << std::endl;
-	sendMessage("PONG " + cmd[1] + "\r");
+	sendMessage("PONG " + cmd[1] + "\r\n");
 	return (true);
 }
 

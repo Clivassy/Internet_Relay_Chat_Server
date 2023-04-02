@@ -34,8 +34,8 @@ class Channel
 		~Channel( void );
 		bool	isclientConnected(std::string name);
 		bool	isClientBanned(std::string name);
-		void	addClient(Client& client);
-		void	removeClient(Client& client);
+		void	addClient(std::string name);
+		void	removeClient(std::string name);
 		void	sendMessageToClients( std::string msg, std::string sender);
 		
 

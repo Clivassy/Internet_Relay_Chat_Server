@@ -61,8 +61,8 @@ bool	Client::cmdPRIVMSG(std::vector<std::string> &cmd)
 			return (false);
 		}
 		std::string msg = cmd[2];
-		std::string pingmessaage = "PING\r\n"; // TBD ping avant sinon 1er message non recu apres inactivité -> a sup qd ca marchera sans
-		sendCustom(this->server.getClient(nickNameClientReceiver)->socketFd , pingmessaage.c_str(), pingmessaage.size(), 0); // TBD sup avec ping
+		//std::string pingmessaage = "PING\r\n"; // TBD ping avant sinon 1er message non recu apres inactivité -> a sup qd ca marchera sans
+		//sendCustom(this->server.getClient(nickNameClientReceiver)->socketFd , pingmessaage.c_str(), pingmessaage.size(), 0); // TBD sup avec ping
 		std::string msgToSend = ":" + this->userInfos.nickName + " PRIVMSG " + nickNameClientReceiver + " :" + msg + "\r\n";
 		this->server.getClient(nickNameClientReceiver)->sendMessage(msgToSend);
 
