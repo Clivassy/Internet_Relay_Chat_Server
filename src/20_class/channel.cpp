@@ -36,7 +36,7 @@ bool	Channel::isClientBanned(std::string name)
 // Ajouter le fd du clien qui se connecte au serveur dans la liste des clients connectés
 void Channel::addClient(Client& client)
 {
-	if (isClientBanned(client.userInfos.nickName))
+	if (isClientBanned(client.userInfos.nickName)) // TBD peut etre sortir ce test de la fonction si checké en amont
 	{
 		// TBD a tester quand ban (commande KICK) fait
 		ERR_BANNEDFROMCHAN(client.userInfos.nickName, this->name);
@@ -61,6 +61,11 @@ void Channel::addClient(Client& client)
 		
 		// annonce arrivée aux autres clients
 		this->sendMessageToClients(JOIN(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, this->name), "");
+}
+
+void Channel::removeClient(Client& client)
+{
+	this->clientConnected.erase(client.userInfos.nickName);
 }
 
 // Send msg a tous les clients connectés sauf a sender

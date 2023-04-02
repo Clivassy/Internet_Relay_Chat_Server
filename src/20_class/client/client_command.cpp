@@ -70,23 +70,6 @@ bool	Client::cmdQUIT(std::vector<std::string> &cmd)
 }
 
 
-// Supprime un client ou des channels
-bool	Client::cmdPART(std::vector<std::string> &cmd)
-{
-	if (cmd.size() < 2)
-	{
-		sendMessage(ERR_NEEDMOREPARAMS("PART"));
-		return (false);
-	}
-	// ERR_NOSUCHCHANNEL si le channel n'exidte pas 
-	// ERR_NOTONCHANNEL si le channel existe mais le client n'est pas dedans
-	
-	// the user will receive a PART message from the server for each channel they have been removed from. <reason> is the reason that the client has left the channel(s).
-	// Servers SHOULD NOT send multiple channels in this message to clients, and SHOULD distribute these multiple-channel JOIN messages as a series of messages with a single channel name on each.
-	return (true);
-}
-
-// Commandes ARZU => déplacée dans des fichiers indépendants // TO REMOVE 
 // Parameters: <nickname> <channel>
 /*bool	Client::cmdINVITE(std::vector<std::string> &cmd)
 {
@@ -135,8 +118,8 @@ bool	Client::launchCommand(std::string command)
 	
 	std::vector<std::string> ccmd = split(command, ':');
 	std::vector<std::string> vecmd = split(ccmd[0], ' ');
-	std::string	choice[15] = {"CAP", "PASS", "NICK", "USER", "PING", "OPER", "QUIT", "JOIN", "PART", "PRIVMSG", "NOTICE", "MODE", "INVITE", "KICK", "WHOIS"};
-	bool	(Client::*f[15])(std::vector<std::string> &) = {&Client::cmdCAP, &Client::cmdPASS, &Client::cmdNICK, &Client::cmdUSER, &Client::cmdPING, &Client::cmdOPER, &Client::cmdQUIT, &Client::cmdJOIN, &Client::cmdPART, &Client::cmdPRIVMSG, &Client::cmdNOTICE, &Client::cmdMODE, &Client::cmdINVITE, &Client::cmdKICK, &Client::cmdWHOIS};
+	std::string	choice[16] = {"CAP", "PASS", "NICK", "USER", "PING", "PONG", "OPER", "QUIT", "JOIN", "PART", "PRIVMSG", "NOTICE", "MODE", "INVITE", "KICK", "WHOIS"};
+	bool	(Client::*f[16])(std::vector<std::string> &) = {&Client::cmdCAP, &Client::cmdPASS, &Client::cmdNICK, &Client::cmdUSER, &Client::cmdPING, &Client::cmdPONG, &Client::cmdOPER, &Client::cmdQUIT, &Client::cmdJOIN, &Client::cmdPART, &Client::cmdPRIVMSG, &Client::cmdNOTICE, &Client::cmdMODE, &Client::cmdINVITE, &Client::cmdKICK, &Client::cmdWHOIS};
 	int i = 0;
 
 	if (ccmd.size() != 1 && ccmd.size() != 2)

@@ -31,6 +31,49 @@ std::vector<Client>::iterator Server::getClient(std::string user)
 	return (it); // return end si fd non trouvé
 }
 
+// ping les client connectés toutes les PING_FREQUENCY ms
+void	Server::pingAllClients()
+{
+	for(std::vector<Client>::iterator it = this->clientList.begin(); it != this->clientList.end(); it++)
+	{
+		if (it->status == 4)
+		{
+			if (difftime(time(0), it->lastPingSent) > PING_FREQUENCY / 1000)
+			{
+				it->ping();
+				it->lastPingSent = time(0);
+			}
+		}
+
+	}
+}
+
+void Server::checkAndRemoveInactiveClients()
+{
+	for(std::vector<Client>::iterator it = this->clientList.begin(); it != this->clientList.end(); it++)
+	{
+		// WAIT_TIME_BEFORE_KILL = xxxxxxx
+		// -----ping-pong---------ping-pong----------ping----time(0)
+		// -------|---|-------------|---|-------------|------|--------
+		// --------xxx---------------xxx---------------xxxxxxx <- kill
+
+		// 1er check equivaut a regarder si un ping a ete envoyé (ping>pong) sinon ca veut dire qu'on a deja eu la reponse au dernier ping
+		// 2n check pour voir si le pong met trop de temps a revenir apres le dernier ping
+		if (difftime(it->lastPingSent, it->lastPongReceived) > 0 && difftime(time(0), it->lastPingSent) > WAIT_TIME_BEFORE_KILL / 1000) 
+		{
+			this->killclient(it->userInfos.nickName, "No response to ping in time");
+		}
+	}
+}
+
+void Server::killclient(std::string name, std::string reason)
+{
+	(void)reason;
+	// TBD refaire kill du cient (suppression dans fdListened, clientList et de l'objet client si c'est pas auto)
+	// TBD attention, voir avant pourquoi irssi ne repond pas au 1er ping
+	std::cout << BOLD_RED << "TBD: fonction to kill Client: " << name << RESET << std::endl;
+}
+
 void Server::set_port(int port)
 {
 	this->port = port; 
@@ -108,21 +151,6 @@ void Server::run()
 	int pollreturn = -1;
 	while (1)
 	{
-		// pour tests yann
-		//Client cl1(Client(*this));
-		//cl1.userInfos.nickName = "cl1";
-		//Client cl2(Client(*this));
-		//cl2.userInfos.nickName = "cl2";
-		//this->addChannel("chan1");
-		//this->getChannel("chan1").addClient(cl1);
-		//this->addChannel("chan2");
-		//this->addChannel("chan3");
-		//this->getChannel("chan3").addClient(cl1);
-		//this->getChannel("chan3").addClient(cl2);
-		//this->addChannel("chan4");
-		//this->printState();
-		// fin tests yann
-
 		std::cout << BOLD_BLUE << "-------------------------------------------------------------------------------------------------" << RESET << std::endl;
 		std::cout << BOLD_BLUE << "loop step " << i << BLUE << " (1 loop = " << LISTENING_TIMEOUT/1000 << "s)  Waiting for event ... \U0001F634" << RESET << std::endl;
 		pollreturn = poll(&(this->fdListened[0]), this->fdListened.size(), LISTENING_TIMEOUT);
@@ -143,7 +171,8 @@ void Server::run()
 			std::cout << BOLD_BLUE << "Poll delay expired \n\n" << RESET;
 
 		}
-
+		this->pingAllClients(); // TBD ajout check reponse (flag lastPong dans client + deco si delay depassé)
+		this->checkAndRemoveInactiveClients();
 		std::cout << BOLD_BLUE << "Server state at the end of the run loop " << RESET << std::endl;
 		this->printState();
 
@@ -312,7 +341,9 @@ void Server::printState()
 		std::cout << "nickName " << it->userInfos.nickName << " | ";
 		std::cout << "userName " << it->userInfos.userName << " | ";
 		std::cout << "socketFd " << it->socketFd << " | ";
-		std::cout << "status " << PRINT_STATUS(it->status) << " (" << it->status << "/4)" ;
+		std::cout << "status " << PRINT_STATUS(it->status) << " (" << it->status << "/4)" << " | " ;
+		std::cout << "invisible " << PRINT_BOOL(it->userInfos.invisibleMode) << " | " ;
+		std::cout << "operator " << PRINT_BOOL(it->userInfos.operatorMode);
 //		# define COMING 1
 //# define REGISTERED 2
 //# define BAD_PASSWORD 3

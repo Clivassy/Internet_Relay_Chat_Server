@@ -31,7 +31,6 @@ std::vector<std::string> split(std::string str, std::string separator)
 	}
 	if (!str.empty())
 		output.push_back(str);
-	output.push_back(std::string(""));
 	return (output);
 }
 

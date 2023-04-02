@@ -34,9 +34,10 @@ class Channel
 		~Channel( void );
 		bool	isclientConnected(std::string name);
 		bool	isClientBanned(std::string name);
+		void	addClient(Client& client);
+		void	removeClient(Client& client);
 		bool	isClientOperatorChannel(std::string name);
 		void	sendMessageToClients( std::string msg, std::string sender);
-		void	addClient(Client& client);
 		
 
 	public: // TBD remettre en protected avec friend ou getteur

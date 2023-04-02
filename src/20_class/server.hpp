@@ -24,7 +24,9 @@
 
 
 # define BUFFER_SIZE 1024
-# define LISTENING_TIMEOUT 30000// delai d'ecoute dans poll() en ms
+# define LISTENING_TIMEOUT 2000// delai d'ecoute dans poll() en ms
+# define PING_FREQUENCY 10000// frequence d'envoie de ping au clients en ms
+# define WAIT_TIME_BEFORE_KILL 5000// temps d'attente apres un ping avant de supprimer client en ms, doit etre 
 
 class Client;
 class Channel;
@@ -59,7 +61,9 @@ class Server
 		void							listen_client(Client &client);
 		std::vector<Client>::iterator	getClient(int fd);
 		std::vector<Client>::iterator	getClient(std::string user);
-
+		void							pingAllClients();
+		void							checkAndRemoveInactiveClients();
+		void							killclient(std::string name, std::string reason);
 
 		// channel
 		bool										isChannelExisting(std::string name);

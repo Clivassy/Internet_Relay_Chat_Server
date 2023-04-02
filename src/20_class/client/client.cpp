@@ -5,6 +5,9 @@ server(serv), bufferSize(BUFFER_SIZE), status(WAITING),hasNick(false)
 { 
 	this->userInfos.invisibleMode = true;
 	this->userInfos.operatorMode = false;
+	this->lastPingSent = time(0);
+	this->lastPongReceived = time(0);
+	
 }
 
 Client::~Client(){ }
@@ -38,7 +41,17 @@ std::string		removeLines( std::string toSplit )
     }
 	return(toSplit);
 }
-	
+
+void	Client::ping()
+{
+	sendMessage(PING(this->userInfos.hostName));
+}
+
+
+// TO KEEP UNTIL WE FINISH 
+
+// ANCIENNE BOUCLE D'envoi de la commande // JULIA
+/* 
 	memset(client.buffer, 0, client.bufferSize);
 	client.authentificationCmd.clear();
 	std::vector<std::string> tmp;
