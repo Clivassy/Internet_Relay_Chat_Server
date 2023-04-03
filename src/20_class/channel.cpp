@@ -11,6 +11,13 @@ Channel::~Channel( void )
 
 }
 
+bool Channel::isClientOperatorChannel(std::string name)
+{
+	if (this->clientOperators.count(name) > 0)
+		return (true);
+	return false;
+}
+
 bool	Channel::isclientConnected(std::string name)
 {
 	if (this->clientConnected.count(name) > 0)

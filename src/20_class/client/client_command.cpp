@@ -71,7 +71,7 @@ bool	Client::cmdQUIT(std::vector<std::string> &cmd)
 
 
 // Parameters: <nickname> <channel>
-bool	Client::cmdINVITE(std::vector<std::string> &cmd)
+/*bool	Client::cmdINVITE(std::vector<std::string> &cmd)
 {
 	if (cmd.size() < 3)
 	{
@@ -96,7 +96,7 @@ bool	Client::cmdKICK(std::vector<std::string> &cmd)
 	}
 	// supprime le user du channel
 	return (true);
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////////////
 bool	Client::cmdWHOIS(std::vector<std::string> &cmd)
@@ -109,19 +109,6 @@ bool	Client::cmdWHOIS(std::vector<std::string> &cmd)
 	return (true);
 }
 
-bool	Client::cmdCAP(std::vector<std::string> &cmd)
-{
-	if (cmd.size() == 2)
-	{
-		//std::cout << RED << cmd[1] << std::endl;
-		if (cmd[1].compare("LS") == 0)
-		{
-			this->status = COMING;
-			return (true);
-		}
-	}
-	return (false);
-}
 
 //- PASS, NICK, USER, PING, OPER, QUIT, JOIN, PART, PRIVMSG, NOTICE, MODE, INVITE. KICK, WHOIS
 bool	Client::launchCommand(std::string command)
@@ -141,18 +128,10 @@ bool	Client::launchCommand(std::string command)
 	}
 	if (ccmd.size() == 2)
 		vecmd.push_back(ccmd[1]);
-
-
 	if (vecmd.empty())
 	{
 		return (false);
 	}
-
-	//------- Pré authentification pour Yann et Arzu (TEMPORAIRE) ----// JULIA::commentaire
-	//	if (this->status == WAITING)
-	//	this->status = REGISTERED;
-	//	this->hasNick == true;
-	////------------------------------------------------------------ //
 	while (i < 14)
 	{
 		if (vecmd[0] == choice[i])
