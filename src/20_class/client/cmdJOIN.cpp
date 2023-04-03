@@ -47,6 +47,8 @@
 // return false si un channel n'a pas pu etre rejoint
 bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 {
+	if (this->status != CONNECTED)
+		return (false);
 	bool toReturn = true;
 	if (cmd.size() <=1)
 	{
@@ -56,16 +58,26 @@ bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 	std::vector<std::string> listOfChannelToAdd = split(cmd[1], ",");
 	std::string channel_name;
 
+
 	for (std::vector<std::string>::iterator it = listOfChannelToAdd.begin(); it != listOfChannelToAdd.end(); it++)
 	{
 		channel_name = *it;
 		toLowerStr(channel_name);
+		if (this->server.getChannel(channel_name)->second.isInviteOnly)
+		{
+			this->sendMessage(ERR_INVITEONLYCHAN(this->userInfos.nickName, channel_name));
+			toReturn = false;
+		}
 		if (channel_name.size() <= 1 || !isChannelName(channel_name))
 		{
 			this->sendMessage(ERR_BADCHANMASK(channel_name));
 			toReturn = false;
 		}
-		this->server.addChannel(channel_name); // check existence channel fait dans addChannel
+		if (!(this->server.isChannelExisting(channel_name)))
+		{
+			this->server.addChannel(channel_name);
+			this->server.getChannel(channel_name)->second.addOperator(this->userInfos.nickName);
+		}
 		this->server.getChannel(channel_name)->second.addClient(this->userInfos.nickName);
 	}
 	return (toReturn);

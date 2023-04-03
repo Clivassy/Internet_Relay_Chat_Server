@@ -33,7 +33,7 @@ bool	Channel::isClientBanned(std::string name)
 }
 
 
-// Ajouter le fd du clien qui se connecte au serveur dans la liste des clients connectés
+// fonction prenant initialement un objet Client en argument, c'est pour ca qu'elle est codé de cette facon
 void Channel::addClient(std::string name)
 {
 	Client& client = *(this->server.getClient(name));
@@ -64,10 +64,21 @@ void Channel::addClient(std::string name)
 		this->sendMessageToClients(JOIN(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, this->name), "");
 }
 
+void Channel::addOperator(std::string name)
+{
+		this->clientOperators.insert(name);
+}
+
+// fonction prenant initialement un objet Client en argument, c'est pour ca qu'elle est codé de cette facon
 void Channel::removeClient(std::string name)
 {
 	Client& client = *(this->server.getClient(name));
 	this->clientConnected.erase(client.userInfos.nickName);
+}
+
+void Channel::removeOperator(std::string name)
+{
+	this->clientOperators.erase(name);
 }
 
 // Send msg a tous les clients connectés sauf a sender

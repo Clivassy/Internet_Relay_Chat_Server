@@ -21,6 +21,8 @@
 
 bool	Client::cmdPRIVMSG(std::vector<std::string> &cmd)
 {
+	if (this->status != CONNECTED)
+		return (false);
 	if (cmd.size() < 3)
 	{
 		std::cout << ERR_NEEDMOREPARAMS("PRIVMSG");

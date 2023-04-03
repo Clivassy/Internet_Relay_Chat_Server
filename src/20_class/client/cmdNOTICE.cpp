@@ -6,6 +6,8 @@
 
 bool	Client::cmdNOTICE(std::vector<std::string> &cmd)
 {
+	if (this->status != CONNECTED)
+		return (false);
 	if (cmd.size() < 3)
 	{
 		return (false);

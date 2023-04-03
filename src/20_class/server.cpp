@@ -36,7 +36,7 @@ void	Server::pingAllClients()
 {
 	for(std::vector<Client>::iterator it = this->clientList.begin(); it != this->clientList.end(); it++)
 	{
-		if (it->status == 4)
+		if (it->status == CONNECTED)
 		{
 			if (difftime(time(0), it->lastPingSent) > PING_FREQUENCY / 1000)
 			{
@@ -368,9 +368,17 @@ void Server::printState()
 	}
 	std::cout << "]" << std::endl;
 
-	// print list of connected clients in channels
 	for (std::map<std::string, Channel>::iterator it=this->channelList.begin(); it != this->channelList.end(); it++)
 	{
+		// print status in channels
+		std::cout << BLUE_PIPE << CYAN << "  Channel " << it->first << ": ";
+		std::cout << "name " << it->second.name << " | ";
+		std::cout << "topic '" << it->second.topic << "' | ";
+		std::cout << "isInviteOnly " << PRINT_BOOL(it->second.isInviteOnly);
+		std::cout << RESET << std::endl;
+	
+
+		// print list of connected clients in channels
 		std::cout << BLUE_PIPE << CYAN << "  Clients in " << it->first << ": [";
 		for (std::set<std::string>::iterator it_client=it->second.clientConnected.begin(); it_client != it->second.clientConnected.end(); it_client++)
 		{
@@ -380,6 +388,19 @@ void Server::printState()
 			--it_client;
 		}
 		std::cout << "]" << std::endl;
+
+		// print list of operators in channels
+		std::cout << BLUE_PIPE << CYAN << "  Operators in " << it->first << ": [";
+		for (std::set<std::string>::iterator it_client=it->second.clientOperators.begin(); it_client != it->second.clientOperators.end(); it_client++)
+		{	
+			std::cout << *it_client;
+			if(++it_client != it->second.clientOperators.end())
+				std::cout << ", ";
+			--it_client;
+		}
+		std::cout << "]" << std::endl;
+
+
 	}
 
 	std::cout << RESET << std::endl << std::endl;

@@ -11,6 +11,8 @@
 // return false si une erreur rencontrée
 bool	Client::cmdPART(std::vector<std::string> &cmd)
 {
+	if (this->status != CONNECTED)
+		return (false);
 	bool toReturn = true;
 
 	if (cmd.size() < 2)

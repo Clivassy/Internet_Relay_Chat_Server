@@ -24,9 +24,9 @@
 
 
 # define BUFFER_SIZE 1024
-# define LISTENING_TIMEOUT 2000// delai d'ecoute dans poll() en ms
-# define PING_FREQUENCY 10000// frequence d'envoie de ping au clients en ms
-# define WAIT_TIME_BEFORE_KILL 5000// temps d'attente apres un ping avant de supprimer client en ms, doit etre 
+# define LISTENING_TIMEOUT 10000// delai d'ecoute dans poll() en ms // TBD remettre loop a 1000ms a la fin
+# define PING_FREQUENCY 120000// frequence d'envoie de ping au clients en ms (120ms = temps habituel)
+# define WAIT_TIME_BEFORE_KILL 20000// temps d'attente apres un ping avant de supprimer client en ms // TBD remettre time a 10000ms a la fin
 
 class Client;
 class Channel;
