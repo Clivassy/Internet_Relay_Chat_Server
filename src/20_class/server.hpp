@@ -59,10 +59,12 @@ class Server
 		void							manage_poll_event();
 		void							addNewClient();
 		void							listen_client(Client &client);
+		std::vector<pollfd>::iterator	getPollfd(int fd);
 		std::vector<Client>::iterator	getClient(int fd);
 		std::vector<Client>::iterator	getClient(std::string user);
 		void							pingAllClients();
-		void							checkAndRemoveInactiveClients();
+		void							checkInactiveClients();
+		void							removeClientWithNegativeRevent();
 		void							killclient(std::string name, std::string reason);
 
 		// channel
