@@ -7,10 +7,8 @@
 # include <string>
 # include "../../10_tools/errors.hpp"
 
-
 //source https://modern.ircdocs.horse/#client-messages
 
-/////////////////////////////////////////////////////////
 void	Client::sendMessage(std::string str)
 {
 	sendCustom(this->socketFd, str.c_str(), str.size(), 0);
@@ -52,10 +50,6 @@ bool	Client::cmdKICK(std::vector<std::string> &cmd)
 	// supprime le user du channel
 	return (true);
 }*/
-
-////////////////////////////////////////////////////////////////////////////
-
-
 
 //- PASS, NICK, USER, PING, OPER, QUIT, JOIN, PART, PRIVMSG, NOTICE, MODE, INVITE. KICK, WHOIS
 bool	Client::launchCommand(std::string command)
