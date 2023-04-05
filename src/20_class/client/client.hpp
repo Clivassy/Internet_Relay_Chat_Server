@@ -89,8 +89,9 @@ class Client {
         //-- commandMODE.cpp
         bool                parsingErrorChannel(std::vector<std::string> cmd);
         int		            updateUserModes(char sign, char mode);
-        int                 updateChannelModes(char sign, char mode, std::string user);
-        int		            parseModes(std::string modes, int modeType, std::string user);
+        int                 handleInviteOnlyMode(char sign, char mode, std::string chan );
+        int                 handleOperatorChannelMode(char sign, char mode, std::string user, std::string chan );
+        int		            parseModes(std::string modes, int modeType, std::string user, std::string chan);
         bool	            addUserMode(std::vector<std::string> cmd);
         bool	            addChannelMode(std::vector<std::string> cmd);
         std::string		    getChannelName(std::vector<std::string> cmd);
