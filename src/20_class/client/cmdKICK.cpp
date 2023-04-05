@@ -32,6 +32,6 @@ bool	Client::cmdKICK(std::vector<std::string> &cmd)
 		return(false);
 	if (!isValidParsingKICK(cmd))
 		return(false);
-	this->server.getChannel(cmd[1])->second.removeClient(this->userInfos.nickName);
+	this->server.getChannel(cmd[1])->second.removeConnected(this->userInfos.nickName);
 	return (true);
 }
