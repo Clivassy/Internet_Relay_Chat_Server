@@ -25,51 +25,6 @@ void	Client::sendOtherClient(std::string str)
 	}
 }
 
-bool	Client::cmdPING(std::vector<std::string> &cmd)
-{
-	if (cmd.size() < 2)
-	{
-		sendMessage(ERR_NEEDMOREPARAMS("PING"));
-		return (false);
-	}
-	//std::cout << "PONG " + cmd[1] + "\r" << std::endl;
-	sendMessage("PONG " + cmd[1] + "\r\n");
-	return (true);
-}
-
-bool	Client::cmdOPER(std::vector<std::string> &cmd)
-{
-	if (cmd.size() < 3)
-	{
-		sendMessage(ERR_NEEDMOREPARAMS("OPER"));
-		return (false);
-	}
-	if (cmd[2] != this->server.get_password())
-	{
-		sendMessage(ERR_PASSWDMISMATCH);
-		return (false);
-	}
-	sendMessage(RPL_YOUREOPER(cmd[1]));
-	//The user will also receive a MODE message indicating their new user modes, and other messages may be sent.
-	return (true);
-}
-
-bool	Client::cmdQUIT(std::vector<std::string> &cmd)
-{
-	if (cmd.size() == 1)
-	{
-		sendMessage(QUIT(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName));
-		sendOtherClient(QUIT(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName));
-	}
-	else
-	{
-		sendMessage(QUIT_REASON(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, cmd[1]));	
-		sendOtherClient(QUIT_REASON(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, cmd[1]));	
-	}
-	return (true);
-}
-
-
 // Parameters: <nickname> <channel>
 /*bool	Client::cmdINVITE(std::vector<std::string> &cmd)
 {
@@ -99,15 +54,7 @@ bool	Client::cmdKICK(std::vector<std::string> &cmd)
 }*/
 
 ////////////////////////////////////////////////////////////////////////////
-bool	Client::cmdWHOIS(std::vector<std::string> &cmd)
-{
-	if (cmd.size() < 2)
-	{
-		sendMessage(ERR_NEEDMOREPARAMS("WHOIS"));
-		return (false);
-	}
-	return (true);
-}
+
 
 
 //- PASS, NICK, USER, PING, OPER, QUIT, JOIN, PART, PRIVMSG, NOTICE, MODE, INVITE. KICK, WHOIS
@@ -132,7 +79,7 @@ bool	Client::launchCommand(std::string command)
 	{
 		return (false);
 	}
-	while (i < 14)
+	while (i < 16)
 	{
 		if (vecmd[0] == choice[i])
 		{
@@ -140,6 +87,5 @@ bool	Client::launchCommand(std::string command)
 		}
 		i++;
 	}
-	// sendMessage("Command not found"); //ARZU: commentaire
 	return (false);
 }
