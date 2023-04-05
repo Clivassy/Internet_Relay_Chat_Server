@@ -8,16 +8,16 @@ bool	Client::isValidParsingINVITE(std::vector<std::string> &cmd)
 		sendMessage(ERR_NEEDMOREPARAMS("INVITE"));
 		return (false);
 	}
-  /*if (this->server.isClientExisting(cmd[1]))
+  if (!this->server.isClientExisting(cmd[1]))
   {
       sendMessage(ERR_NOSUCHNICK(cmd[1]));
-	return (false);
+	    return (false);
   }
   if (!this->server.isChannelExisting(cmd[2]))
 	{
 		sendMessage(ERR_NOSUCHCHANNEL(cmd[2]));
 		return (false);
-	}*/
+	}
 	if (!this->server.getChannel(cmd[2])->second.isclientConnected(this->userInfos.nickName))
 	{
 		sendMessage(ERR_NOTONCHANNEL(cmd[2]));
@@ -30,9 +30,11 @@ bool	Client::isValidParsingINVITE(std::vector<std::string> &cmd)
   }
   if (this->server.getChannel(cmd[2])->second.isInviteOnly == true)
   {
-	  if (!this->server.getChannel(cmd[2])->second.isClientOperatorChannel(this->userInfos.nickName)) 
+	  if (!this->server.getChannel(cmd[2])->second.isClientOperatorChannel(this->userInfos.nickName))
+    {
 	  	sendMessage(ERR_CHANOPRIVSNEEDED(cmd[2], this->userInfos.nickName));
       return(false);
+    } 
   }
   return (true);
 }
