@@ -18,8 +18,11 @@ bool	Client::isValidParsingKICK(std::vector<std::string> &cmd)
 		sendMessage(ERR_NOTONCHANNEL(cmd[1]));
 		return (false);
 	}
-	//if (!this->server.getChannel(cmd[1])->second.isClientOperatorChannel(this->userInfos.nickName)) 
-	//	sendMessage(ERR_CHANOPRIVSNEEDED(cmd[1]));
+	if (!this->server.getChannel(cmd[1])->second.isClientOperatorChannel(this->userInfos.nickName)) 
+	{
+		sendMessage(ERR_CHANOPRIVSNEEDED(cmd[1], this->userInfos.nickName));
+		return (false);
+	}
 	return(true);
 }
 
@@ -29,7 +32,6 @@ bool	Client::cmdKICK(std::vector<std::string> &cmd)
 		return(false);
 	if (!isValidParsingKICK(cmd))
 		return(false);
-	//this->server.getChannel(cmd[1])->second.removeCLient(this->userInfos.nickName);
-	//  => de Yann en passant le nickname du user. 
+	this->server.getChannel(cmd[1])->second.removeClient(this->userInfos.nickName);
 	return (true);
 }
