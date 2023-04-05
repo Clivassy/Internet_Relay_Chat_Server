@@ -19,6 +19,7 @@ std::vector<Client>::iterator Server::getClient(int fd)
 	std::cout << BOLD_RED << "fd non trouve dans getclient -> /!\\ pour suite execution (return getClient non valid)" << RESET << std::endl;
 	return (it); // return end si fd non trouvé
 }
+
 std::vector<Client>::iterator Server::getClient(std::string user)
 {
 	std::vector<Client>::iterator it;
@@ -29,6 +30,24 @@ std::vector<Client>::iterator Server::getClient(std::string user)
 		}
 	std::cout << BOLD_RED << "user non trouve dans getclient -> /!\\ pour suite execution (return getClient non valid)" << RESET << std::endl;
 	return (it); // return end si fd non trouvé
+}
+
+std::vector<pollfd>::iterator Server::getClientByFd(std::string user)
+{
+	std::vector<Client>::iterator it;
+	for (it = this->clientList.begin(); it != this->clientList.end(); it++)
+	{
+		if (it->userInfos.nickName == user)		
+			break ;
+	}
+	std::vector<pollfd>::iterator its;
+	for (its = this->fdListened.begin(); its != this->fdListened.end(); its++)
+	{
+		if (its->fd == it->socketFd)
+			return (its);
+	}
+	std::cout << BOLD_RED << "user non trouve dans getclientByFd -> /!\\ pour suite execution (return getClientByFd non valid)" << RESET << std::endl;
+	return (its); // return end si fd non trouvé
 }
 
 // ping les client connectés toutes les PING_FREQUENCY ms
@@ -404,4 +423,18 @@ void Server::printState()
 	}
 
 	std::cout << RESET << std::endl << std::endl;
+}
+
+void	Server::removeClient(std::string name)
+{
+	//rm in fdListened
+	this->fdListened.erase(this->getClientByFd(name));
+	//rm in clientList
+	this->clientList.erase(this->getClient(name));
+	for (std::map<std::string, Channel>::iterator it=this->channelList.begin(); it != this->channelList.end(); it++)
+	{
+		it->second.removeConnected(it->second.name);
+		it->second.removeBanned(it->second.name);
+		it->second.removeOperator(it->second.name);
+	}
 }
