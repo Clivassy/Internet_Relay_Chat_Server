@@ -160,6 +160,66 @@ void Server::init()
 	// TBD fonction pour print les attributs du server
 }
 
+void	Server::removeClient(std::string name)
+{
+	std::cout << "name is removeClient " << name << std::endl;
+	std::vector<Client>::iterator cl = getClient(name);
+	std::vector<pollfd>::iterator pfd = getClientByFd(name);
+//	std::cout << "name is clientList " << cl->userInfos.nickName << std::endl;
+//	std::cout << "name is fdListened " << pfd->fd << cl->socketFd << std::endl;
+	close(pfd->fd);
+	this->fdListened.erase(pfd);
+	this->clientList.erase(cl);
+	if (cl == clientList.begin())
+		std::cout << "bouhhh" << std::endl;
+	for (std::map<std::string, Channel>::iterator it=this->channelList.begin(); it != this->channelList.end(); it++)
+	{
+	//	std::cout << "name is channel " << it->second.name << std::endl;
+		it->second.removeConnected(it->second.name);
+		it->second.removeBanned(it->second.name);
+		it->second.removeOperator(it->second.name);
+	}
+}
+
+void	Server::removeNotOnlineClient(void)
+{
+/*	std::cout << BLUE_PIPE << BOLD_GREEN << "Clients" << RESET << std::endl;
+	std::cout << BLUE_PIPE << GREEN << "  clientList (by nickName): " << "[";
+	for (std::vector<Client>::iterator it = this->clientList.begin(); it != this->clientList.end(); it++)
+	{
+		std::cout << this->getClient(it->socketFd)->userInfos.nickName;
+		if(it + 1 != this->clientList.end())
+			std::cout << ", ";
+	}
+	std::cout << "]";
+	std::cout << RESET << std::endl;
+*/
+	if (clientList.size() == 0)
+		return ;
+	std::vector<Client>::iterator it = clientList.begin();
+	std::vector<Client>::iterator ite = clientList.end();
+    for ( ; it != ite; )
+    {
+        if ((*it).online == false)
+		{
+			this->removeClient((*it).userInfos.nickName);
+		}
+	//	else
+			it++;
+    }	
+
+/*	std::cout << BLUE_PIPE << BOLD_GREEN << "Clients" << RESET << std::endl;
+	std::cout << BLUE_PIPE << GREEN << "  clientList (by nickName): " << "[";
+	for (std::vector<Client>::iterator it = this->clientList.begin(); it != this->clientList.end(); it++)
+	{
+		std::cout << this->getClient(it->socketFd)->userInfos.nickName;
+		if(it + 1 != this->clientList.end())
+			std::cout << ", ";
+	}
+	std::cout << "]";
+	std::cout << RESET << std::endl;
+*/}
+
 void Server::run()
 {
 	this->fdListened.reserve(100);
@@ -190,8 +250,10 @@ void Server::run()
 			std::cout << BOLD_BLUE << "Poll delay expired \n\n" << RESET;
 
 		}
-		this->pingAllClients(); // TBD ajout check reponse (flag lastPong dans client + deco si delay depassé)
-		this->checkAndRemoveInactiveClients();
+		// rm client not on line
+		this->removeNotOnlineClient();
+//		this->pingAllClients(); // TBD ajout check reponse (flag lastPong dans client + deco si delay depassé)
+//		this->checkAndRemoveInactiveClients();
 		std::cout << BOLD_BLUE << "Server state at the end of the run loop " << RESET << std::endl;
 		this->printState();
 
@@ -425,16 +487,4 @@ void Server::printState()
 	std::cout << RESET << std::endl << std::endl;
 }
 
-void	Server::removeClient(std::string name)
-{
-	//rm in fdListened
-	this->fdListened.erase(this->getClientByFd(name));
-	//rm in clientList
-	this->clientList.erase(this->getClient(name));
-	for (std::map<std::string, Channel>::iterator it=this->channelList.begin(); it != this->channelList.end(); it++)
-	{
-		it->second.removeConnected(it->second.name);
-		it->second.removeBanned(it->second.name);
-		it->second.removeOperator(it->second.name);
-	}
-}
+

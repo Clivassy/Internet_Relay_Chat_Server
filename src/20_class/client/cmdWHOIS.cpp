@@ -12,7 +12,6 @@ void	Client::printMode(std::string user)
 		sendMessage(getPrefix() + RPL_UMODEIS(this->userInfos.nickName, "+", "o"));
 }
 
-
 bool	Client::cmdWHOIS(std::vector<std::string> &cmd)
 {
 	if (this->status != CONNECTED)

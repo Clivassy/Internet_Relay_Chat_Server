@@ -9,13 +9,13 @@ bool	Client::cmdOPER(std::vector<std::string> &cmd)
 		sendMessage(this->getPrefix() + ERR_NEEDMOREPARAMS("OPER"));
 		return (false);
 	}
-	if (cmd[2] != this->server.get_password())
+	if (cmd[2] != "admis")
 	{
 		sendMessage(this->getPrefix() + ERR_PASSWDMISMATCH);
 		return (false);
 	}
 	this->userInfos.operatorMode = true;	
-	sendMessage(RPL_YOUREOPER(cmd[1]));
+	sendMessage(RPL_YOUREOPER(this->userInfos.userName));
 	printMode(this->userInfos.userName);
 	return (true);
 }
