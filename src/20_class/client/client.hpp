@@ -131,6 +131,7 @@ class Client {
         std::string                 cmd;
 		int							status;
 		bool						hasNick;
+		bool						online;
 		time_t						lastPingSent;
 		time_t						lastPongReceived;
 

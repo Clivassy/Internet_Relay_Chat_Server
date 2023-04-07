@@ -36,7 +36,8 @@ class Channel
 		bool	isClientBanned(std::string name);
 		void	addClient(std::string name);
 		void	addOperator(std::string name);
-		void	removeClient(std::string name);
+		void	removeConnected(std::string name);
+		void	removeBanned(std::string name);
 		void	removeOperator(std::string name);
 		bool	isClientOperatorChannel(std::string name);
 		void	sendMessageToClients( std::string msg, std::string sender);

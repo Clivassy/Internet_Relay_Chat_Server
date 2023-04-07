@@ -1,7 +1,7 @@
 #include "client.hpp"
 
 Client::Client(Server& serv):
-server(serv), bufferSize(BUFFER_SIZE), status(WAITING),hasNick(false)
+server(serv), bufferSize(BUFFER_SIZE), status(WAITING),hasNick(false), online(true)
 { 
 	this->userInfos.invisibleMode = true;
 	this->userInfos.operatorMode = false;

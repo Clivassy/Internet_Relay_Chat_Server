@@ -19,6 +19,7 @@ std::vector<Client>::iterator Server::getClient(int fd)
 	std::cout << BOLD_RED << "fd non trouve dans getclient -> /!\\ pour suite execution (return getClient non valid)" << RESET << std::endl;
 	return (it); // return end si fd non trouvé
 }
+
 std::vector<Client>::iterator Server::getClient(std::string user)
 {
 	std::vector<Client>::iterator it;
@@ -29,6 +30,24 @@ std::vector<Client>::iterator Server::getClient(std::string user)
 		}
 	std::cout << BOLD_RED << "user non trouve dans getclient -> /!\\ pour suite execution (return getClient non valid)" << RESET << std::endl;
 	return (it); // return end si fd non trouvé
+}
+
+std::vector<pollfd>::iterator Server::getClientByFd(std::string user)
+{
+	std::vector<Client>::iterator it;
+	for (it = this->clientList.begin(); it != this->clientList.end(); it++)
+	{
+		if (it->userInfos.nickName == user)		
+			break ;
+	}
+	std::vector<pollfd>::iterator its;
+	for (its = this->fdListened.begin(); its != this->fdListened.end(); its++)
+	{
+		if (its->fd == it->socketFd)
+			return (its);
+	}
+	std::cout << BOLD_RED << "user non trouve dans getclientByFd -> /!\\ pour suite execution (return getClientByFd non valid)" << RESET << std::endl;
+	return (its); // return end si fd non trouvé
 }
 
 // ping les client connectés toutes les PING_FREQUENCY ms
@@ -141,6 +160,40 @@ void Server::init()
 	// TBD fonction pour print les attributs du server
 }
 
+void	Server::removeClient(std::string name)
+{
+//	std::cout << "name is removeClient " << name << std::endl;
+	std::vector<Client>::iterator cl = getClient(name);
+	std::vector<pollfd>::iterator pfd = getClientByFd(name);
+//	std::cout << "name is clientList " << cl->userInfos.nickName << std::endl;
+//	std::cout << "name is fdListened " << pfd->fd << cl->socketFd << std::endl;
+	close(pfd->fd);
+	this->fdListened.erase(pfd);
+	this->clientList.erase(cl);
+	
+	for (std::map<std::string, Channel>::iterator it=this->channelList.begin(); it != this->channelList.end(); it++)
+	{
+		it->second.removeConnected(it->second.name);
+		it->second.removeBanned(it->second.name);
+		it->second.removeOperator(it->second.name);
+	}
+}
+
+//void	Server::removeNotOnlineClient(void)
+//{
+//	if (clientList.size() == 0)
+//		return ;
+//	std::vector<Client>::iterator it = clientList.begin();
+//	std::vector<Client>::iterator ite = clientList.end();
+//	for ( ; it != ite; it++)
+//	{
+//		if ((*it).online == false
+//		{
+//		this->removeClient((*(it)).userInfos.nickName);
+//		}
+//	}	
+//}
+
 void Server::run()
 {
 	this->fdListened.reserve(100);
@@ -171,6 +224,8 @@ void Server::run()
 			std::cout << BOLD_BLUE << "Poll delay expired \n\n" << RESET;
 
 		}
+		// rm client not on line
+//		this->removeNotOnlineClient();
 		this->pingAllClients(); // TBD ajout check reponse (flag lastPong dans client + deco si delay depassé)
 		this->checkAndRemoveInactiveClients();
 		std::cout << BOLD_BLUE << "Server state at the end of the run loop " << RESET << std::endl;
@@ -405,3 +460,5 @@ void Server::printState()
 
 	std::cout << RESET << std::endl << std::endl;
 }
+
+

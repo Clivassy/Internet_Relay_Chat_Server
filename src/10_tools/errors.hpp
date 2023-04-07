@@ -19,6 +19,7 @@
 //message pour tous les gens sur le channel ":<nick persone qui a join>!<user>@<host> JOIN <channel>"
 
 # define PRIVMSG(nick, user, host, dest, str) (":" + nick + "!" + user + "@" + host + " PRIVMSG " + dest + " :" + str + "\r\n") //dest cest le nom du channel
+
 //pour envoyer 
 
 # define NOTICE(nick, user, host, chan, str) (":" + nick + "!" + user + "@" + host + " NOTICE " + chan + " :" + str + "\r\n")
@@ -53,6 +54,7 @@
 # define ERR_NEEDMOREPARAMS(command) (std::string("461 ") + command + " :Not enough parameters\r\n")
 
 # define ERR_PASSWDMISMATCH "464 :Password incorrect\r\n"
+# define ERR_USERMISMATCH "464 : User incorrect\r\n"
 
 # define ERR_NONICKNAMEGIVEN "431 :No nickname given\r\n"
 

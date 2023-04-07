@@ -61,8 +61,11 @@ class Server
 		void							listen_client(Client &client);
 		std::vector<Client>::iterator	getClient(int fd);
 		std::vector<Client>::iterator	getClient(std::string user);
+		std::vector<pollfd>::iterator	getClientByFd(std::string user);
 		void							pingAllClients();
 		void							checkAndRemoveInactiveClients();
+		void							removeNotOnlineClient(void);
+		void							removeClient(std::string name);
 		void							killclient(std::string name, std::string reason);
 
 		// channel
