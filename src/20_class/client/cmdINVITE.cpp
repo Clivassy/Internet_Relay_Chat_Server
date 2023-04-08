@@ -41,11 +41,14 @@ bool	Client::isValidParsingINVITE(std::vector<std::string> &cmd)
 
 bool	Client::cmdINVITE(std::vector<std::string> &cmd)
 {
-  if (this->status != CONNECTED)
-	  return(false);
-  if (!isValidParsingINVITE(cmd))
-	  return(false);
+	if (this->status != CONNECTED)
+		return(false);
+	if (!isValidParsingINVITE(cmd))
+		return(false);
+	std::string msgToSend = RPL_INVITING(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, cmd[1], cmd[2]);
 	this->server.getChannel(cmd[2])->second.addClient(cmd[1]);
+	sendMessage(msgToSend);
+	this->server.getClient(cmd[1])->sendMessage(msgToSend);
 	return(true);
 }
     /* - ERRORS :
