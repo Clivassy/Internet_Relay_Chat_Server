@@ -27,6 +27,11 @@ void parsing_arguments(int ac, char **av, Server& server)
 
 	//  - validité passsword
 	i = 0;
+	if (!av[2][0]) 
+	{
+		std::cout << BOLD_RED << "Errror : Password can't be empty" << RESET << std::endl;
+		exit(EXIT_FAILURE);
+	}
 	while (av[2][i])
 	{
 		if (av[2][i] == ' ' || av[2][i] == ':')

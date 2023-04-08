@@ -78,6 +78,11 @@ bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 			this->server.addChannel(channel_name);
 			this->server.getChannel(channel_name)->second.addOperator(this->userInfos.nickName);
 		}
+		if (this->server.getChannel(channel_name)->second.isClientBanned(this->userInfos.nickName))
+		{
+			// TBD a tester quand ban (commande KICK) fait
+			ERR_BANNEDFROMCHAN(this->userInfos.nickName, channel_name);
+		}
 		this->server.getChannel(channel_name)->second.addClient(this->userInfos.nickName);
 	}
 	return (toReturn);

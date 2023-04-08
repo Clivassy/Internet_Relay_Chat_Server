@@ -47,7 +47,7 @@ bool	Client::cmdPART(std::vector<std::string> &cmd)
 				}
 			else
 				this->server.getChannel(channel_name)->second.sendMessageToClients(PART(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, channel_name), "");
-			this->server.getChannel(channel_name)->second.removeClient(this->userInfos.nickName);
+			this->server.getChannel(channel_name)->second.removeConnected(this->userInfos.nickName);
 		}
 	}
 

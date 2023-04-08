@@ -1,6 +1,6 @@
 #include "channel.hpp"
 
-Channel::Channel( Server& serv, std::string channel_name):
+Channel::Channel(Server& serv, std::string channel_name):
 server(serv), name(channel_name), isInviteOnly(false)
 {
 	this->topic = "Welcome to the channel " + channel_name + " !!";
@@ -37,31 +37,28 @@ bool	Channel::isClientBanned(std::string name)
 void Channel::addClient(std::string name)
 {
 	Client& client = *(this->server.getClient(name));
-	if (isClientBanned(client.userInfos.nickName)) // TBD peut etre sortir ce test de la fonction si checké en amont
+
+	this->clientConnected.insert(client.userInfos.nickName);
+	// messages de welcome envoyes selon norme IRC 1459 et http://chi.cs.uchicago.edu/chirc/assignment3.html7
+	// TBD a confirmer ce qu'il faut afficher
+	// TBD RPL_TOPIC ne marche pas (il est bien envoyé mais pas affiché coté irssi)
+	//std::string pingmessaage = "PING\r\n"; // TBD ping avant sinon 1er message non recu apres inactivité -> a sup qd ca marchera sans
+	//sendCustom(client.socketFd , pingmessaage.c_str(), pingmessaage.size(), 0);client.sendMessage(RPL_TOPIC(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, this->name, this->topic));
+	std::string clientList;
+	for( std::set<std::string>::iterator it = clientConnected.begin(); it != clientConnected.end(); it++ )
 	{
-		// TBD a tester quand ban (commande KICK) fait
-		ERR_BANNEDFROMCHAN(client.userInfos.nickName, this->name);
-		return;
+		// TBD voir si il faut ajouter qqch en foncion du mode client
+		if (this->isClientOperatorChannel(*it))
+			clientList.append("@");
+		clientList.append(*it);
+		if (it != clientConnected.end())
+			clientList.append(" ");
 	}
-		this->clientConnected.insert(client.userInfos.nickName);
-		// messages de welcome envoyes selon norme IRC 1459 et http://chi.cs.uchicago.edu/chirc/assignment3.html7
-		// TBD a confirmer ce qu'il faut afficher
-		// TBD RPL_TOPIC ne marche pas (il est bien envoyé mais pas affiché coté irssi)
-		//std::string pingmessaage = "PING\r\n"; // TBD ping avant sinon 1er message non recu apres inactivité -> a sup qd ca marchera sans
-		//sendCustom(client.socketFd , pingmessaage.c_str(), pingmessaage.size(), 0);client.sendMessage(RPL_TOPIC(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, this->name, this->topic));
-		std::string clientList;
-		for( std::set<std::string>::iterator it = clientConnected.begin(); it != clientConnected.end(); it++ )
-		{
-			// TBD voir si il faut ajouter qqch en foncion du mode client
-			clientList.append(*it);
-			if (it != clientConnected.end())
-				clientList.append(" ");
-		}
-		client.sendMessage(RPL_NAMREPLY(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, this->name) + clientList + "\r\n");
-		client.sendMessage(RPL_ENDOFNAMES(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, this->name));
-		
-		// annonce arrivée aux autres clients
-		this->sendMessageToClients(JOIN(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, this->name), "");
+	client.sendMessage(RPL_NAMREPLY(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, this->name) + clientList + "\r\n");
+	client.sendMessage(RPL_ENDOFNAMES(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, this->name));
+	
+	// annonce arrivée aux autres clients
+	this->sendMessageToClients(JOIN(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, this->name), "");
 }
 
 void Channel::addOperator(std::string name)
@@ -70,15 +67,22 @@ void Channel::addOperator(std::string name)
 }
 
 // fonction prenant initialement un objet Client en argument, c'est pour ca qu'elle est codé de cette facon
-void Channel::removeClient(std::string name)
+void Channel::removeConnected(std::string name)
 {
 	Client& client = *(this->server.getClient(name));
 	this->clientConnected.erase(client.userInfos.nickName);
 }
 
+void Channel::removeBanned(std::string name)
+{
+	Client& client = *(this->server.getClient(name));
+	this->clientBanned.erase(client.userInfos.nickName);
+}
+
 void Channel::removeOperator(std::string name)
 {
-	this->clientOperators.erase(name);
+	Client& client = *(this->server.getClient(name));
+	this->clientOperators.erase(client.userInfos.nickName);
 }
 
 // Send msg a tous les clients connectés sauf a sender
