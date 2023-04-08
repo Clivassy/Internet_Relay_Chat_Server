@@ -9,6 +9,7 @@
 // Servers SHOULD NOT send multiple channels in this message to clients, and SHOULD distribute these multiple-channel JOIN 
 // messages as a series of messages with a single channel name on each.
 // return false si une erreur rencontrée
+// /PART <channel> <reason>
 bool	Client::cmdPART(std::vector<std::string> &cmd)
 {
 	if (this->status != CONNECTED)
@@ -48,9 +49,17 @@ bool	Client::cmdPART(std::vector<std::string> &cmd)
 			else
 				this->server.getChannel(channel_name)->second.sendMessageToClients(PART(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, channel_name), "");
 			this->server.getChannel(channel_name)->second.removeConnected(this->userInfos.nickName);
+			// here checker si le user etait operator du channel et si le channel n'a plus d'operateur :
+			// si c'est le cas : prendre le 'nouveau' premier user de la liste Client et le faire passer en operator du channel
+			if (this->server.getChannel(cmd[1])->second.isClientOperatorChannel(this->userInfos.nickName) 
+				and this->server.getChannel(cmd[1])->second.clientOperators.empty())
+			{
+				this->server.getChannel(cmd[1])->second.clientOperators.erase(this->userInfos.nickName);
+ 				std::string clientName = *(this)->server.getChannel(cmd[1])->second.clientConnected.begin();
+				std::cout << BOLD_RED << clientName << RESET << std::endl;
+				this->server.getChannel(cmd[1])->second.clientOperators.insert(clientName);
+			}
 		}
 	}
-
 	return (toReturn);
-
 }
