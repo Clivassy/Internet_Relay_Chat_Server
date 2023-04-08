@@ -66,7 +66,6 @@ class Server
 		void							pingAllClients();
 		void							checkInactiveClients();
 		void							removeClientWithNegativeRevent();
-		void							checkAndRemoveInactiveClients();
 		void							removeNotOnlineClient(void);
 		void							removeClient(std::string name);
 		void							killclient(std::string name, std::string reason);
