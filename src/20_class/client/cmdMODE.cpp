@@ -109,7 +109,7 @@ int		Client::updateUserModes(char sign, char mode)
 		}
 		if (mode == 'o')
 		{
-			this->userInfos.invisibleMode = false;
+			this->userInfos.operatorMode = false;
 			sendMessage(getPrefix() + RPL_UMODEIS(this->userInfos.nickName, "-", character));
 		}
 		else if (mode != 'i' and mode != 'o')

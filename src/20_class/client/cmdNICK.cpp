@@ -19,7 +19,7 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 			if (this->server.isClientExisting(cmd[1]))
 			{
 				sendMessage(this->getPrefix() + ERR_NICKNAMEINUSE(cmd[1]));
-				this->deconnectClient();
+				this->online = false;
 				return (false);
 			}
 			if (cmd.size() == 2)
