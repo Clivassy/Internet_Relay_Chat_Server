@@ -19,6 +19,7 @@
 //message pour tous les gens sur le channel ":<nick persone qui a join>!<user>@<host> JOIN <channel>"
 
 # define PRIVMSG(nick, user, host, dest, str) (":" + nick + "!" + user + "@" + host + " PRIVMSG " + dest + " :" + str + "\r\n") //dest cest le nom du channel
+
 //pour envoyer 
 
 # define NOTICE(nick, user, host, chan, str) (":" + nick + "!" + user + "@" + host + " NOTICE " + chan + " :" + str + "\r\n")
@@ -53,6 +54,7 @@
 # define ERR_NEEDMOREPARAMS(command) (std::string("461 ") + command + " :Not enough parameters\r\n")
 
 # define ERR_PASSWDMISMATCH "464 :Password incorrect\r\n"
+# define ERR_USERMISMATCH "464 : User incorrect\r\n"
 
 # define ERR_NONICKNAMEGIVEN "431 :No nickname given\r\n"
 
@@ -88,7 +90,7 @@
 
 # define ERR_USERNOTINCHANNEL(nick, chan) ("441 " + nick + " " + chan + " :They aren't on that channel\r\n")
 # define ERR_NOTONCHANNEL(chan) ("442 " + chan + " :You're not on that channel\r\n")
-# define ERR_CHANOPRIVSNEEDED(chan) ("482 " + chan + " :You're not channel operator\r\n")
+# define ERR_CHANOPRIVSNEEDED(chan, nick) ("482 " + nick + " " + chan + " :You're not channel operator\r\n")
 # define ERR_INVITEONLYCHAN(nick, chan) ("473 " + nick + " " + chan + " :Cannot join channel (+i)\r\n")
 //# define RPL_NAMREPLY(nick, user, host, channel) ("353 " + nick + "!" + user + "@" + host + " = " + channel + " :") // TBD (yann) commenté car 2 fois dans le fichier ?
 

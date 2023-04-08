@@ -1,6 +1,6 @@
 #include "channel.hpp"
 
-Channel::Channel( Server& serv, std::string channel_name):
+Channel::Channel(Server& serv, std::string channel_name):
 server(serv), name(channel_name), isInviteOnly(false)
 {
 	this->topic = "Welcome to the channel " + channel_name + " !!";
@@ -67,15 +67,22 @@ void Channel::addOperator(std::string name)
 }
 
 // fonction prenant initialement un objet Client en argument, c'est pour ca qu'elle est codé de cette facon
-void Channel::removeClient(std::string name)
+void Channel::removeConnected(std::string name)
 {
 	Client& client = *(this->server.getClient(name));
 	this->clientConnected.erase(client.userInfos.nickName);
 }
 
+void Channel::removeBanned(std::string name)
+{
+	Client& client = *(this->server.getClient(name));
+	this->clientBanned.erase(client.userInfos.nickName);
+}
+
 void Channel::removeOperator(std::string name)
 {
-	this->clientOperators.erase(name);
+	Client& client = *(this->server.getClient(name));
+	this->clientOperators.erase(client.userInfos.nickName);
 }
 
 // Send msg a tous les clients connectés sauf a sender

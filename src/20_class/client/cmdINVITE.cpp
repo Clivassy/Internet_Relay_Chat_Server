@@ -8,12 +8,12 @@ bool	Client::isValidParsingINVITE(std::vector<std::string> &cmd)
 		sendMessage(ERR_NEEDMOREPARAMS("INVITE"));
 		return (false);
 	}
-    if (this->server.isClientExisting(cmd[1]))
-    {
-        sendMessage(ERR_NOSUCHNICK(cmd[1]));
-		return (false);
-    }
-    if (!this->server.isChannelExisting(cmd[2]))
+  if (!this->server.isClientExisting(cmd[1]))
+  {
+      sendMessage(ERR_NOSUCHNICK(cmd[1]));
+	    return (false);
+  }
+  if (!this->server.isChannelExisting(cmd[2]))
 	{
 		sendMessage(ERR_NOSUCHCHANNEL(cmd[2]));
 		return (false);
@@ -23,30 +23,30 @@ bool	Client::isValidParsingINVITE(std::vector<std::string> &cmd)
 		sendMessage(ERR_NOTONCHANNEL(cmd[2]));
 		return (false);
 	}
-    if (this->server.getChannel(cmd[2])->second.isclientConnected(cmd[1]))
+  if (this->server.getChannel(cmd[2])->second.isclientConnected(cmd[1]))
+  {
+    	sendMessage(ERR_NOTONCHANNEL(cmd[1]));
+	return (false);  
+  }
+  if (this->server.getChannel(cmd[2])->second.isInviteOnly == true)
+  {
+	  if (!this->server.getChannel(cmd[2])->second.isClientOperatorChannel(this->userInfos.nickName))
     {
-      	sendMessage(ERR_NOTONCHANNEL(cmd[1]));
-		return (false);  
-    }
-    if (this->server.getChannel(cmd[2])->second.isInviteOnly == true)
-    {
-	    if (!this->server.getChannel(cmd[2])->second.isClientOperatorChannel(this->userInfos.nickName)) 
-	    	sendMessage(ERR_CHANOPRIVSNEEDED(cmd[2]));
-        return(false);
-    }
-    return (true);
+	  	sendMessage(ERR_CHANOPRIVSNEEDED(cmd[2], this->userInfos.nickName));
+      return(false);
+    } 
+  }
+  return (true);
 }
 
 bool	Client::cmdINVITE(std::vector<std::string> &cmd)
 {
-    if (this->status != CONNECTED)
-		return(false);
-    if (!isValidParsingINVITE(cmd))
-		return(false);
-	//this->server.getChannel(cmd[1])->second.addClient(this->userInfos.nickName);
-	//  => de Yann en passant le nickname du user. 
+  if (this->status != CONNECTED)
+	  return(false);
+  if (!isValidParsingINVITE(cmd))
+	  return(false);
+	this->server.getChannel(cmd[2])->second.addClient(cmd[1]);
 	return(true);
- 
 }
     /* - ERRORS :
     ERR_NOSUCHNICK : si le user n'est pas encore enregistré dans le server IRC 
