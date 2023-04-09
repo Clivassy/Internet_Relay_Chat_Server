@@ -64,8 +64,9 @@ class Server
 		std::vector<Client>::iterator	getClient(std::string user);
 		std::vector<pollfd>::iterator	getClientByFd(std::string user);
 		void							pingAllClients();
-		void							checkInactiveClients();
-		void							removeClientWithNegativeRevent();
+		void							checkInactiveClients();;
+		size_t							nbOfClientsNotOnline();
+		void							removeFirstClientNotOnline();
 		void							removeNotOnlineClient(void);
 		void							removeClient(std::string name);
 		void							killclient(std::string name, std::string reason);

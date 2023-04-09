@@ -98,11 +98,6 @@ void Server::checkInactiveClients()
 	}
 }
 
-void Server::removeClientWithNegativeRevent()
-{
-
-}
-
 void Server::killclient(std::string name, std::string reason)
 {
 	(void)reason;
@@ -180,14 +175,30 @@ void Server::init()
 
 void	Server::removeClient(std::string name)
 {
+	this->printState();
+	print_vector_client(this->clientList);
+	std::cout << "it: " << this->clientList.begin()->userInfos.nickName << std::endl;
+	std::cout << "it: " << (++this->clientList.begin())->userInfos.nickName << std::endl;
+	std::cout << "it: " << (--this->clientList.end())->userInfos.nickName << std::endl;
+	this->clientList.erase(this->clientList.begin());
+	this->printState();
+	print_vector_client(this->clientList);
+
 //	std::cout << "name is removeClient " << name << std::endl;
 	std::vector<Client>::iterator cl = getClient(name);
 	std::vector<pollfd>::iterator pfd = getClientByFd(name);
+	std::cout << "name: " << name << std::endl;
+	std::cout << "client name it: " << cl->userInfos.nickName << std::endl;
 //	std::cout << "name is clientList " << cl->userInfos.nickName << std::endl;
 //	std::cout << "name is fdListened " << pfd->fd << cl->socketFd << std::endl;
 	close(pfd->fd);
-	this->fdListened.erase(pfd);
-	this->clientList.erase(cl);
+	this->fdListened.erase(getClientByFd(name));
+	this->printState();
+	std::cout << "name: " << name << std::endl;
+	std::cout << "client name it: " << cl->userInfos.nickName << std::endl;
+	this->clientList.erase(this->clientList.begin());
+	this->printState();
+
 	
 	for (std::map<std::string, Channel>::iterator it=this->channelList.begin(); it != this->channelList.end(); it++)
 	{
@@ -197,20 +208,48 @@ void	Server::removeClient(std::string name)
 	}
 }
 
-//void	Server::removeNotOnlineClient(void)
-//{
-//	if (clientList.size() == 0)
-//		return ;
-//	std::vector<Client>::iterator it = clientList.begin();
-//	std::vector<Client>::iterator ite = clientList.end();
-//	for ( ; it != ite; it++)
-//	{
-//		if ((*it).online == false
-//		{
-//		this->removeClient((*(it)).userInfos.nickName);
-//		}
-//	}	
-//}
+// TBD peut servir si removeNotOnlineClient() ne marche pas TBD fct a checker
+size_t Server::nbOfClientsNotOnline()
+{
+	size_t total = 0;
+	for(std::vector<Client>::iterator it = this->clientList.begin(); it != this->clientList.end(); it++)
+	{
+		if (it->online == false)
+			total++;
+	}
+	return (total);
+}
+
+void Server::removeFirstClientNotOnline()
+{
+	for(std::vector<Client>::iterator it = this->clientList.begin(); it != this->clientList.end(); it++)
+	{
+		if (it->online == false)
+		{
+			this->removeClient(it->userInfos.nickName);
+			return;
+		}
+	}
+}
+
+// TBD en cours
+void	Server::removeNotOnlineClient(void)
+{
+	if (clientList.size() == 0)
+		return ;
+
+	while (this->nbOfClientsNotOnline() > 0)
+	{
+		this->removeFirstClientNotOnline();
+	}
+	//for (std::vector<Client>::iterator it = clientList.begin(); it != clientList.end(); it++)
+	//{
+	//	if (it->online == false)
+	//	{
+	//		this->removeClient((*(it)).userInfos.nickName);
+	//	}
+	//}	
+}
 
 void Server::run()
 {
@@ -222,6 +261,16 @@ void Server::run()
 	int pollreturn = -1;
 	while (1)
 	{
+
+		// tmp pour debug
+		//if (i > 10)
+		//{
+		//	this->clientList.erase(this->clientList.begin());
+
+		//}
+
+
+		// fin tmp
 		std::cout << BOLD_BLUE << "-------------------------------------------------------------------------------------------------" << RESET << std::endl;
 		std::cout << BOLD_BLUE << "loop step " << i << BLUE << " (1 loop = " << LISTENING_TIMEOUT/1000 << "s)  Waiting for event ... \U0001F634" << RESET << std::endl;
 		pollreturn = poll(&(this->fdListened[0]), this->fdListened.size(), LISTENING_TIMEOUT);
@@ -243,10 +292,9 @@ void Server::run()
 
 		}
 		// rm client not on line
-//		this->removeNotOnlineClient();
 		this->pingAllClients(); // TBD ajout check reponse (flag lastPong dans client + deco si delay depassé)
 		this->checkInactiveClients();
-		this->removeClientWithNegativeRevent(); // TBD a faire
+		//this->removeNotOnlineClient();
 		std::cout << BOLD_BLUE << "Server state at the end of the run loop " << RESET << std::endl;
 		this->printState();
 
@@ -275,21 +323,21 @@ void Server::manage_poll_event()
 		}
 	}
 	// TBD partie a supprimer quand on aura removeClientWithNegativeRevent()
-	std::vector<pollfd>::iterator ite = this->fdListened.begin();
-	for (size_t i = 0; i < fdListened.size(); i++, ite++)
-	{
-		if(ite->revents == -1)
-		{
-			close(ite->fd);
-			this->fdListened.erase(ite);
+	//std::vector<pollfd>::iterator ite = this->fdListened.begin();
+	//for (size_t i = 0; i < fdListened.size(); i++, ite++)
+	//{
+	//	if(ite->revents == -1)
+	//	{
+	//		close(ite->fd);
+	//		this->fdListened.erase(ite);
 
-			std::vector<Client>::iterator it  = std::find(this->clientList.begin(), this->clientList.end(), *(this->getClient(ite->fd)) );
-			if (it != clientList.end())
-    		{	
-				this->clientList.erase(it);
-			}
-		}
-	}
+	//		std::vector<Client>::iterator it  = std::find(this->clientList.begin(), this->clientList.end(), *(this->getClient(ite->fd)) );
+	//		if (it != clientList.end())
+    //		{	
+	//			this->clientList.erase(it);
+	//		}
+	//	}
+	//}
 }
 
 void Server::addNewClient()
@@ -321,7 +369,8 @@ void Server::listen_client(Client &client)
 	if(recv(client.socketFd, client.buffer, client.bufferSize - 1, 0) <= 0)
 	{
 		std::cout << BOLD_RED << "Error on client " << client.userInfos.nickName << "\n" << RESET << std::endl;
-		this->getPollfd(client.socketFd)->revents = -1; // passage du revent pour que ce client soit kill (le kill ne peut pas etre fait ici pour ne pas invalider les iterateurs dans la boucle appelant listen_client)
+		//this->getPollfd(client.socketFd)->revents = -1; // passage du revent pour que ce client soit kill (le kill ne peut pas etre fait ici pour ne pas invalider les iterateurs dans la boucle appelant listen_client)
+		client.online = false; // passage du revent pour que ce client soit kill (le kill ne peut pas etre fait ici pour ne pas invalider les iterateurs dans la boucle appelant listen_client)
 		return;
 		// Ajout flag pour kill client et return (client.revents = -1)
 		// le kill doit etre fait plus tard en dehors de la boucle appelant listen_client
@@ -423,6 +472,7 @@ void Server::printState()
 		std::cout << BLUE_PIPE << GREEN << "  Client " << i << ": ";
 		std::cout << "nickName " << it->userInfos.nickName << " | ";
 		std::cout << "userName " << it->userInfos.userName << " | ";
+		std::cout << "online " << PRINT_BOOL(it->online) << " | ";
 		std::cout << "socketFd " << it->socketFd << " | ";
 		std::cout << "status " << PRINT_STATUS(it->status) << " (" << it->status << "/4)" << " | " ;
 		std::cout << "invisible " << PRINT_BOOL(it->userInfos.invisibleMode) << " | " ;
