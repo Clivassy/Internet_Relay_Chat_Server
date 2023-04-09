@@ -26,6 +26,7 @@ bool isChannelName(std::string str);
 ssize_t sendCustom(int sockfd, const void *buf, size_t len, int flags);
 template<typename T>
 void print_vector(std::vector<T> vec);
+void print_vector_str(std::vector<std::string> vec);
 void print_vector_client(std::vector<Client> vec);
 //template<typename key, typename T>
 //void print_map(std::map<key, T> map);

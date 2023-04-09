@@ -257,19 +257,53 @@ void Server::run()
 
 	int i = 0; // limite pour eviter de kill process en debug, TBD mettre loop infinie
 	// TBD redefinir ctrl+C pour close les fd (evite de bloquer les ports en debug)
+
+	// tmp pour debug
+	//Client newClient1(*this);
+	//newClient1.userInfos.nickName = "usr1";
+	//this->clientList.push_back(newClient1);
+	//Client newClient2(*this);
+	//newClient2.userInfos.nickName = "usr2";
+	//this->clientList.push_back(newClient2);
+	//Client newClient3(*this);
+	//newClient3.userInfos.nickName = "usr3";
+	//this->clientList.push_back(newClient3);
+	//print_vector_client(this->clientList);
+	//this->clientList.erase(this->clientList.begin());
+	//print_vector_client(this->clientList);
+
+	//objTest objTest1;
+	//objTest1.var = "usr1";
+	//this->clientList_objtest.push_back(objTest1);
+	//objTest objTest2;
+	//objTest2.var = "usr2";
+	//this->clientList_objtest.push_back(objTest2);
+	//objTest objTest3;
+	//objTest3.var = "usr3";
+	//this->clientList_objtest.push_back(objTest3);
+	//std::cout << "vector: " << clientList_objtest[0].var << " - " << clientList_objtest[1].var << " - " << clientList_objtest[2].var << std::endl;
+	//this->clientList_objtest.erase(this->clientList_objtest.begin());
+	//std::cout << "vector: " << clientList_objtest[0].var << " - " << clientList_objtest[1].var<< std::endl;
+
+
+	//std::string s1("s1");
+	//this->clientList_test.push_back(s1);
+	//std::string s2("s2");
+	//this->clientList_test.push_back(s2);
+	//std::string s3("s3");
+	//this->clientList_test.push_back(s3);
+	//print_vector_str(this->clientList_test);
+	//this->clientList_test.erase(this->clientList_test.begin());
+	//print_vector_str(this->clientList_test);
+
+
+	//std::cout << "fin test\n";
+	//sleep(10);
+	// fin tmp
 	
 	int pollreturn = -1;
 	while (1)
 	{
-
-		// tmp pour debug
-		//if (i > 10)
-		//{
-		//	this->clientList.erase(this->clientList.begin());
-
-		//}
-
-
 		// fin tmp
 		std::cout << BOLD_BLUE << "-------------------------------------------------------------------------------------------------" << RESET << std::endl;
 		std::cout << BOLD_BLUE << "loop step " << i << BLUE << " (1 loop = " << LISTENING_TIMEOUT/1000 << "s)  Waiting for event ... \U0001F634" << RESET << std::endl;
@@ -294,7 +328,7 @@ void Server::run()
 		// rm client not on line
 		this->pingAllClients(); // TBD ajout check reponse (flag lastPong dans client + deco si delay depassé)
 		this->checkInactiveClients();
-		//this->removeNotOnlineClient();
+		this->removeNotOnlineClient();
 		std::cout << BOLD_BLUE << "Server state at the end of the run loop " << RESET << std::endl;
 		this->printState();
 

@@ -31,6 +31,13 @@
 class Client;
 class Channel;
 
+class objTest
+{
+	public: 
+		std::string var;
+	
+};
+
 class Server
 {
 	public:
@@ -43,6 +50,10 @@ class Server
 		struct sockaddr_in				serverAddr;
 		std::vector<pollfd> 			fdListened;
 		std::vector<Client> 			clientList;		
+		std::vector<std::string> 		clientList_test;	
+		std::vector<objTest> 		clientList_objtest;	
+
+
 		std::map<std::string, Channel>	channelList;
 
 	public:

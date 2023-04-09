@@ -141,6 +141,20 @@ void print_vector(std::vector<T> vec)
 	std::cout << "]" << std::endl;
 }
 
+void print_vector_str(std::vector<std::string> vec)
+{
+	std::cout << "[";
+	for (std::vector<std::string>::iterator it=vec.begin(); it != vec.end(); it++)
+	{
+		std::cout << *it;
+		if(it + 1 != vec.end())
+			std::cout << ", ";
+
+
+	}
+	std::cout << "]" << std::endl;
+}
+
 void print_vector_client(std::vector<Client> vec)
 {
 	std::cout << "[";
