@@ -81,6 +81,18 @@ void Channel::removeBanned(std::string name)
 
 void Channel::removeOperator(std::string name)
 {
+	int	isOperatorChannel = false;
+	if (this->isClientOperatorChannel(name))
+		isOperatorChannel = true;
+		
+	// si le user est channelOperator et que la liste de channelOperator est == 1
+	if (isOperatorChannel == true and this->clientOperators.size() == 1)
+	{
+		std::cout << BOLD_RED << "CHANGE OPERATOR CHANNEL LIST" << RESET << std::endl;
+		this->clientOperators.erase(name);
+ 		std::string clientName = *(this)->clientConnected.begin();
+		this->clientOperators.insert(clientName);
+	}
 	Client& client = *(this->server.getClient(name));
 	this->clientOperators.erase(client.userInfos.nickName);
 }
@@ -98,7 +110,6 @@ void    Channel::sendMessageToClients(std::string msg, std::string sender)
 			if (sendCustom(this->server.getClient(*it)->socketFd , msg.c_str(), msg.size(), 0) == -1)
 				perror("error sending message: ");
 		}
-
 	}   
 
 }

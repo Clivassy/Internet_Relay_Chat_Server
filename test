@@ -1,0 +1,20 @@
+PARSING LANCEMENT SERVER
+- Connexion sans port ou mpd avec des espaces : 
+
+
+SERVEUR 
+- Connexion de plusieurs clients simultanement
+- Decnnexion de clients un apres les autres sans creer de soucis
+
+COMMANDES
+
+> CAP 
+- Ignorer les autres commanddes si CAP LS pas recu
+- est ce que si on envoie CAP et apres LS c'est cense fonctionner ?
+
+> INVITE 
+- Erreur en cas de 
+
+> JOIN 
+
+> KICK 
