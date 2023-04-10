@@ -1,10 +1,9 @@
 PARSING LANCEMENT SERVER
 - Connexion sans port ou mpd avec des espaces : 
 
-
 SERVEUR 
 - Connexion de plusieurs clients simultanement
-- Decnnexion de clients un apres les autres sans creer de soucis
+- Deconnexion de clients un apres les autres sans creer de soucis
 
 COMMANDES
 
@@ -13,8 +12,53 @@ COMMANDES
 - est ce que si on envoie CAP et apres LS c'est cense fonctionner ?
 
 > INVITE 
-- Erreur en cas de 
+- Erreur si :
+-> le channel n'existe pas 
+-> le client n'est pas dans le channel dont il a envoyé l'invitation
+-> le client est deja dans le channel
+-> si le channel est en mode InviteOnly et que le demandeur n'est pas en mode operator du channel enquestion.
+- Reception de la reply INVITE par le user qui envoie l'invitation + par celui invité.
 
 > JOIN 
+- Impossible de joindre un channel qui est en invite-only
 
 > KICK 
+- Erreur si :
+-> le channel n'existe pas
+-> le user qui appelle la cmd n'est pas dans le channel
+-> le user qui appelle la cmd n'est pas channel operator
+
+> PASS 
+-> Toujours pas décidé : si on deconnecte en cas de mdp invalide
+- check que rien ne se passe tant que mdp pas correct
+- Check en cas de mdp invalide 
+- check en cas d'absence de mpd
+
+> USER 
+-> Check qu'il ne se passe rien si pas de nickName donné.
+
+> NICK
+Erreur si :
+-> un client a deja le meme nickname sur le serveur.
+
+Deconnexion si:
+-> User pas encore connecté et NickName déja existant sur le server.
+- Affichage du nouveau nickname du user (reply au user).
+
+> MODE USER
+
+- MODE +/-i = mode invisible
+- MODE +o = rien ne se passe
+- MODE -o = -mode operator
+Erreur si :
+-> nickname du user passé en parametre est different de celui qui envoie la cmd.
+-> Pas assez de param (netcat)
+
+> MODE CHANNEL
+- MODE #channelName = affiche le mode du channel (invite only (+/- i))
+- MODE #channelName <+i/-i> : change le mode invite-only du channel
+- MODE #channelName <+o/-o> <nickname> : change le nickname en operator ou lui enleve ce mode.
+
+Error:
+-> 
+

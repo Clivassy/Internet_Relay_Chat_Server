@@ -81,7 +81,9 @@ void Channel::removeBanned(std::string name)
 
 void Channel::removeOperator(std::string name)
 {
+	Client& client = *(this->server.getClient(name));
 	int	isOperatorChannel = false;
+	
 	if (this->isClientOperatorChannel(name))
 		isOperatorChannel = true;
 		
@@ -89,12 +91,11 @@ void Channel::removeOperator(std::string name)
 	if (isOperatorChannel == true and this->clientOperators.size() == 1)
 	{
 		std::cout << BOLD_RED << "CHANGE OPERATOR CHANNEL LIST" << RESET << std::endl;
-		this->clientOperators.erase(name);
+		this->clientOperators.erase(client.userInfos.nickName);
  		std::string clientName = *(this)->clientConnected.begin();
 		this->clientOperators.insert(clientName);
 	}
-	Client& client = *(this->server.getClient(name));
-	this->clientOperators.erase(client.userInfos.nickName);
+	//this->clientOperators.erase(client.userInfos.nickName);
 }
 
 // Send msg a tous les clients connectés sauf a sender
