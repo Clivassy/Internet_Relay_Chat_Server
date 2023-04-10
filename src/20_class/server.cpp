@@ -175,31 +175,11 @@ void Server::init()
 
 void	Server::removeClient(std::string name)
 {
-	this->printState();
-	print_vector_client(this->clientList);
-	std::cout << "it: " << this->clientList.begin()->userInfos.nickName << std::endl;
-	std::cout << "it: " << (++this->clientList.begin())->userInfos.nickName << std::endl;
-	std::cout << "it: " << (--this->clientList.end())->userInfos.nickName << std::endl;
-	this->clientList.erase(this->clientList.begin());
-	this->printState();
-	print_vector_client(this->clientList);
-
-//	std::cout << "name is removeClient " << name << std::endl;
 	std::vector<Client>::iterator cl = getClient(name);
 	std::vector<pollfd>::iterator pfd = getClientByFd(name);
-	std::cout << "name: " << name << std::endl;
-	std::cout << "client name it: " << cl->userInfos.nickName << std::endl;
-//	std::cout << "name is clientList " << cl->userInfos.nickName << std::endl;
-//	std::cout << "name is fdListened " << pfd->fd << cl->socketFd << std::endl;
 	close(pfd->fd);
-	this->fdListened.erase(getClientByFd(name));
-	this->printState();
-	std::cout << "name: " << name << std::endl;
-	std::cout << "client name it: " << cl->userInfos.nickName << std::endl;
-	this->clientList.erase(this->clientList.begin());
-	this->printState();
-
-	
+	this->fdListened.erase(pfd);
+	this->clientList.erase(cl);
 	for (std::map<std::string, Channel>::iterator it=this->channelList.begin(); it != this->channelList.end(); it++)
 	{
 		it->second.removeConnected(it->second.name);
@@ -208,7 +188,6 @@ void	Server::removeClient(std::string name)
 	}
 }
 
-// TBD peut servir si removeNotOnlineClient() ne marche pas TBD fct a checker
 size_t Server::nbOfClientsNotOnline()
 {
 	size_t total = 0;
@@ -255,7 +234,7 @@ void Server::run()
 {
 	this->fdListened.reserve(100);
 
-	int i = 0; // limite pour eviter de kill process en debug, TBD mettre loop infinie
+	int i = 0;
 	// TBD redefinir ctrl+C pour close les fd (evite de bloquer les ports en debug)
 
 	// tmp pour debug
