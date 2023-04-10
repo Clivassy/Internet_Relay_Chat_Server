@@ -221,7 +221,7 @@ bool	Client::cmdMODE(std::vector<std::string> &cmd)
 	if (cmd[1].find("#") != std::string::npos)
 	{
 		std::cout << BOLD_RED << "CHANNEL MODE" << RESET << std::endl;
-    	this->addChannelMode(cmd);
+		this->addChannelMode(cmd);
 	}
 	else
 	{
@@ -236,9 +236,9 @@ bool	Client::cmdMODE(std::vector<std::string> &cmd)
 	// NB : unlimited number of mode changes in the same command.
 	// differents can be separated by space OR sticked togheter.
 
-	// ERR_NEEDMOREPARAMS              
+	// ERR_NEEDMOREPARAMS			  
 	// ERR_USERSDONTMATCH
-    // ERR_UMODEUNKNOWNFLAG :: a la mano car pas dans le define
+	// ERR_UMODEUNKNOWNFLAG :: a la mano car pas dans le define
 	// RPL_UMODEIS :: a la mano car pas dans le define
 	
 	// 1) Parsing the Command 

@@ -14,17 +14,36 @@ Client::~Client(){ }
 
 std::string	Client::getPrefix( void )
 {
-	return(":" + this->userInfos.nickName + "!" + this->userInfos.userName + "@" + this->userInfos.hostName); // add espace quand error.hpp added
+	return(":" + this->userInfos.nickName + "!" + this->userInfos.userName + "@" + this->userInfos.hostName);
 }
 
-void	Client::deconnectClient( void )
+Client& Client::operator=(const Client&other)
 {
-	//std::cout << BOLD_RED << "DISCONNECTING CLIENT" << RESET << std::endl;
-	for (std::vector<pollfd>::iterator it = this->server.fdListened.begin(); it != this->server.fdListened.end(); it++)
+	// userInfos 
+	this->userInfos.nickName = other.userInfos.nickName;
+	this->userInfos.userName = other.userInfos.userName;
+	this->userInfos.hostName = other.userInfos.hostName;
+	this->userInfos.serverName = other.userInfos.serverName;
+	this->userInfos.realName = other.userInfos.realName;
+	this->userInfos.invisibleMode = other.userInfos.invisibleMode;
+	this->userInfos.operatorMode = other.userInfos.operatorMode;
+
+	// Other Attributes
+	this->socketFd = other.socketFd;
+	this->clientAddr = other.clientAddr;
+	this->clientSize = other.clientSize;
+	for (int i = 0; i < this->bufferSize; i++)
 	{
-		if (this->socketFd == it->fd)
-			it->revents = -1; 
+		this->buffer[i] = other.buffer[i];
 	}
+	this->cmd = other.cmd;
+	this->status = other.status;
+	this->hasNick = other.hasNick;
+	this->online = other.online;
+	this->lastPingSent = other.lastPingSent;
+	this->lastPongReceived = other.lastPongReceived;
+	
+	return (*this);
 }
 
 void	Client::ping()
@@ -32,60 +51,12 @@ void	Client::ping()
 	sendMessage(PING(this->userInfos.hostName));
 }
 
-
-// TO KEEP UNTIL WE FINISH 
-
-// TO KEEP UNTIL WE FINISH 
-// ANCIENNE BOUCLE D'envoi de la commande // JULIA
-/* 
-
-std::string		removeLines( std::string toSplit )
+Client::User Client::getUserInfo() const
 {
-	for (size_t i = 0; i < toSplit.size(); i++) {
-        if (toSplit[i] == '\n') {
-            toSplit.erase(i, 1);
-        }
-    }
-	return(toSplit);
+	return (this->userInfos);
 }
-*/
-// ANCIENNE BOUCLE D'envoi de la commande // JULIA
-/* 
-	memset(client.buffer, 0, client.bufferSize);
-	client.authentificationCmd.clear();
-	std::vector<std::string> tmp;
-	
-	recv(client.socketFd, client.buffer, client.bufferSize - 1, 0);
-	std::cout << BOLD_YELLOW << "buffer read: -->" << YELLOW << client.buffer << BOLD_YELLOW << "<--" << RESET << std::endl;
-	client.cmd += client.buffer;
-	//std::cout << "client.cmd:" << client.cmd << std::endl;
-	if (client.cmd.find("\r"))
-	{
-		//std::cout << "here split" << std::endl;
-		tmp = split(client.cmd, '\r');
-		for (std::vector<std::string>::iterator it = tmp.begin(); it != tmp.end() ; it++)
-		{
-			std::string tmp = *it;
-			tmp = removeLines(tmp);
-			if (!tmp.empty())
-			{
-				//std::cout << YELLOW << "|" << tmp << "|" << RESET << std::endl;
-				client.authentificationCmd.push_back(tmp);
-			}	
-		}
-	}
-	else
-	{
-		//std::cout << "here" << std::endl;
-		tmp = split(client.authentification, "\n");
-		client.authentificationCmd.push_back(tmp[0]);
-	}
-	if (client.authentificationCmd.size() > 1)
-		client.isIrssi = true;
-	for (std::vector<std::string>::iterator it = client.authentificationCmd.begin(); it != client.authentificationCmd.end(); it++)
-	{
-		std::cout << BOLD_YELLOW << "launchCommand: -->" << YELLOW << *it << BOLD_YELLOW << "<--" << RESET << std::endl;
-		client.launchCommand(*it);
-	}
-	client.cmd.clear();
-*/
+
+int Client::getSocketFd() const
+{
+	return (this->socketFd);
+}

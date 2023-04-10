@@ -92,7 +92,6 @@
 # define ERR_NOTONCHANNEL(chan) ("442 " + chan + " :You're not on that channel\r\n")
 # define ERR_CHANOPRIVSNEEDED(chan, nick) ("482 " + nick + " " + chan + " :You're not channel operator\r\n")
 # define ERR_INVITEONLYCHAN(nick, chan) ("473 " + nick + " " + chan + " :Cannot join channel (+i)\r\n")
-//# define RPL_NAMREPLY(nick, user, host, channel) ("353 " + nick + "!" + user + "@" + host + " = " + channel + " :") // TBD (yann) commenté car 2 fois dans le fichier ?
 
 # define ERR_CANNOTSENDTOCHAN(nick, chan) ("404 " + nick + " " + chan + " :Cannot send to channel\r\n")
 

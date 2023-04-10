@@ -2,7 +2,7 @@
 
 #include "utils.hpp"
 
-std::vector<std::string>    split(std::string toSplit, char sep)
+std::vector<std::string>	split(std::string toSplit, char sep)
 {
 	std::vector<std::string> tokenList;
 	std::stringstream split(toSplit);
@@ -160,7 +160,7 @@ void print_vector_client(std::vector<Client> vec)
 	std::cout << "[";
 	for (std::vector<Client>::iterator it=vec.begin(); it != vec.end(); it++)
 	{
-		std::cout << it->userInfos.nickName;
+		std::cout << it->getUserInfo().nickName;
 		if(it + 1 != vec.end())
 			std::cout << ", ";
 

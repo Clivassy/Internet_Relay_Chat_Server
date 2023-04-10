@@ -29,9 +29,13 @@ class Client;
 // non sensible a la casse
 class Channel
 {
+	friend class Client;
+	friend class Server;
+
 	public:
 		Channel( Server& serv, std::string channel_name );
 		~Channel( void );
+
 		bool	isclientConnected(std::string name);
 		bool	isClientBanned(std::string name);
 		void	addClient(std::string name);
@@ -43,12 +47,12 @@ class Channel
 		void	sendMessageToClients( std::string msg, std::string sender);
 		
 
-	public: // TBD remettre en protected avec friend ou getteur
+	protected:
 		Server&						server;
 		std::string					name;
-		std::string					topic; // TBD voir on implemente le topic et de cette facon (c'est actuellement utilise pour l'arrivee dans un channel)
-		std::set<std::string>		clientConnected; // userName is used to identify a client
-		std::set<std::string>		clientBanned; // userName is used to identify a client
+		std::string					topic;
+		std::set<std::string>		clientConnected; // Nickname is used to identify a client
+		std::set<std::string>		clientBanned; // Nickname is used to identify a client
 		std::set<std::string>		clientOperators; 
 		bool						isInviteOnly;
 };

@@ -14,7 +14,7 @@
 
 class Client;
 
-std::vector<std::string>    split(std::string toSplit, char sep);
+std::vector<std::string>	split(std::string toSplit, char sep);
 std::vector<std::string> split(std::string str, std::string separator);
 void clear_str(char* str, size_t size);
 void replace_rn_by_n(std::string& str);
