@@ -31,6 +31,13 @@
 class Client;
 class Channel;
 
+class objTest
+{
+	public: 
+		std::string var;
+	
+};
+
 class Server
 {
 	public:
@@ -43,6 +50,10 @@ class Server
 		struct sockaddr_in				serverAddr;
 		std::vector<pollfd> 			fdListened;
 		std::vector<Client> 			clientList;		
+		std::vector<std::string> 		clientList_test;	
+		std::vector<objTest> 		clientList_objtest;	
+
+
 		std::map<std::string, Channel>	channelList;
 
 	public:
@@ -64,8 +75,9 @@ class Server
 		std::vector<Client>::iterator	getClient(std::string user);
 		std::vector<pollfd>::iterator	getClientByFd(std::string user);
 		void							pingAllClients();
-		void							checkInactiveClients();
-		void							removeClientWithNegativeRevent();
+		void							checkInactiveClients();;
+		size_t							nbOfClientsNotOnline();
+		void							removeFirstClientNotOnline();
 		void							removeNotOnlineClient(void);
 		void							removeClient(std::string name);
 		void							killclient(std::string name, std::string reason);
