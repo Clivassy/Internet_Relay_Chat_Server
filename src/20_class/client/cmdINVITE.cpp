@@ -25,7 +25,7 @@ bool	Client::isValidParsingINVITE(std::vector<std::string> &cmd)
 	}
   	if (this->server.getChannel(cmd[2])->second.isclientConnected(cmd[1]))
   	{
-		sendMessage(ERR_NOTONCHANNEL(cmd[1]));
+		sendMessage(ERR_USERONCHANNEL(this->userInfos.nickName, cmd[1], cmd[2]));
 		return (false);  
   	}
   	if (this->server.getChannel(cmd[2])->second.isInviteOnly == true)

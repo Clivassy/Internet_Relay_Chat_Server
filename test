@@ -8,25 +8,26 @@ SERVEUR
 COMMANDES
 
 > CAP 
-- Ignorer les autres commandes si CAP LS pas recu
+- Ignorer les autres commandes si CAP LS pas recu : OK 
 - est ce que si on envoie CAP et apres LS c'est cense fonctionner ?
+-> est ce qu'on enleve le check du CAP du coup ? 
 
 > INVITE 
 - Erreur si :
--> le channel n'existe pas 
--> le client n'est pas dans le channel dont il a envoyé l'invitation
--> le client est deja dans le channel
--> si le channel est en mode InviteOnly et que le demandeur n'est pas en mode operator du channel enquestion.
-- Reception de la reply INVITE par le user qui envoie l'invitation + par celui invité.
+-> le channel n'existe pas : OK 
+-> le client n'est pas dans le channel dont il a envoyé l'invitation : OK
+-> le client est deja dans le channel : OK
+-> si le channel est en mode InviteOnly et que le demandeur n'est pas en mode operator du channel en question : OK 
+- Reception de la reply INVITE par le user qui envoie l'invitation + par celui invité : OK 
 
 > JOIN 
-- Impossible de joindre un channel qui est en invite-only
+- Impossible de joindre un channel qui est en invite-only : 
 
 > KICK 
 - Erreur si :
--> le channel n'existe pas
--> le user qui appelle la cmd n'est pas dans le channel
--> le user qui appelle la cmd n'est pas channel operator
+-> le channel n'existe pas : OK 
+-> le user qui appelle la cmd n'est pas dans le channel : OK 
+-> le user qui appelle la cmd n'est pas channel operator : OK 
 
 > PASS 
 -> Toujours pas décidé : si on deconnecte en cas de mdp invalide
@@ -39,30 +40,37 @@ COMMANDES
 
 > NICK
 Erreur si :
--> un client a deja le meme nickname sur le serveur.
+-> un client a deja le meme nickname sur le serveur : OK 
 
 Deconnexion si:
--> User pas encore connecté et NickName déja existant sur le server.
-- Affichage du nouveau nickname du user (reply au user).
+-> User pas encore connecté et NickName déja existant sur le server : OK 
+- Affichage du nouveau nickname du user (reply au user) : OK 
 
 > MODE USER
 
-- MODE +/-i = mode invisible
-- MODE +o = rien ne se passe
-- MODE -o = -mode operator
+- MODE +/-i = mode invisible : OK 
+- MODE +o = rien ne se passe : OK 
+- MODE -o si le user est operator => -mode operator : OK 
+- MODE -o si le user n'est pas encore operator => rien ne se passe : OK
 Erreur si :
--> nickname du user passé en parametre est different de celui qui envoie la cmd.
--> Pas assez de param (netcat)
+-> nickname du user passé en parametre est different de celui qui envoie la cmd : OK 
+-> Pas assez de param : OK
 
 > MODE CHANNEL
-- MODE #channelName = affiche le mode du channel (invite only (+/- i))
-- MODE #channelName <+i/-i> : change le mode invite-only du channel
-- MODE #channelName <+o/-o> <nickname> : change le nickname en operator ou lui enleve ce mode.
+- MODE #channelName = affiche le mode du channel (invite only (+/- i)) : OK 
+- MODE #channelName <+i/-i> : change le mode invite-only du channel : OK 
+- MODE #channelName <+o/-o> <nickname> : change le nickname en operator ou lui enleve ce mode : OK 
 
 Error:
--> 
+- Not enough parameter : OK 
+- Channel does not exist : OK 
+- Client asking is not on the channel : OK
+- Client asking is not channel operator : OK 
+- If +o/-o, User we want to change mode is not on the channel : OK 
 
-
+// TESTER 
+CAP LS
+PASS lol
+NICK ju
+USER ju 0 * : ju 
 /connect localhost 8981 lol usr1
-
-/482 usr1 #chan1 :You're not channel operator\r\n
