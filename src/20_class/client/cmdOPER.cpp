@@ -9,11 +9,11 @@ bool	Client::cmdOPER(std::vector<std::string> &cmd)
 		sendMessage(this->getPrefix() + ERR_NEEDMOREPARAMS("OPER"));
 		return (false);
 	}
-//	if (cmd[1] != "admis")
-//	{
-//		sendMessage(this->getPrefix() + ERR_USERMISMATCH);
-//		return (false);
-//	}
+	if (cmd[1] != this->userInfos.nickName)
+	{
+		sendMessage(this->getPrefix() + ERR_USERMISMATCH);
+		return (false);
+	}
 	if (cmd[2] != "admis")
 	{
 		sendMessage(this->getPrefix() + ERR_PASSWDMISMATCH);
