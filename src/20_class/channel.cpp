@@ -3,7 +3,8 @@
 Channel::Channel(Server& serv, std::string channel_name):
 server(serv), name(channel_name), isInviteOnly(false)
 {
-	this->topic = "Welcome to the channel " + channel_name + " !!";
+	//this->topic = "Welcome to the channel " + channel_name + " !!";
+	this->topic = "";
 }
 
 Channel::~Channel(){}
@@ -39,7 +40,6 @@ void Channel::addClient(std::string name)
 	std::string clientList;
 	for( std::set<std::string>::iterator it = clientConnected.begin(); it != clientConnected.end(); it++ )
 	{
-		// TBD voir si il faut ajouter qqch en foncion du mode client
 		if (this->isClientOperatorChannel(*it))
 			clientList.append("@");
 		clientList.append(*it);
@@ -47,6 +47,8 @@ void Channel::addClient(std::string name)
 			clientList.append(" ");
 	}
 	// messages au client se connectant
+	if (this->topic != "")
+		client.sendMessage(RPL_TOPIC(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, this->name, this->topic));
 	client.sendMessage(RPL_NAMREPLY(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, this->name) + clientList + "\r\n");
 	client.sendMessage(RPL_ENDOFNAMES(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, this->name));
 	

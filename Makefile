@@ -20,6 +20,7 @@ SRCS += ./src/20_class/client/cmdUSER.cpp
 SRCS += ./src/20_class/client/cmdKICK.cpp
 SRCS += ./src/20_class/client/cmdINVITE.cpp
 SRCS += ./src/20_class/client/cmdOPER.cpp
+SRCS += ./src/20_class/client/cmdTOPIC.cpp
 SRCS += ./src/20_class/client/cmdQUIT.cpp
 SRCS += ./src/20_class/client/cmdPING.cpp
 SRCS += ./src/20_class/client/cmdWHOIS.cpp
