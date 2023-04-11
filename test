@@ -29,11 +29,32 @@ COMMANDES
 -> le user qui appelle la cmd n'est pas dans le channel : OK 
 -> le user qui appelle la cmd n'est pas channel operator : OK 
 
+> NOTICE
+- Ne s'aaplique pas (mais sans message d'erreur) si :
+-> le client n'est pas connecté
+-> le nombre d'argument est < 3
+-> le client cible n'existe pas 
+
+> PART
+- Erreur si :
+-> nb de parametres < 2
+-> Le channel n'existe pas
+-> Le client n'est pas dans le channel
+
 > PASS 
 -> Toujours pas décidé : si on deconnecte en cas de mdp invalide
 - check que rien ne se passe tant que mdp pas correct
 - Check en cas de mdp invalide 
 - check en cas d'absence de mpd
+
+> PRIVMSG
+- Erreur si :
+-> nombre arguments < 3
+-> channel cible non existant
+-> Client ban dans channel cible
+-> Client non connecté au channel
+-> User cible non existant
+- Tester PRIVMSG entre 2 clients (/msg)
 
 > USER 
 -> Check qu'il ne se passe rien si pas de nickName donné.
@@ -74,3 +95,5 @@ PASS lol
 NICK ju
 USER ju 0 * : ju 
 /connect localhost 8981 lol usr1
+
+

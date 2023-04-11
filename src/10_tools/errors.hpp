@@ -3,7 +3,7 @@
 
 # define RPL_WELCOME(nick, user, host) ("001 " + nick + " :Welcome to the Internet Relay Network " + nick + "!" + user + "@" + host + "\r\n")
 
-# define RPL_WHOISUSER(nick, user, host, realname) ( nick + user + host +" * :" + realname + "\r\n")
+# define RPL_WHOISUSER(nick, user, host, realname) ( nick + " " + user + " " + host +" * :" + realname + "\r\n")
 
 # define PING(localhost) ("PING " + localhost + "\r\n")
 
