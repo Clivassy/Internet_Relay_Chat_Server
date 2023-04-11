@@ -18,7 +18,7 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 		{
 			if (this->server.isClientExisting(cmd[1]))
 			{
-				sendMessage(this->getPrefix() + ERR_NICKNAMEINUSE(cmd[1]));
+				sendMessage(ERR_NICKNAMEINUSE(cmd[1]));
 				this->online = false;
 				return (false);
 			}
@@ -34,10 +34,9 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 	{
 		if (this->server.isClientExisting(cmd[1]))
 		{
-			sendMessage(this->getPrefix() + ERR_NICKNAMEINUSE(cmd[1]));
+			sendMessage(ERR_NICKNAMEINUSE(cmd[1]));
 			return (false);
 		}
-		//sendMessage(NICK_INFORM(this->userInfos.nickName,this->userInfos.userName,this->userInfos.hostName,cmd[1]));
 		sendMessage(NICK(this->userInfos.nickName, cmd[1]));
 		this->userInfos.nickName = cmd[1];
 		return (true);

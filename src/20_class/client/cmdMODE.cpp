@@ -11,23 +11,13 @@ int		Client::parseModes(std::string modes, int modeType, std::string user, std::
 		if (modes[j] == '+' or modes[j] == '-')
 		{
 			if (modeType == USER_MODE)
-			{
-				//std::cout << BOLD_YELLOW << "USER MODE" << RESET << std::endl;
 				updateUserModes(modes[j], modes[j + 1]);
-			}
 			else 
 			{
-				//std::cout << BOLD_YELLOW << "CHANNEL MODE" << RESET << std::endl;
 				if (user.empty())
-				{
-					//std::cout << BOLD_GREEN << "INVITE-ONLY MODE" << RESET << std::endl;
 					handleInviteOnlyMode(modes[j], modes[j + 1], chan);
-				}
 				else
-				{
-					//std::cout << BOLD_GREEN << "OPERATOR MODE" << RESET << std::endl;
 					handleOperatorChannelMode(modes[j], modes[j + 1], user, chan);
-				}
 			}
 		}		
 	}
@@ -209,6 +199,7 @@ bool	Client::addChannelMode(std::vector<std::string> cmd)
 	return(true);
 }
 
+// cmd : MODE <target> <mode changes>
 bool	Client::cmdMODE(std::vector<std::string> &cmd)
 {
 	if (this->status != CONNECTED)
@@ -219,29 +210,8 @@ bool	Client::cmdMODE(std::vector<std::string> &cmd)
 		return (false);
 	}
 	if (cmd[1].find("#") != std::string::npos)
-	{
-		std::cout << BOLD_RED << "CHANNEL MODE" << RESET << std::endl;
 		this->addChannelMode(cmd);
-	}
 	else
-	{
-		std::cout << BOLD_RED << "USER MODE" << RESET << std::endl;
 		this->addUserMode(cmd);
-	}
 	return (true);
 }
-//------------------------------------------------------------------------
-	// cmd : MODE <target> <mode changes>
-	// ex : MODE nickname +i-o+
-	// NB : unlimited number of mode changes in the same command.
-	// differents can be separated by space OR sticked togheter.
-
-	// ERR_NEEDMOREPARAMS			  
-	// ERR_USERSDONTMATCH
-	// ERR_UMODEUNKNOWNFLAG :: a la mano car pas dans le define
-	// RPL_UMODEIS :: a la mano car pas dans le define
-	
-	// 1) Parsing the Command 
-	// 2) Validating the Command
-	// 3) Updating Modesmake
-	

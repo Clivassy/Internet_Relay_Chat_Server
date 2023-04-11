@@ -8,7 +8,7 @@ SERVEUR
 COMMANDES
 
 > CAP 
-- Ignorer les autres commanddes si CAP LS pas recu
+- Ignorer les autres commandes si CAP LS pas recu
 - est ce que si on envoie CAP et apres LS c'est cense fonctionner ?
 
 > INVITE 
@@ -62,3 +62,7 @@ Erreur si :
 Error:
 -> 
 
+
+/connect localhost 8981 lol usr1
+
+/482 usr1 #chan1 :You're not channel operator\r\n

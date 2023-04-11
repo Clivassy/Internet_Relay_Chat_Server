@@ -20,7 +20,7 @@ bool	Client::isValidParsingKICK(std::vector<std::string> &cmd)
 	}
 	if (!this->server.getChannel(cmd[1])->second.isClientOperatorChannel(this->userInfos.nickName)) 
 	{
-		sendMessage(ERR_CHANOPRIVSNEEDED(cmd[1], this->userInfos.nickName));
+		sendMessage(this->getPrefix() + ERR_CHANOPRIVSNEEDED(cmd[1], this->userInfos.nickName));
 		return (false);
 	}
 	return(true);
