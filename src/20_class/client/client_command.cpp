@@ -28,8 +28,8 @@ bool	Client::launchCommand(std::string command)
 	
 	std::vector<std::string> ccmd = split(command, ':');
 	std::vector<std::string> vecmd = split(ccmd[0], ' ');
-	std::string	choice[16] = {"CAP", "PASS", "NICK", "USER", "PING", "PONG", "OPER", "QUIT", "JOIN", "PART", "PRIVMSG", "NOTICE", "MODE", "INVITE", "KICK", "WHOIS"};
-	bool	(Client::*f[16])(std::vector<std::string> &) = {&Client::cmdCAP, &Client::cmdPASS, &Client::cmdNICK, &Client::cmdUSER, &Client::cmdPING, &Client::cmdPONG, &Client::cmdOPER, &Client::cmdQUIT, &Client::cmdJOIN, &Client::cmdPART, &Client::cmdPRIVMSG, &Client::cmdNOTICE, &Client::cmdMODE, &Client::cmdINVITE, &Client::cmdKICK, &Client::cmdWHOIS};
+	std::string	choice[19] = {"CAP", "PASS", "NICK", "USER", "PING", "PONG", "OPER", "QUIT", "JOIN", "PART", "PRIVMSG", "LIST", "NAMES", "TOPIC", "NOTICE", "MODE", "INVITE", "KICK", "WHOIS"};
+	bool	(Client::*f[19])(std::vector<std::string> &) = {&Client::cmdCAP, &Client::cmdPASS, &Client::cmdNICK, &Client::cmdUSER, &Client::cmdPING, &Client::cmdPONG, &Client::cmdOPER, &Client::cmdQUIT, &Client::cmdJOIN, &Client::cmdPART, &Client::cmdPRIVMSG, &Client::cmdLIST, &Client::cmdNAMES, &Client::cmdTOPIC, &Client::cmdNOTICE, &Client::cmdMODE, &Client::cmdINVITE, &Client::cmdKICK, &Client::cmdWHOIS};
 	int i = 0;
 
 	if (ccmd.size() != 1 && ccmd.size() != 2)
@@ -42,7 +42,7 @@ bool	Client::launchCommand(std::string command)
 	{
 		return (false);
 	}
-	while (i < 16 and this->online)
+	while (i < 19 and this->online)
 	{
 		if (vecmd[0] == choice[i])
 		{
