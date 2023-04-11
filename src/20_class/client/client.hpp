@@ -89,7 +89,6 @@ class Client
 		bool				cmdPONG(std::vector<std::string> &cmd);
 		bool				cmdOPER(std::vector<std::string> &cmd);
 		bool				cmdQUIT(std::vector<std::string> &cmd);
-		bool				cmdTOPIC(std::vector<std::string> &cmd);
 		bool				cmdJOIN(std::vector<std::string> &cmd);
 		bool				cmdPART(std::vector<std::string> &cmd);
 		bool				cmdINVITE(std::vector<std::string> &cmd);

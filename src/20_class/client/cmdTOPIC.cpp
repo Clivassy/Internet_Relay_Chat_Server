@@ -28,6 +28,8 @@ bool	Client::cmdTOPIC(std::vector<std::string> &cmd)
 		// TBD check droits
 		std::string topicToSet = cmd[2];
 		this->server.getChannel(channel)->second.topic = cmd[2];
+		this->server.getChannel(channel)->second.sendMessageToClients(RPL_TOPIC(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, channel, topicToSet), "");
+		// TBD en cours
 		return (true);
 	}
 }

@@ -15,7 +15,6 @@ SRCS += ./src/20_class/client/cmdPART.cpp
 SRCS += ./src/20_class/client/cmdPASS.cpp
 SRCS += ./src/20_class/client/cmdPONG.cpp
 SRCS += ./src/20_class/client/cmdPRIVMSG.cpp
-SRCS += ./src/20_class/client/cmdTOPIC.cpp
 SRCS += ./src/20_class/client/cmdLIST.cpp
 SRCS += ./src/20_class/client/cmdNAMES.cpp
 SRCS += ./src/20_class/client/cmdNICK.cpp
