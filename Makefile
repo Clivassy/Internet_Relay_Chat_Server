@@ -43,8 +43,8 @@ OBJS = ${SRCS:.cpp=.o}
 # Compilateurs
 CC = c++
 
-#CFLAGS = -g -Wall -Wextra -Werror -std=c++98
-CFLAGS = -g3 -Wall -Wextra -std=c++98
+CFLAGS = -g -Wall -Wextra -Werror -std=c++98
+#CFLAGS = -g3 -Wall -Wextra -std=c++98
 
 ##########   RULES   ##########
 all: $(NAME)

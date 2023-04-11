@@ -1,21 +1,11 @@
 #include "client.hpp"
 
-// Supprime un client ou des channels
-// ERR_NOSUCHCHANNEL si le channel n'exidte pas 
-// ERR_NOTONCHANNEL si le channel existe mais le client n'est pas dedans
-
-// the user will receive a PART message from the server for each channel they have been removed from. <reason> is the reason 
-// that the client has left the channel(s).
-// Servers SHOULD NOT send multiple channels in this message to clients, and SHOULD distribute these multiple-channel JOIN 
-// messages as a series of messages with a single channel name on each.
-// return false si une erreur rencontrée
 // /PART <channel> <reason>
 bool	Client::cmdPART(std::vector<std::string> &cmd)
 {
 	if (this->status != CONNECTED)
 		return (false);
 	bool toReturn = true;
-
 	if (cmd.size() < 2)
 	{
 		sendMessage(ERR_NEEDMOREPARAMS("PART"));
@@ -28,7 +18,6 @@ bool	Client::cmdPART(std::vector<std::string> &cmd)
 	{
 		channel_name = *it;
 		toLowerStr(channel_name);
-		
 		if (!this->server.isChannelExisting(channel_name))
 		{
 			this->sendMessage(ERR_NOSUCHCHANNEL(channel_name));
@@ -42,12 +31,14 @@ bool	Client::cmdPART(std::vector<std::string> &cmd)
 		else
 		{
 			if (cmd.size() > 2)
-				{
-					std::string leavingReason = cmd[2];
-					this->server.getChannel(channel_name)->second.sendMessageToClients(PART_REASON(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, channel_name, leavingReason), "");
-				}
+			{
+				std::string leavingReason = cmd[2];
+				this->server.getChannel(channel_name)->second.sendMessageToClients(PART_REASON(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, channel_name, leavingReason), "");
+			}
 			else
+			{
 				this->server.getChannel(channel_name)->second.sendMessageToClients(PART(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, channel_name), "");
+			}
 			this->server.getChannel(channel_name)->second.removeConnected(this->userInfos.nickName);
 		}
 	}
