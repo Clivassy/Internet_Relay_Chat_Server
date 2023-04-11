@@ -26,21 +26,24 @@ bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 			this->sendMessage(ERR_INVITEONLYCHAN(this->userInfos.nickName, channel_name));
 			toReturn = false;
 		}
-		if (channel_name.size() <= 1 || !isChannelName(channel_name))
+		else if (channel_name.size() <= 1 || !isChannelName(channel_name))
 		{
 			this->sendMessage(ERR_BADCHANMASK(channel_name));
 			toReturn = false;
 		}
-		if (!(this->server.isChannelExisting(channel_name)))
-		{
-			this->server.addChannel(channel_name);
-			this->server.getChannel(channel_name)->second.addOperator(this->userInfos.nickName);
-		}
-		if (this->server.getChannel(channel_name)->second.isClientBanned(this->userInfos.nickName))
+		else if (this->server.getChannel(channel_name)->second.isClientBanned(this->userInfos.nickName))
 		{
 			ERR_BANNEDFROMCHAN(this->userInfos.nickName, channel_name);
 		}
-		this->server.getChannel(channel_name)->second.addClient(this->userInfos.nickName);
+		else
+		{
+			if (!(this->server.isChannelExisting(channel_name)))
+			{
+				this->server.addChannel(channel_name);
+				this->server.getChannel(channel_name)->second.addOperator(this->userInfos.nickName);
+			}
+			this->server.getChannel(channel_name)->second.addClient(this->userInfos.nickName);
+		}
 	}
 	return (toReturn);
 }

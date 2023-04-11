@@ -42,7 +42,7 @@ bool	Client::launchCommand(std::string command)
 	{
 		return (false);
 	}
-	while (i < 16)
+	while (i < 16 and this->online)
 	{
 		if (vecmd[0] == choice[i])
 		{

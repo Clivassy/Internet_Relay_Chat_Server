@@ -7,6 +7,7 @@ bool	Client::cmdPASS(std::vector<std::string> &cmd)
 		if (cmd.empty() or cmd.size() == 1)
 		{
 			sendMessage(ERR_NEEDMOREPARAMS("PASS"));
+			this->online = false;
 			return (false);
 		}
 		if (cmd.size() == 2)
@@ -25,7 +26,7 @@ bool	Client::cmdPASS(std::vector<std::string> &cmd)
 			{
 				sendMessage(this->getPrefix() + " 464 " + this->userInfos.nickName + ERR_PASSWDMISMATCH);
 				this->status = COMING;
-				// this->online = false; // no need to deconnect? version Marie + William : a discuter //JULIA
+				this->online = false;
 				return(false);
 			}
 		}		

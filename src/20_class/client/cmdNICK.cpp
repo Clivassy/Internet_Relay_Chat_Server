@@ -41,5 +41,6 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 		this->userInfos.nickName = cmd[1];
 		return (true);
 	}
+	this->online = false;
 	return (false);
 }

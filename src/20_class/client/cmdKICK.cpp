@@ -32,6 +32,8 @@ bool	Client::cmdKICK(std::vector<std::string> &cmd)
 		return(false);
 	if (!isValidParsingKICK(cmd))
 		return(false);
+	Client client = *this->server.getClient(cmd[2]);
+	this->server.getChannel(cmd[1])->second.sendMessageToClients(PART(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, cmd[1]), "");
 	this->server.getChannel(cmd[1])->second.removeConnected(cmd[2]);
 	return (true);
 }
