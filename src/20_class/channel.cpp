@@ -47,7 +47,9 @@ void Channel::addClient(std::string name)
 			clientList.append(" ");
 	}
 	// messages au client se connectant
-	if (this->topic != "")
+	if (this->topic == "")
+		client.sendMessage(RPL_NOTOPIC(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, this->name));
+	else
 		client.sendMessage(RPL_TOPIC(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, this->name, this->topic));
 	client.sendMessage(RPL_NAMREPLY(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, this->name) + clientList + "\r\n");
 	client.sendMessage(RPL_ENDOFNAMES(client.userInfos.nickName, client.userInfos.userName, client.userInfos.hostName, this->name));

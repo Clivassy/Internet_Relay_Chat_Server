@@ -16,7 +16,7 @@ bool	Client::cmdTOPIC(std::vector<std::string> &cmd)
 	// si 1 parametre: on renvoie le nom du topic
 	if (cmd.size() == 2)
 	{
-		if (currentTopic != "")
+		if (currentTopic == "")
 			this->sendMessage(RPL_NOTOPIC(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, channel));
 		else
 			this->sendMessage(RPL_TOPIC(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, channel, currentTopic));
@@ -25,11 +25,14 @@ bool	Client::cmdTOPIC(std::vector<std::string> &cmd)
 	// si 2 parametres: changement du topic si le user est operator (les autres parametres sont ignores)
 	else
 	{
-		// TBD check droits
+		if (!this->server.getChannel(channel)->second.isClientOperatorChannel(this->userInfos.nickName))
+		{
+			this->sendMessage(ERR_CHANOPRIVSNEEDED(channel, this->userInfos.nickName));
+			return (false);
+		}
 		std::string topicToSet = cmd[2];
 		this->server.getChannel(channel)->second.topic = cmd[2];
 		this->server.getChannel(channel)->second.sendMessageToClients(RPL_TOPIC(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, channel, topicToSet), "");
-		// TBD en cours
 		return (true);
 	}
 }
