@@ -95,6 +95,9 @@ class Client
 		bool				cmdKICK(std::vector<std::string> &cmd);
 		bool				cmdMODE(std::vector<std::string> &cmd);
 		bool				cmdPRIVMSG(std::vector<std::string> &cmd);
+		bool				cmdLIST(std::vector<std::string> &cmd);
+		bool				cmdNAMES(std::vector<std::string> &cmd);
+		bool				cmdTOPIC(std::vector<std::string> &cmd);
 		bool				cmdNOTICE(std::vector<std::string> &cmd);
 		bool				cmdWHOIS(std::vector<std::string> &cmd);
 		void				ping();
