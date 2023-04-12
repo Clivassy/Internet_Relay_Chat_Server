@@ -93,7 +93,6 @@ Error:
 CAP LS
 PASS lol
 NICK ju
-USER ju 0 * : ju 
+USER ju 0 * : ju
+
 /connect localhost 8988 lol usr1
-
-
