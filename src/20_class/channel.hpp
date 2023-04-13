@@ -45,7 +45,6 @@ class Channel
 		void	removeOperator(std::string name);
 		bool	isClientOperatorChannel(std::string name);
 		void	sendMessageToClients( std::string msg, std::string sender);
-		
 
 	protected:
 		Server&						server;
