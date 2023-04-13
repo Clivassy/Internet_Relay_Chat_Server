@@ -218,23 +218,23 @@ void	Server::removeEmptyChannels()
 	}
 }
 
-void Server::run()
+void Server::run(int i)
 {
-	this->fdListened.reserve(100);
+	// this->fdListened.reserve(100);
 
-	int i = 0;
 	int pollreturn = -1;
-	while (1)
-	{
+	// while (closeServer == false)
+	// {
 		std::cout << BOLD_BLUE << "-------------------------------------------------------------------------------------------------" << RESET << std::endl;
 		std::cout << BOLD_BLUE << "loop step " << i << BLUE << " (1 loop = " << LISTENING_TIMEOUT/1000 << "s)  Waiting for event ... \U0001F634" << RESET << std::endl;
 		pollreturn = poll(&(this->fdListened[0]), this->fdListened.size(), LISTENING_TIMEOUT);
 		if(pollreturn < 0)
 		{
-			std::cout << BOLD_RED << "Error with poll()" << std::endl;
-			perror("poll");
-			std::cout << RESET << std::endl;
-			exit(EXIT_FAILURE);
+			return;
+			// std::cout << BOLD_RED << "Error with poll()" << std::endl;
+			// perror("poll");
+			// std::cout << RESET << std::endl;
+			// exit(EXIT_FAILURE);
 		}
 		if(pollreturn > 0)
 		{
@@ -255,8 +255,8 @@ void Server::run()
 
 		// temporisation pour debug
 		//sleep(1); // sleep 1s
-		i++;
-	}
+		// i++;
+	// }
 }
 
 void Server::manage_poll_event()

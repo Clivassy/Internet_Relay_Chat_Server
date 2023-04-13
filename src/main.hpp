@@ -28,7 +28,6 @@
 // proto class
 class Server;
 
-
 // 30_parsing_argv
 void parsing_arguments(int ac, char **av, Server& server);
 
