@@ -21,29 +21,35 @@ bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 	{
 		channel_name = *it;
 		toLowerStr(channel_name);
-		if (this->server.getChannel(channel_name)->second.isInviteOnly)
-		{
-			this->sendMessage(ERR_INVITEONLYCHAN(this->userInfos.nickName, channel_name));
-			toReturn = false;
-		}
-		else if (channel_name.size() <= 1 || !isChannelName(channel_name))
+		if (channel_name.size() <= 1 || !isChannelName(channel_name))
 		{
 			this->sendMessage(ERR_BADCHANMASK(channel_name));
 			toReturn = false;
-		}
-		else if (this->server.getChannel(channel_name)->second.isClientBanned(this->userInfos.nickName))
-		{
-			ERR_BANNEDFROMCHAN(this->userInfos.nickName, channel_name);
 		}
 		else
 		{
 			if (!(this->server.isChannelExisting(channel_name)))
 			{
 				this->server.addChannel(channel_name);
-				this->server.getChannel(channel_name)->second.addOperator(this->userInfos.nickName);
 			}
-			this->server.getChannel(channel_name)->second.addClient(this->userInfos.nickName);
+			if (this->server.getChannel(channel_name)->second.isInviteOnly)
+			{
+				this->sendMessage(ERR_INVITEONLYCHAN(this->userInfos.nickName, channel_name));
+				toReturn = false;
+			}
+			else if (this->server.getChannel(channel_name)->second.isClientBanned(this->userInfos.nickName))
+			{
+				this->sendMessage(ERR_BANNEDFROMCHAN(this->userInfos.nickName, channel_name));
+				toReturn = false;
+			}
+			else
+			{
+				this->server.getChannel(channel_name)->second.addClient(this->userInfos.nickName);
+				if (this->server.getChannel(channel_name)->second.clientOperators.size() == 0)
+					this->server.getChannel(channel_name)->second.addOperator(this->userInfos.nickName);
+			}
 		}
+
 	}
 	return (toReturn);
 }
