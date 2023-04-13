@@ -1,6 +1,8 @@
 #include "server.hpp"
 
-Server::Server(){}
+Server::Server():
+port(-1), serverFd(-1)
+{}
 
 std::vector<pollfd>::iterator	Server::getPollfd(int fd_searched)
 {
@@ -367,7 +369,7 @@ void Server::printState()
 {
 	// server parameters
 	std::cout << BLUE_PIPE << BOLD_PURPLE << "Server parameters" << RESET << std::endl;
-	std::cout << BLUE_PIPE << PURPLE << "  port " << port << " | socketFd " << socketFd << " | serverFd " << serverFd << std::endl;
+	std::cout << BLUE_PIPE << PURPLE << "  port " << port << " | serverFd " << serverFd << std::endl;
 	std::cout << BLUE_PIPE << PURPLE << "  fdListened (fd,events,revents): "<< PURPLE << "[";
 	for (std::vector<pollfd>::iterator it=this->fdListened.begin(); it != this->fdListened.end(); it++)
 	{

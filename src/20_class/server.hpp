@@ -37,7 +37,6 @@ class Server
 	protected:
 		int								port;
 		std::string						password;
-		int								socketFd;
 		int								serverFd;
 		struct sockaddr_in				serverAddr;
 		std::vector<pollfd> 			fdListened;
