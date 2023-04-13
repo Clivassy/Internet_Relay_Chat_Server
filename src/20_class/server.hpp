@@ -51,7 +51,7 @@ class Server
 		void										set_password(std::string password);
 		std::string									get_password(void);
 		void										init();
-		void										run();
+		void										run(int i);
 		void										terminate();
 
 		// client

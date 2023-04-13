@@ -1,16 +1,16 @@
 #include "main.hpp"
 #include <signal.h>
 
-int main(int ac, char **av)
+/*int main(int ac, char **av)
 {
 	Server server;
 	parsing_arguments(ac, av, server);
 	server.init();
 	server.run();
 	server.terminate();
-}
+}*/
 
-/*bool closeServer = false;
+bool closeServer;
 
 void	handler(int signal)
 {
@@ -20,11 +20,16 @@ void	handler(int signal)
 
 int main(int ac, char **av)
 {
+	closeServer = false;
 	Server server;
 	parsing_arguments(ac, av, server);
 	signal(SIGINT, handler);
 	server.init();
-	while (closeServer == false)
-		server.run();
+	int i = 0;
+	while (!closeServer)
+	{
+		server.run(i);
+		i++;
+	}
 	server.terminate();
-}*/
+}
