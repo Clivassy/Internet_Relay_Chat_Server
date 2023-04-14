@@ -56,6 +56,14 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 					it->second.clientOperators.insert(cmd[1]);
 				}
 			}
+			for (std::set<std::string>::iterator it_client=it->second.clientBanned.begin(); it_client != it->second.clientBanned.end(); it_client++)
+			{
+				if (*it_client == this->userInfos.nickName)
+				{
+					it->second.clientBanned.erase(it_client);
+					it->second.clientBanned.insert(cmd[1]);
+				}
+			}
 		}
 		this->userInfos.nickName = cmd[1];
 		return (true);
