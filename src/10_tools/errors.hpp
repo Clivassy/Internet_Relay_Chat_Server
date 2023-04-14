@@ -79,12 +79,15 @@
 # define ERR_TOOMANYCHANNELS(nick, channel) ("405 " + nick + " " + channel + " :You have joined too many channels\r\n")
 
 # define RPL_NAMREPLY(nick, user, host, channel) ("353 =" + nick + "!" + user + "@" + host + " = " + channel + " :\r\n") // ajouter \r\n ou list des clients presents
+# define RPL_ENDOFNAMES(nick, user, host, channel) ("366 " + nick + "!" + user + "@" + host + " " + channel + " :End of NAMES list\r\n")
 
 
 # define RPL_NAMREPLY2(nick, channel) ("353 =" + channel + ":" + nick + "\r\n")
 //2e message standard recu quand on rejoint un channel
+# define RPL_ENDOFNAMES2(channel) ("366 " + channel + " :End of NAMES list\r\n")
 
-# define RPL_ENDOFNAMES(nick, user, host, channel) ("366 " + nick + "!" + user + "@" + host + " " + channel + " :End of NAMES list\r\n")
+# define RPL_LIST(channel, topic) ("322 " + channel + ":" + topic + "\r\n")
+# define RPL_LISTEND ("323 :End of List \r\n")
 //3e message standard qu on recoit quand on rejoint un channel
 
 # define RPL_INVITING(nick, user, host, invitenick, channel) ("341 " + nick + "!" + user + "@" + host + " " + invitenick + " " + channel + "\r\n")

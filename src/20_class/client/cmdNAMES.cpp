@@ -24,6 +24,7 @@ bool	Client::cmdNAMES(std::vector<std::string> &cmd)
 				{
 					this->sendMessage(RPL_NAMREPLY2(*it_client, it_channel->first));
 				}
+				this->sendMessage(this->getPrefix() + RPL_ENDOFNAMES2(it_channel->first));
 			}
 		}
 	}
