@@ -7,10 +7,12 @@ bool	Client::cmdTOPIC(std::vector<std::string> &cmd)
 		return (false);
 	if (cmd.size() < 2)
 	{
-		sendMessage(ERR_NEEDMOREPARAMS("JOIN"));
+		sendMessage(ERR_NEEDMOREPARAMS("TOPIC"));
 		return (false);
 	}
 	std::string channel = cmd[1];
+	if(!this->server.isChannelExisting(channel))
+		return (false);
 	std::string currentTopic = this->server.getChannel(channel)->second.topic;
 
 	// si 1 parametre: on renvoie le nom du topic

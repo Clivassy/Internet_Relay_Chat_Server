@@ -42,7 +42,7 @@ std::vector<pollfd>::iterator Server::getClientByFd(std::string user)
 	std::vector<Client>::iterator it;
 	for (it = this->clientList.begin(); it != this->clientList.end(); it++)
 	{
-		if (it->userInfos.nickName == user)		
+		if (it->userInfos.nickName == user)
 			break ;
 	}
 	std::vector<pollfd>::iterator its;
@@ -82,7 +82,7 @@ void Server::checkInactiveClients()
 		// --------xxx---------------xxx---------------xxxxxxx <- kill
 		// 1er check equivaut a regarder si un ping a ete envoyé (ping>pong) sinon ca veut dire qu'on a deja eu la reponse au dernier ping
 		// 2n check pour voir si le pong met trop de temps a revenir apres le dernier ping
-		if (difftime(it->lastPingSent, it->lastPongReceived) > 0 && difftime(time(0), it->lastPingSent) > WAIT_TIME_BEFORE_KILL / 1000) 
+		if (difftime(it->lastPingSent, it->lastPongReceived) > 0 && difftime(time(0), it->lastPingSent) > WAIT_TIME_BEFORE_KILL / 1000)
 		{
 			it->online = false;
 		}
@@ -91,7 +91,7 @@ void Server::checkInactiveClients()
 
 void Server::set_port(int port)
 {
-	this->port = port; 
+	this->port = port;
 }
 
 void Server::set_password(std::string password)
@@ -151,6 +151,8 @@ void	Server::removeClient(std::string name)
 		it->second.removeBanned(name);
 		it->second.removeOperator(name);
 	}
+	std::cout << BOLD_RED << "client disconnected : " << name << "\n" << RESET << std::endl;
+
 }
 
 size_t Server::nbOfClientsNotOnline()
@@ -303,7 +305,6 @@ void Server::listen_client(Client &client)
 	clear_str(client.buffer, client.bufferSize);
 	if(recv(client.socketFd, client.buffer, client.bufferSize - 1, 0) <= 0)
 	{
-		std::cout << BOLD_RED << "Error on client " << client.userInfos.nickName << "\n" << RESET << std::endl;
 		client.online = false;
 		return;
 	}
@@ -382,7 +383,7 @@ void Server::printState()
 	std::cout << RESET << std::endl;
 
 	// Clients parameters
-	// list of clients 
+	// list of clients
 	std::cout << BLUE_PIPE << BOLD_GREEN << "Clients" << RESET << std::endl;
 	std::cout << BLUE_PIPE << GREEN << "  clientList (by nickName): " << "[";
 	for (std::vector<Client>::iterator it = this->clientList.begin(); it != this->clientList.end(); it++)
@@ -393,7 +394,7 @@ void Server::printState()
 	}
 	std::cout << "]";
 	std::cout << RESET << std::endl;
-	// Clients state 
+	// Clients state
 	int i = 1;
 	for (std::vector<Client>::iterator it = this->clientList.begin(); it != this->clientList.end(); it++)
 	{
@@ -430,7 +431,7 @@ void Server::printState()
 		std::cout << "topic '" << it->second.topic << "' | ";
 		std::cout << "isInviteOnly " << PRINT_BOOL(it->second.isInviteOnly);
 		std::cout << RESET << std::endl;
-	
+
 
 		// print list of connected clients in channels
 		std::cout << BLUE_PIPE << CYAN << "  Clients in " << it->first << ": [";
@@ -446,7 +447,7 @@ void Server::printState()
 		// print list of operators in channels
 		std::cout << BLUE_PIPE << CYAN << "  Clients banned in " << it->first << ": [";
 		for (std::set<std::string>::iterator it_client=it->second.clientBanned.begin(); it_client != it->second.clientBanned.end(); it_client++)
-		{	
+		{
 			std::cout << *it_client;
 			if(++it_client != it->second.clientBanned.end())
 				std::cout << ", ";
@@ -457,7 +458,7 @@ void Server::printState()
 		// print list of operators in channels
 		std::cout << BLUE_PIPE << CYAN << "  Operators in " << it->first << ": [";
 		for (std::set<std::string>::iterator it_client=it->second.clientOperators.begin(); it_client != it->second.clientOperators.end(); it_client++)
-		{	
+		{
 			std::cout << *it_client;
 			if(++it_client != it->second.clientOperators.end())
 				std::cout << ", ";
@@ -468,17 +469,17 @@ void Server::printState()
 	std::cout << RESET << std::endl << std::endl;
 }
 
-bool operator==( Client& other, const Client& rhs) 
+bool operator==( Client& other, const Client& rhs)
 {
 	return (other.getSocketFd() == rhs.getSocketFd());
 }
 
-bool operator==( const Client& other, Client& rhs) 
+bool operator==( const Client& other, Client& rhs)
 {
 	return (other.getSocketFd() == rhs.getSocketFd());
 }
 
-bool operator==( const Client& other, const Client& rhs) 
+bool operator==( const Client& other, const Client& rhs)
 {
 	return (other.getSocketFd() == rhs.getSocketFd());
 }

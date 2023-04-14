@@ -43,8 +43,8 @@ class Client
 	friend class Server;
 	friend class Channel;
 
-	protected: 
-		struct User 
+	protected:
+		struct User
 		{
 			std::string nickName;
 			std::string userName;
@@ -75,12 +75,12 @@ class Client
 		Client(Server& serv);
 		Client& operator=(const Client&other);
 		~Client();
-		
+
 		// Command
 		bool				launchCommand(std::string command);
 		void				sendMessage(std::string str);
 		void				sendOtherClient(std::string str);
-		void				printMode(std::string user);
+		void				printMode( void );
 		bool				cmdCAP(std::vector<std::string> &cmd);
 		bool				cmdPASS(std::vector<std::string> &cmd);
 		bool				cmdUSER(std::vector<std::string> &cmd);
@@ -122,7 +122,7 @@ class Client
 
 		//-- commandeINVITE.cpp
 		bool				isValidParsingINVITE(std::vector<std::string> &cmd);
-		
+
 		//-- Getters
 		User 				getUserInfo() const;
 		int					 getSocketFd() const;

@@ -20,7 +20,7 @@
 
 # define PRIVMSG(nick, user, host, dest, str) (":" + nick + "!" + user + "@" + host + " PRIVMSG " + dest + " :" + str + "\r\n") //dest cest le nom du channel
 
-//pour envoyer 
+//pour envoyer
 
 # define NOTICE(nick, user, host, chan, str) (":" + nick + "!" + user + "@" + host + " NOTICE " + chan + " :" + str + "\r\n")
 
@@ -101,7 +101,7 @@
 
 # define ERR_CANNOTSENDTOCHAN(nick, chan) ("404 " + nick + " " + chan + " :Cannot send to channel\r\n")
 
-#define RPL_CHANNELMODEIS(nick, mode, user) (" 324 " + nick + " " + mode + " " + user + "\r\n")
+#define RPL_CHANNELMODEIS(nick, chan, mode) (" 324 " + nick + " " + chan + " " + mode + "\r\n")
 # define ERR_USERSDONTMATCH(nick) ("502 " + nick + " :Cannot change change mode for other users\r\n")
 # define RPL_UMODEIS(nick, mode, char) (" 221 " + nick + " " + mode + char + "\r\n")
 # define ERR_USERONCHANNEL(nick, invitenick, chan) ("443 " + nick + " " + invitenick + " " + chan + ":is already on channel\r\n")

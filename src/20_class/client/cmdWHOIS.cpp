@@ -1,11 +1,7 @@
 #include "client.hpp"
 
-void	Client::printMode(std::string user)
+void	Client::printMode()
 {
-	if (this->server.getChannel(this->userInfos.nickName)->second.isInviteOnly)
-		sendMessage(this->getPrefix() + RPL_CHANNELMODEIS(this->userInfos.nickName, "+i", user));
-	if (this->server.getChannel(this->userInfos.nickName)->second.clientOperators.size() > 0)
-		sendMessage(this->getPrefix() + RPL_CHANNELMODEIS(this->userInfos.nickName, "+o", user));
 	if (this->userInfos.invisibleMode)
 		sendMessage(getPrefix() + RPL_UMODEIS(this->userInfos.nickName, "+", "i"));
 	if (this->userInfos.operatorMode)
@@ -22,6 +18,6 @@ bool	Client::cmdWHOIS(std::vector<std::string> &cmd)
 		return (false);
 	}
 	sendMessage(RPL_WHOISUSER(this->userInfos.nickName, this->userInfos.userName, this->userInfos.hostName, this->userInfos.realName));
-	printMode(this->userInfos.userName);
+	printMode();
 	return (true);
 }
