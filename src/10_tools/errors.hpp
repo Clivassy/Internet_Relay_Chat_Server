@@ -78,7 +78,7 @@
 
 # define ERR_TOOMANYCHANNELS(nick, channel) ("405 " + nick + " " + channel + " :You have joined too many channels\r\n")
 
-# define RPL_NAMREPLY(nick, user, host, channel) ("353 =" + nick + "!" + user + "@" + host + " = " + channel + " :\r\n") // ajouter \r\n ou list des clients presents
+# define RPL_NAMREPLY(nick, user, host, channel) ("353 =" + nick + "!" + user + "@" + host + " = " + channel + " :") // ajouter \r\n ou list des clients presents
 # define RPL_ENDOFNAMES(nick, user, host, channel) ("366 " + nick + "!" + user + "@" + host + " " + channel + " :End of NAMES list\r\n")
 
 
