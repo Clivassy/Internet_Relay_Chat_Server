@@ -44,9 +44,9 @@ bool	Client::cmdJOIN(std::vector<std::string> &cmd)
 			}
 			else
 			{
-				this->server.getChannel(channel_name)->second.addClient(this->userInfos.nickName);
 				if (this->server.getChannel(channel_name)->second.clientOperators.size() == 0)
 					this->server.getChannel(channel_name)->second.addOperator(this->userInfos.nickName);
+				this->server.getChannel(channel_name)->second.addClient(this->userInfos.nickName);
 			}
 		}
 
