@@ -38,6 +38,25 @@ bool	Client::cmdNICK(std::vector<std::string> &cmd)
 			return (false);
 		}
 		sendMessage(NICK(this->userInfos.nickName, cmd[1]));
+		for (std::map<std::string, Channel>::iterator it=this->server.channelList.begin(); it != this->server.channelList.end(); it++)
+		{
+			for (std::set<std::string>::iterator it_client=it->second.clientConnected.begin(); it_client != it->second.clientConnected.end(); it_client++)
+			{
+				if (*it_client == this->userInfos.nickName)
+				{
+					it->second.clientConnected.erase(it_client);
+					it->second.clientConnected.insert(cmd[1]);
+				}
+			}
+			for (std::set<std::string>::iterator it_client=it->second.clientOperators.begin(); it_client != it->second.clientOperators.end(); it_client++)
+			{
+				if (*it_client == this->userInfos.nickName)
+				{
+					it->second.clientOperators.erase(it_client);
+					it->second.clientOperators.insert(cmd[1]);
+				}
+			}
+		}
 		this->userInfos.nickName = cmd[1];
 		return (true);
 	}
