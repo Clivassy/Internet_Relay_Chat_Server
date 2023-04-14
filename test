@@ -95,4 +95,4 @@ PASS lol
 NICK ju
 USER ju 0 * : ju
 
-/connect localhost 8988 lol usr1
+/connect localhost 8083 lol usr1
