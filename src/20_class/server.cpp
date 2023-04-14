@@ -330,7 +330,7 @@ void Server::terminate()
 
 bool	Server::isChannelExisting(std::string name)
 {
-	if (this->channelList.count(name) >= 1)
+	if (this->channelList.find(name) != this->channelList.end())
 		return (true);
 	return false;
 }
@@ -438,6 +438,17 @@ void Server::printState()
 		{
 			std::cout << *it_client;
 			if(++it_client != it->second.clientConnected.end())
+				std::cout << ", ";
+			--it_client;
+		}
+		std::cout << "]" << std::endl;
+
+		// print list of operators in channels
+		std::cout << BLUE_PIPE << CYAN << "  Clients banned in " << it->first << ": [";
+		for (std::set<std::string>::iterator it_client=it->second.clientBanned.begin(); it_client != it->second.clientBanned.end(); it_client++)
+		{	
+			std::cout << *it_client;
+			if(++it_client != it->second.clientBanned.end())
 				std::cout << ", ";
 			--it_client;
 		}

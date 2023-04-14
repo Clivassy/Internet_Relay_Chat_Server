@@ -11,22 +11,22 @@ Channel::~Channel(){}
 
 bool Channel::isClientOperatorChannel(std::string name)
 {
-	if (this->clientOperators.count(name) > 0)
+	if (this->clientOperators.find(name) != this->clientOperators.end())
 		return (true);
 	return false;
 }
 
 bool	Channel::isclientConnected(std::string name)
 {
-	if (this->clientConnected.count(name) > 0)
+	if (this->clientConnected.find(name) != this->clientConnected.end())
 		return (true);
 	return false;
 }
 
 bool	Channel::isClientBanned(std::string name)
 {
-	if (this->clientBanned.count(name) > 0)
-		return (true);
+	if (this->clientBanned.find(name) != this->clientBanned.end())
+			return (true);
 	return false;
 }
 
