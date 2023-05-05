@@ -70,3 +70,9 @@ Please note that the following rules and constraints apply:<br>
 - IRSSI :<br>
 <https://irssi.org/download/> <br>
 <https://www.linode.com/docs/guides/using-irssi-for-internet-relay-chat/>
+
+
+
+
+https://user-images.githubusercontent.com/76965602/236534962-2dbd8302-2de9-461b-b749-8b4995665422.mov
+
