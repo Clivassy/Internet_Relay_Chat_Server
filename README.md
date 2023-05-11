@@ -12,8 +12,8 @@ To run this program, you will need:
 - g++ compiler
 
 ## Installation
-1- Clone the repository: git clone ``https://github.com/Clivassy/ft_irc``<br>
-2- ``cd ft_irc`` <br>
+1- Clone the repository: git clone ``https://github.com/Clivassy/Internet_Relay_Chat_Server``<br>
+2- ``cd Internet_Relay_Chat_Server`` <br>
 3- Compile the code using the provided Makefile: ``make``<br>
 3- Run the server with the following command: ``./ircserv <port> <password>`` <br>
 <i>Note: Replace <port> with the port number on which the server should listen for incoming connections, and <password> with the password required for authentication.</i><br>
